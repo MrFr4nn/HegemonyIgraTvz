@@ -14,25 +14,27 @@ public class UpraviteljGlasanja {
     private KontrolePoteza kontrolePoteza;
     private XmlUpravitelj xmlUpravitelj;
     private int pozicijaGlasacaUNizu;
+    private String nazivPredlagaca;
 
     public UpraviteljGlasanja(HegemonyEngine engineIgre, KontrolePoteza kontrolePoteza, XmlUpravitelj xmlUpravitelj) {
         this.engineIgre = engineIgre;
         this.kontrolePoteza = kontrolePoteza;
         this.xmlUpravitelj = xmlUpravitelj;
         this.pozicijaGlasacaUNizu = 0;
+        this.nazivPredlagaca = "";
     }
 
     public void resetirajPoziciju() {
         pozicijaGlasacaUNizu = 0;
+        nazivPredlagaca = "";
+    }
+
+    public void zabiljeziPredlagaca(String naziv) {
+        this.nazivPredlagaca = naziv;
     }
 
     public void prikaziPanelGlasanja(VBox panelKontrolaTrenutniIgrac, Runnable akcijaPonovnogPrikaza) {
         if (engineIgre.getTrenutnoGlasanje() == null) {
-            VBox panelPrijedloga = kontrolePoteza.napraviPanelPrijedlogaZakona(
-                    () -> obradiPrijedlogZakona("Zakon o porezu", akcijaPonovnogPrikaza),
-                    () -> obradiPrijedlogZakona("Zakon o minimalnoj placi", akcijaPonovnogPrikaza)
-            );
-            panelKontrolaTrenutniIgrac.getChildren().add(panelPrijedloga);
             return;
         }
 
@@ -43,7 +45,8 @@ public class UpraviteljGlasanja {
         }
 
         List<KlasaIgraca> listaIgraca = engineIgre.getListaIgraca();
-        while (pozicijaGlasacaUNizu < listaIgraca.size() && listaIgraca.get(pozicijaGlasacaUNizu) == engineIgre.getVlada()) {
+        while (pozicijaGlasacaUNizu < listaIgraca.size()
+                && listaIgraca.get(pozicijaGlasacaUNizu).getNaziv().equals(nazivPredlagaca)) {
             pozicijaGlasacaUNizu = pozicijaGlasacaUNizu + 1;
         }
 
@@ -64,22 +67,16 @@ public class UpraviteljGlasanja {
         panelKontrolaTrenutniIgrac.getChildren().addAll(oznakaTko, panelGlasanja);
     }
 
-    private void obradiPrijedlogZakona(String nazivZakona, Runnable akcijaPonovnogPrikaza) {
+    public void obradiPrijedlogZakona(String naziviPredlagaca, String nazivZakona) {
         engineIgre.pokreniNovoGlasanje(nazivZakona);
+        zabiljeziPredlagaca(naziviPredlagaca);
         pozicijaGlasacaUNizu = 0;
-        xmlUpravitelj.dodajPotezUPovijest(engineIgre.getBrojRunde(), engineIgre.getVlada().getNaziv(),
-                "Predlozen zakon: " + nazivZakona);
-        akcijaPonovnogPrikaza.run();
+        xmlUpravitelj.dodajPotezUPovijest(engineIgre.getBrojRunde(), naziviPredlagaca, "Predlozen zakon: " + nazivZakona);
     }
 
     private void obradiGlas(String nazivIgraca, boolean glasZa, Runnable akcijaPonovnogPrikaza) {
         engineIgre.zabrojiGlasIgraca(nazivIgraca, glasZa);
-        String odluka;
-        if (glasZa) {
-            odluka = "ZA";
-        } else {
-            odluka = "PROTIV";
-        }
+        String odluka = glasZa ? "ZA" : "PROTIV";
         xmlUpravitelj.dodajPotezUPovijest(engineIgre.getBrojRunde(), nazivIgraca, "Glasao " + odluka);
         pozicijaGlasacaUNizu = pozicijaGlasacaUNizu + 1;
         akcijaPonovnogPrikaza.run();

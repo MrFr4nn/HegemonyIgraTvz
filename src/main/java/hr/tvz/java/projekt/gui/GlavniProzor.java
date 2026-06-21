@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -83,7 +84,7 @@ public class GlavniProzor {
     }
 
     private String napraviTekstFaze() {
-        return "Runda: " + engineIgre.getBrojRunde() + " | Faza: " + engineIgre.getTrenutnaFaza()
+        return "Runda: " + engineIgre.getBrojRunde() + " / 5 | Faza: " + engineIgre.getTrenutnaFaza()
                 + " | Na potezu: " + engineIgre.dohvatiIgracaNaPotezu().getNaziv();
     }
 
@@ -119,26 +120,39 @@ public class GlavniProzor {
 
     private void azurirajPanelPotezaPremaFazi() {
         panelKontrolaTrenutniIgrac.getChildren().clear();
+        String faza = engineIgre.getTrenutnaFaza();
 
-        if (engineIgre.getTrenutnaFaza().equals(HegemonyEngine.FAZA_GLASANJE)) {
+        if (faza.equals(HegemonyEngine.FAZA_PROIZVODNJA)) {
+            prikaziIzvjestaj("Faza Proizvodnje", engineIgre.obradiFazuProizvodnje());
+        } else if (faza.equals(HegemonyEngine.FAZA_POTROSNJA)) {
+            prikaziIzvjestaj("Faza Potrosnje", engineIgre.obradiFazuPotrosnje());
+        } else if (faza.equals(HegemonyEngine.FAZA_GLASANJE)) {
             upraviteljGlasanja.prikaziPanelGlasanja(panelKontrolaTrenutniIgrac, this::azurirajPanelPotezaPremaFazi);
+        } else if (faza.equals(HegemonyEngine.FAZA_KRAJ_RUNDE) || faza.equals(HegemonyEngine.FAZA_PRIPREMA)) {
+            Label oznaka = new Label("Faza " + faza + " - kliknite Sljedeca faza za nastavak.");
+            panelKontrolaTrenutniIgrac.getChildren().add(oznaka);
         } else {
             KlasaIgraca igracNaPotezu = engineIgre.dohvatiIgracaNaPotezu();
-            VBox kontrole = kontrolePoteza.napraviKontroleZaIgraca(igracNaPotezu, this::obradiPotezIgraca);
+            VBox kontrole = kontrolePoteza.napraviKontroleZaIgraca(engineIgre, igracNaPotezu,
+                    () -> upraviteljGlasanja.obradiPrijedlogZakona(igracNaPotezu.getNaziv(), "Promjena ekonomske politike"),
+                    this::obradiPotezIgraca);
             panelKontrolaTrenutniIgrac.getChildren().add(kontrole);
         }
     }
 
-    private void obradiPotezIgraca() {
-        KlasaIgraca igracNaPotezu = engineIgre.dohvatiIgracaNaPotezu();
-        xmlUpravitelj.dodajPotezUPovijest(engineIgre.getBrojRunde(), igracNaPotezu.getNaziv(), "Odigran potez");
+    private void prikaziIzvjestaj(String naslovIzvjestaja, String sadrzaj) {
+        Label naslov = new Label(naslovIzvjestaja);
+        TextArea poljeIzvjestaja = new TextArea(sadrzaj);
+        poljeIzvjestaja.setEditable(false);
+        poljeIzvjestaja.setPrefHeight(120);
+        panelKontrolaTrenutniIgrac.getChildren().addAll(naslov, poljeIzvjestaja);
+    }
 
-        upraviteljAnimacija.pokreniAsinkronoAzuriranjeEkonomije(
-                () -> System.out.println("Azuriranje ekonomskih podataka u pozadinskoj niti."),
-                () -> prikazPloce.azurirajPrikaz(engineIgre.getListaIgraca())
-        );
-        engineIgre.prebaciPotez();
-        oznakaFazeIgre.setText(napraviTekstFaze());
+    private void obradiPotezIgraca() {
+        prikazPloce.azurirajPrikaz(engineIgre.getListaIgraca());
+        if (engineIgre.jeIgracNaPotezuOdigraoSveApove()) {
+            engineIgre.prebaciPotez();
+        }
         azurirajPanelPotezaPremaFazi();
     }
 
