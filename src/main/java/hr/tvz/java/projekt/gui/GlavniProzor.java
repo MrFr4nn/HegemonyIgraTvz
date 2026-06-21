@@ -3,6 +3,7 @@ package hr.tvz.java.projekt.gui;
 import hr.tvz.java.projekt.logika.HegemonyEngine;
 import hr.tvz.java.projekt.model.KlasaIgraca;
 import hr.tvz.java.projekt.util.Serijalizator;
+import hr.tvz.java.projekt.util.XmlUpravitelj;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -25,12 +26,14 @@ public class GlavniProzor {
     private UpraviteljAnimacija upraviteljAnimacija;
     private Serijalizator serijalizator;
     private UpraviteljTehnickeAnalize upraviteljTehnickeAnalize;
+    private XmlUpravitelj xmlUpravitelj;
+    private UpraviteljReplay upraviteljReplay;
+    private UpraviteljGlasanja upraviteljGlasanja;
 
     private BorderPane korijenskiLayout;
     private VBox panelKontrolaTrenutniIgrac;
     private Label oznakaFazeIgre;
     private Label oznakaAnimacije;
-    private int pozicijaGlasacaUNizu;
 
     public GlavniProzor(Stage glavnaScena, List<KlasaIgraca> listaIgraca) {
         this.glavnaScena = glavnaScena;
@@ -40,7 +43,10 @@ public class GlavniProzor {
         this.upraviteljAnimacija = new UpraviteljAnimacija();
         this.serijalizator = new Serijalizator();
         this.upraviteljTehnickeAnalize = new UpraviteljTehnickeAnalize(serijalizator);
-        this.pozicijaGlasacaUNizu = 0;
+        this.xmlUpravitelj = new XmlUpravitelj();
+        this.xmlUpravitelj.pokreniNovuPovijest();
+        this.upraviteljReplay = new UpraviteljReplay(xmlUpravitelj);
+        this.upraviteljGlasanja = new UpraviteljGlasanja(engineIgre, kontrolePoteza, xmlUpravitelj);
     }
 
     public void prikaziProzor() {
@@ -91,7 +97,10 @@ public class GlavniProzor {
         Button gumbTehnickaAnaliza = new Button("Tehnicka usporedba");
         gumbTehnickaAnaliza.setOnAction(dogadjaj -> upraviteljTehnickeAnalize.otvoriProzorAnalize());
 
-        VBox blokGumbova = new VBox(8, gumbSljedecaFaza, gumbSpremiStanje, gumbTehnickaAnaliza);
+        Button gumbReplay = new Button("Pokreni Replay");
+        gumbReplay.setOnAction(dogadjaj -> upraviteljReplay.otvoriProzorReplaya());
+
+        VBox blokGumbova = new VBox(8, gumbSljedecaFaza, gumbSpremiStanje, gumbTehnickaAnaliza, gumbReplay);
 
         donjiPanel.getChildren().addAll(panelKontrolaTrenutniIgrac, blokGumbova);
         return donjiPanel;
@@ -101,7 +110,7 @@ public class GlavniProzor {
         panelKontrolaTrenutniIgrac.getChildren().clear();
 
         if (engineIgre.getTrenutnaFaza().equals(HegemonyEngine.FAZA_GLASANJE)) {
-            prikaziPanelGlasanja();
+            upraviteljGlasanja.prikaziPanelGlasanja(panelKontrolaTrenutniIgrac, this::azurirajPanelPotezaPremaFazi);
         } else {
             KlasaIgraca igracNaPotezu = engineIgre.dohvatiIgracaNaPotezu();
             VBox kontrole = kontrolePoteza.napraviKontroleZaIgraca(igracNaPotezu, this::obradiPotezIgraca);
@@ -109,57 +118,10 @@ public class GlavniProzor {
         }
     }
 
-    private void prikaziPanelGlasanja() {
-        if (engineIgre.getTrenutnoGlasanje() == null) {
-            VBox panelPrijedloga = kontrolePoteza.napraviPanelPrijedlogaZakona(
-                    () -> obradiPrijedlogZakona("Zakon o porezu"),
-                    () -> obradiPrijedlogZakona("Zakon o minimalnoj placi")
-            );
-            panelKontrolaTrenutniIgrac.getChildren().add(panelPrijedloga);
-            return;
-        }
-
-        if (engineIgre.getTrenutnoGlasanje().isGlasanjeZavrseno()) {
-            Label oznakaIshoda = new Label(engineIgre.getTrenutnoGlasanje().ispisiRezultatGlasanja());
-            panelKontrolaTrenutniIgrac.getChildren().add(oznakaIshoda);
-            return;
-        }
-
-        List<KlasaIgraca> listaIgraca = engineIgre.getListaIgraca();
-        while (pozicijaGlasacaUNizu < listaIgraca.size() && listaIgraca.get(pozicijaGlasacaUNizu) == engineIgre.getVlada()) {
-            pozicijaGlasacaUNizu = pozicijaGlasacaUNizu + 1;
-        }
-
-        if (pozicijaGlasacaUNizu >= listaIgraca.size()) {
-            engineIgre.zatvoriTrenutnoGlasanje();
-            azurirajPanelPotezaPremaFazi();
-            return;
-        }
-
-        KlasaIgraca trenutniGlasac = listaIgraca.get(pozicijaGlasacaUNizu);
-        VBox panelGlasanja = kontrolePoteza.napraviPanelGlasanja(
-                engineIgre.getTrenutnoGlasanje().getNazivZakona(),
-                () -> obradiGlas(trenutniGlasac.getNaziv(), true),
-                () -> obradiGlas(trenutniGlasac.getNaziv(), false)
-        );
-        Label oznakaTko = new Label("Glasa: " + trenutniGlasac.getNaziv());
-        panelKontrolaTrenutniIgrac.getChildren().clear();
-        panelKontrolaTrenutniIgrac.getChildren().addAll(oznakaTko, panelGlasanja);
-    }
-
-    private void obradiPrijedlogZakona(String nazivZakona) {
-        engineIgre.pokreniNovoGlasanje(nazivZakona);
-        pozicijaGlasacaUNizu = 0;
-        azurirajPanelPotezaPremaFazi();
-    }
-
-    private void obradiGlas(String nazivIgraca, boolean glasZa) {
-        engineIgre.zabrojiGlasIgraca(nazivIgraca, glasZa);
-        pozicijaGlasacaUNizu = pozicijaGlasacaUNizu + 1;
-        azurirajPanelPotezaPremaFazi();
-    }
-
     private void obradiPotezIgraca() {
+        KlasaIgraca igracNaPotezu = engineIgre.dohvatiIgracaNaPotezu();
+        xmlUpravitelj.dodajPotezUPovijest(engineIgre.getBrojRunde(), igracNaPotezu.getNaziv(), "Odigran potez");
+
         upraviteljAnimacija.pokreniAsinkronoAzuriranjeEkonomije(
                 () -> System.out.println("Azuriranje ekonomskih podataka u pozadinskoj niti."),
                 () -> prikazPloce.azurirajPrikaz(engineIgre.getListaIgraca())
@@ -175,6 +137,7 @@ public class GlavniProzor {
 
         if (engineIgre.getTrenutnaFaza().equals(HegemonyEngine.FAZA_PRIPREMA)) {
             upraviteljAnimacija.pokreniAnimacijuDonosenjaZakona(oznakaAnimacije, "Nova runda zapoceta");
+            upraviteljGlasanja.resetirajPoziciju();
         }
 
         prikazPloce.azurirajPrikaz(engineIgre.getListaIgraca());
