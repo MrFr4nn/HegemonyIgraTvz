@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -85,7 +86,11 @@ public class PocetniEkran {
         korijenskiLayout.getChildren().addAll(naslov, podnaslov, panelBrojaIgraca, oznakaBrojacaPopunjenosti,
                 panelIzbornikaUloga, oznakaSazetka, gumbZapocni);
 
-        Scene scenaPocetnogEkrana = new Scene(korijenskiLayout, 1000, 780);
+        ScrollPane skrolniPanel = new ScrollPane(korijenskiLayout);
+        skrolniPanel.setFitToWidth(true);
+        skrolniPanel.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
+
+        Scene scenaPocetnogEkrana = new Scene(skrolniPanel, 1000, 780);
         glavnaScena.setTitle("Hegemony - Postavke igre");
         glavnaScena.setScene(scenaPocetnogEkrana);
         glavnaScena.show();
