@@ -1,5 +1,4 @@
 package hr.tvz.java.projekt.gui;
-
 import hr.tvz.java.projekt.logika.HegemonyEngine;
 import hr.tvz.java.projekt.model.KlasaIgraca;
 import hr.tvz.java.projekt.util.Serijalizator;
@@ -15,7 +14,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
 import java.util.List;
 
 public class GlavniProzor {
@@ -34,6 +32,7 @@ public class GlavniProzor {
     private BorderPane korijenskiLayout;
     private VBox panelKontrolaTrenutniIgrac;
     private Label oznakaFazeIgre;
+    private Label oznakaApBrojaca;
     private Label oznakaAnimacije;
 
     public GlavniProzor(Stage glavnaScena, List<KlasaIgraca> listaIgraca) {
@@ -76,16 +75,31 @@ public class GlavniProzor {
         oznakaFazeIgre = new Label(napraviTekstFaze());
         oznakaFazeIgre.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 12px; -fx-text-fill: #3A332B;");
 
+        oznakaApBrojaca = new Label(napraviTekstApBrojaca());
+        azurirajStilApBrojaca();
+
         oznakaAnimacije = new Label("Spremno za pocetak igre.");
         oznakaAnimacije.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 11px; -fx-text-fill: #6B6357;");
 
-        gornjiPanel.getChildren().addAll(naslov, oznakaFazeIgre, oznakaAnimacije);
+        gornjiPanel.getChildren().addAll(naslov, oznakaFazeIgre, oznakaApBrojaca, oznakaAnimacije);
         return gornjiPanel;
     }
 
     private String napraviTekstFaze() {
         return "Runda: " + engineIgre.getBrojRunde() + " / 5 | Faza: " + engineIgre.getTrenutnaFaza()
                 + " | Na potezu: " + engineIgre.dohvatiIgracaNaPotezu().getNaziv();
+    }
+
+    private String napraviTekstApBrojaca() {
+        if (!engineIgre.getTrenutnaFaza().equals(HegemonyEngine.FAZA_AKCIJA)) {
+            return "";
+        }
+        return "Akcijski bodovi (AP) preostalo: " + engineIgre.dohvatiPreostaleApTrenutnogIgraca() + " / 5";
+    }
+
+    private void azurirajStilApBrojaca() {
+        String boja = StilGumba.dohvatiBojuKlase(engineIgre.dohvatiIgracaNaPotezu());
+        oznakaApBrojaca.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: " + boja + ";");
     }
 
     private HBox napraviDonjiPanel() {
@@ -117,10 +131,11 @@ public class GlavniProzor {
         donjiPanel.getChildren().addAll(panelKontrolaTrenutniIgrac, blokGumbova);
         return donjiPanel;
     }
-
     private void azurirajPanelPotezaPremaFazi() {
         panelKontrolaTrenutniIgrac.getChildren().clear();
         String faza = engineIgre.getTrenutnaFaza();
+        oznakaApBrojaca.setText(napraviTekstApBrojaca());
+        azurirajStilApBrojaca();
 
         if (faza.equals(HegemonyEngine.FAZA_PROIZVODNJA)) {
             prikaziIzvjestaj("Faza Proizvodnje", engineIgre.obradiFazuProizvodnje());
@@ -139,7 +154,6 @@ public class GlavniProzor {
             panelKontrolaTrenutniIgrac.getChildren().add(kontrole);
         }
     }
-
     private void prikaziIzvjestaj(String naslovIzvjestaja, String sadrzaj) {
         Label naslov = new Label(naslovIzvjestaja);
         TextArea poljeIzvjestaja = new TextArea(sadrzaj);
@@ -147,15 +161,14 @@ public class GlavniProzor {
         poljeIzvjestaja.setPrefHeight(120);
         panelKontrolaTrenutniIgrac.getChildren().addAll(naslov, poljeIzvjestaja);
     }
-
     private void obradiPotezIgraca() {
         prikazPloce.azurirajPrikaz(engineIgre.getListaIgraca());
+        oznakaApBrojaca.setText(napraviTekstApBrojaca());
         if (engineIgre.jeIgracNaPotezuOdigraoSveApove()) {
             engineIgre.prebaciPotez();
         }
         azurirajPanelPotezaPremaFazi();
     }
-
     private void obradiSljedecuFazu() {
         engineIgre.prebaciNaSljedecuFazu();
         oznakaFazeIgre.setText(napraviTekstFaze());
@@ -164,7 +177,6 @@ public class GlavniProzor {
             upraviteljAnimacija.pokreniAnimacijuDonosenjaZakona(oznakaAnimacije, "Nova runda zapoceta");
             upraviteljGlasanja.resetirajPoziciju();
         }
-
         prikazPloce.azurirajPrikaz(engineIgre.getListaIgraca());
         azurirajPanelPotezaPremaFazi();
 
@@ -172,7 +184,6 @@ public class GlavniProzor {
             prikaziObavijestKraja();
         }
     }
-
     private void prikaziObavijestKraja() {
         Alert obavijest = new Alert(Alert.AlertType.INFORMATION);
         obavijest.setTitle("Kraj igre");

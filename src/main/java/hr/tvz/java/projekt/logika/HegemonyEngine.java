@@ -103,6 +103,10 @@ public class HegemonyEngine {
         return redoslijedPoteza.jeIgracNaPotezuOdigraoSveApove();
     }
 
+    public int dohvatiPreostaleApTrenutnogIgraca() {
+        return redoslijedPoteza.dohvatiApSustavTrenutnogIgraca().getPreostaliAp();
+    }
+
     public void obradiKrajRunde() {
         int brojac = 0;
         while (brojac < listaIgraca.size()) {

@@ -10,7 +10,6 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
@@ -21,12 +20,13 @@ public class KontrolePoteza {
 
         VBox panelKontrola = new VBox(8);
         panelKontrola.setPadding(new Insets(15));
+        StilGumba.primijeniObrubAktivneKlase(panelKontrola, igrac);
 
-        Label naslovPanela = napraviNaslovPanela("Potezi - " + odrediNazivUloge(igrac), odrediBoju(igrac));
-        Label oznakaAp = new Label("Preostalo akcijskih bodova ove runde gleda se kroz limite gumbova.");
-        oznakaAp.setStyle("-fx-font-size: 10px; -fx-text-fill: #6B6357;");
+        Label naslovPanela = new Label(odrediNazivUloge(igrac).toUpperCase() + " - AKCIJSKA FAZA");
+        naslovPanela.setFont(Font.font("Georgia", FontWeight.BOLD, 13));
+        naslovPanela.setStyle("-fx-text-fill: " + StilGumba.dohvatiBojuKlase(igrac) + ";");
 
-        panelKontrola.getChildren().addAll(naslovPanela, oznakaAp);
+        panelKontrola.getChildren().add(naslovPanela);
 
         if (igrac instanceof RadnickaKlasa) {
             dodajGumboveRadnicke(panelKontrola, engineIgre, (RadnickaKlasa) igrac, akcijaPonovnogPrikaza);
@@ -38,7 +38,7 @@ public class KontrolePoteza {
             dodajGumboveVlade(panelKontrola, engineIgre, (Vlada) igrac, akcijaPonovnogPrikaza);
         }
 
-        dodajGumbPrijedlogaZakona(panelKontrola, engineIgre, akcijaPrijedlog);
+        dodajGumbPrijedlogaZakona(panelKontrola, engineIgre, igrac, akcijaPrijedlog);
         return panelKontrola;
     }
 
@@ -64,56 +64,56 @@ public class KontrolePoteza {
     }
 
     private void dodajGumboveRadnicke(VBox panel, HegemonyEngine engineIgre, RadnickaKlasa radnickaKlasa, Runnable akcija) {
-        dodajAkcijskiGumb(panel, engineIgre, "Zapošljavanje", "Zaposljavanje", () -> {
+        dodajAkcijskiGumb(panel, engineIgre, radnickaKlasa, "Zaposljavanje", "Zaposljavanje", () -> {
             radnickaKlasa.zaposliRadnika(1);
             akcija.run();
         });
-        dodajAkcijskiGumb(panel, engineIgre, "Obrazovanje (trosak 10)", "Obrazovanje", () -> {
+        dodajAkcijskiGumb(panel, engineIgre, radnickaKlasa, "Obrazovanje (trosak 10)", "Obrazovanje", () -> {
             radnickaKlasa.investirajUObrazovanje(10);
             akcija.run();
         });
-        dodajAkcijskiGumb(panel, engineIgre, "Sindikalni prosvjed (Strajk)", "Strajk", () -> {
+        dodajAkcijskiGumb(panel, engineIgre, radnickaKlasa, "Sindikalni prosvjed (Strajk)", "Strajk", () -> {
             radnickaKlasa.pokreniStrajk();
             akcija.run();
         });
     }
 
     private void dodajGumboveSrednje(VBox panel, HegemonyEngine engineIgre, SrednjaKlasa srednjaKlasa, Runnable akcija) {
-        dodajAkcijskiGumb(panel, engineIgre, "Otvori poduzece (trosak 15)", "OtvoriPoduzece", () -> {
+        dodajAkcijskiGumb(panel, engineIgre, srednjaKlasa, "Otvori poduzece (trosak 15)", "OtvoriPoduzece", () -> {
             srednjaKlasa.otvoriNovoPoduzece(15.0);
             akcija.run();
         });
-        dodajAkcijskiGumb(panel, engineIgre, "Obrazovanje (trosak 10)", "ObrazovanjeSrednja", () -> {
+        dodajAkcijskiGumb(panel, engineIgre, srednjaKlasa, "Obrazovanje (trosak 10)", "ObrazovanjeSrednja", () -> {
             srednjaKlasa.investirajUObrazovanje(10);
             akcija.run();
         });
     }
 
     private void dodajGumboveKapitalisticke(VBox panel, HegemonyEngine engineIgre, KapitalistickaKlasa kapitalist, Runnable akcija) {
-        dodajAkcijskiGumb(panel, engineIgre, "Investicija - Izgradi tvornicu (50)", "IzgradiTvornicu", () -> {
+        dodajAkcijskiGumb(panel, engineIgre, kapitalist, "Investicija - Izgradi tvornicu (50)", "IzgradiTvornicu", () -> {
             kapitalist.izgradiTvornicu(50.0);
             akcija.run();
         });
-        dodajAkcijskiGumb(panel, engineIgre, "Lobiranje (trosak 30)", "Lobiranje", () -> {
+        dodajAkcijskiGumb(panel, engineIgre, kapitalist, "Lobiranje (trosak 30)", "Lobiranje", () -> {
             kapitalist.ulozUInvesticiju(30.0);
             akcija.run();
         });
     }
 
     private void dodajGumboveVlade(VBox panel, HegemonyEngine engineIgre, Vlada vlada, Runnable akcija) {
-        dodajAkcijskiGumb(panel, engineIgre, "Javne investicije", "JavneInvesticije", () -> {
+        dodajAkcijskiGumb(panel, engineIgre, vlada, "Javne investicije", "JavneInvesticije", () -> {
             vlada.povecajLegitimnost(5);
             akcija.run();
         });
-        dodajAkcijskiGumb(panel, engineIgre, "Socijalni paket (trosak 15)", "SocijalniPaket", () -> {
+        dodajAkcijskiGumb(panel, engineIgre, vlada, "Socijalni paket (trosak 15)", "SocijalniPaket", () -> {
             vlada.isplatiSubvenciju(15.0);
             akcija.run();
         });
     }
 
-    private void dodajGumbPrijedlogaZakona(VBox panel, HegemonyEngine engineIgre, Runnable akcijaPrijedlog) {
+    private void dodajGumbPrijedlogaZakona(VBox panel, HegemonyEngine engineIgre, KlasaIgraca igrac, Runnable akcijaPrijedlog) {
         Button gumbPrijedlog = new Button("Politicki pritisak - Predlozi zakon");
-        StilGumba.primijeniNaglaseni(gumbPrijedlog);
+        StilGumba.primijeniAkcijskiGumb(gumbPrijedlog, igrac);
         if (!engineIgre.jeAkcijaDostupnaTrenutnomIgracu("PrijedlogZakona")) {
             gumbPrijedlog.setDisable(true);
         }
@@ -125,11 +125,11 @@ public class KontrolePoteza {
         panel.getChildren().add(gumbPrijedlog);
     }
 
-    private void dodajAkcijskiGumb(VBox panel, HegemonyEngine engineIgre, String tekst, String nazivAkcije, Runnable efekt) {
-        int preostalo = engineIgre.jeAkcijaDostupnaTrenutnomIgracu(nazivAkcije) ? 1 : 0;
-        Button gumb = new Button(tekst + (preostalo == 0 ? " (iskoristeno)" : ""));
-        StilGumba.primijeniPozitivni(gumb);
-        if (preostalo == 0) {
+    private void dodajAkcijskiGumb(VBox panel, HegemonyEngine engineIgre, KlasaIgraca igrac, String tekst, String nazivAkcije, Runnable efekt) {
+        boolean dostupna = engineIgre.jeAkcijaDostupnaTrenutnomIgracu(nazivAkcije);
+        Button gumb = new Button(tekst + (!dostupna ? " (iskoristeno)" : ""));
+        StilGumba.primijeniAkcijskiGumb(gumb, igrac);
+        if (!dostupna) {
             gumb.setDisable(true);
         }
         gumb.setOnAction(dogadjaj -> {
@@ -138,13 +138,6 @@ public class KontrolePoteza {
             }
         });
         panel.getChildren().add(gumb);
-    }
-
-    private Label napraviNaslovPanela(String tekst, String bojaHex) {
-        Label naslov = new Label(tekst);
-        naslov.setFont(Font.font("Georgia", FontWeight.BOLD, 14));
-        naslov.setTextFill(Color.web(bojaHex));
-        return naslov;
     }
 
     private String odrediNazivUloge(KlasaIgraca igrac) {
@@ -159,23 +152,12 @@ public class KontrolePoteza {
         }
     }
 
-    private String odrediBoju(KlasaIgraca igrac) {
-        if (igrac instanceof RadnickaKlasa) {
-            return "#B0413E";
-        } else if (igrac instanceof SrednjaKlasa) {
-            return "#C9A227";
-        } else if (igrac instanceof KapitalistickaKlasa) {
-            return "#2E6E8E";
-        } else {
-            return "#454B52";
-        }
-    }
-
     public VBox napraviPanelGlasanja(String nazivZakona, Runnable akcijaZa, Runnable akcijaProtiv) {
         VBox panelKontrola = new VBox(8);
         panelKontrola.setPadding(new Insets(15));
 
-        Label naslovPanela = napraviNaslovPanela("Glasajte o zakonu: " + nazivZakona, "#2B2520");
+        Label naslovPanela = new Label("Glasajte o zakonu: " + nazivZakona);
+        naslovPanela.setFont(Font.font("Georgia", FontWeight.BOLD, 14));
 
         Button gumbZa = new Button("ZA");
         StilGumba.primijeniPozitivni(gumbZa);
