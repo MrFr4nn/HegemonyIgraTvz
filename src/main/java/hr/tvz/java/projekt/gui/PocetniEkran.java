@@ -25,7 +25,7 @@ public class PocetniEkran {
     private Stage glavnaScena;
     private Consumer<List<KlasaIgraca>> akcijaPoOdabiru;
     private ProvjeraOdabira provjeraOdabira;
-    private KreatorKarticeUloge kreatorKartice;
+    private KreatorKarticeUloge kreatorKarticeUloge;
     private int odabraniBrojIgraca;
     private List<String> odabraneUlogePoPoziciji;
     private List<HBox> redoviPozicija;
@@ -38,7 +38,7 @@ public class PocetniEkran {
         this.glavnaScena = glavnaScena;
         this.akcijaPoOdabiru = akcijaPoOdabiru;
         this.provjeraOdabira = new ProvjeraOdabira();
-        this.kreatorKartice = new KreatorKarticeUloge();
+        this.kreatorKarticeUloge = new KreatorKarticeUloge();
         this.odabraniBrojIgraca = 2;
         this.odabraneUlogePoPoziciji = new ArrayList<>();
         this.redoviPozicija = new ArrayList<>();
@@ -141,7 +141,7 @@ public class PocetniEkran {
             String svgIkona = dohvatiSvgZaUlogu(brojac);
             boolean odabrana = odabraneUlogePoPoziciji.get(pozicija).equals(nazivUloge);
 
-            VBox kartica = kreatorKartice.napraviKarticu(nazivUloge, bojaHex, svgIkona, odabrana);
+            VBox kartica = kreatorKarticeUloge.napraviKarticu(nazivUloge, bojaHex, svgIkona, odabrana);
             kartica.setOnMouseClicked(dogadjaj -> {
                 odabraneUlogePoPoziciji.set(pozicija, nazivUloge);
                 azurirajIzbornikeUloga();
@@ -156,13 +156,13 @@ public class PocetniEkran {
 
     private String dohvatiSvgZaUlogu(int indeks) {
         if (indeks == 0) {
-            return kreatorKartice.dohvatiIkonuRadnicke();
+            return kreatorKarticeUloge.dohvatiIkonuRadnicke();
         } else if (indeks == 1) {
-            return kreatorKartice.dohvatiIkonuSrednje();
+            return kreatorKarticeUloge.dohvatiIkonuSrednje();
         } else if (indeks == 2) {
-            return kreatorKartice.dohvatiIkonuKapitalisticke();
+            return kreatorKarticeUloge.dohvatiIkonuKapitalisticke();
         } else {
-            return kreatorKartice.dohvatiIkonuVlade();
+            return kreatorKarticeUloge.dohvatiIkonuVlade();
         }
     }
 
