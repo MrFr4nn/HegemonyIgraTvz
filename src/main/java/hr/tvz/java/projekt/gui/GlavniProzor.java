@@ -67,10 +67,16 @@ public class GlavniProzor {
         VBox gornjiPanel = new VBox(8);
         gornjiPanel.setAlignment(Pos.CENTER);
         gornjiPanel.setPadding(new Insets(10));
+        gornjiPanel.setStyle("-fx-background-color: #EFE7D8;");
 
         Label naslov = new Label("HEGEMONY: LEAD YOUR CLASS TO VICTORY");
+        naslov.setStyle("-fx-font-family: 'Georgia'; -fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #2B2520;");
+
         oznakaFazeIgre = new Label(napraviTekstFaze());
+        oznakaFazeIgre.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 12px; -fx-text-fill: #3A332B;");
+
         oznakaAnimacije = new Label("Spremno za pocetak igre.");
+        oznakaAnimacije.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 11px; -fx-text-fill: #6B6357;");
 
         gornjiPanel.getChildren().addAll(naslov, oznakaFazeIgre, oznakaAnimacije);
         return gornjiPanel;
@@ -84,20 +90,25 @@ public class GlavniProzor {
     private HBox napraviDonjiPanel() {
         HBox donjiPanel = new HBox(20);
         donjiPanel.setAlignment(Pos.CENTER);
-        donjiPanel.setPadding(new Insets(10));
+        donjiPanel.setPadding(new Insets(15));
+        donjiPanel.setStyle("-fx-background-color: #E3D9C4;");
 
         panelKontrolaTrenutniIgrac = new VBox();
 
         Button gumbSljedecaFaza = new Button("Sljedeca faza");
+        StilGumba.primijeniNaglaseni(gumbSljedecaFaza);
         gumbSljedecaFaza.setOnAction(dogadjaj -> obradiSljedecuFazu());
 
         Button gumbSpremiStanje = new Button("Spremi stanje");
+        StilGumba.primijeniNeutralni(gumbSpremiStanje);
         gumbSpremiStanje.setOnAction(dogadjaj -> serijalizator.spremiStanje(engineIgre.getListaIgraca()));
 
         Button gumbTehnickaAnaliza = new Button("Tehnicka usporedba");
+        StilGumba.primijeniNeutralni(gumbTehnickaAnaliza);
         gumbTehnickaAnaliza.setOnAction(dogadjaj -> upraviteljTehnickeAnalize.otvoriProzorAnalize());
 
         Button gumbReplay = new Button("Pokreni Replay");
+        StilGumba.primijeniNeutralni(gumbReplay);
         gumbReplay.setOnAction(dogadjaj -> upraviteljReplay.otvoriProzorReplaya());
 
         VBox blokGumbova = new VBox(8, gumbSljedecaFaza, gumbSpremiStanje, gumbTehnickaAnaliza, gumbReplay);
