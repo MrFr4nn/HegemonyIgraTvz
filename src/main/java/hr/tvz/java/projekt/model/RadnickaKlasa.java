@@ -9,6 +9,7 @@ public class RadnickaKlasa extends KlasaIgraca {
     private int kolicinaHrane;
     private int razinaObrazovanja;
     private int standardZivota;
+    private boolean jeUStrajku;
 
     public RadnickaKlasa(String naziv) {
         super(naziv);
@@ -17,6 +18,7 @@ public class RadnickaKlasa extends KlasaIgraca {
         this.kolicinaHrane = 20;
         this.razinaObrazovanja = 1;
         this.standardZivota = 50;
+        this.jeUStrajku = false;
     }
 
     @Override
@@ -36,7 +38,8 @@ public class RadnickaKlasa extends KlasaIgraca {
         tekst = tekst + "Zaposleni radnici: " + zaposleniRadnici + "\n";
         tekst = tekst + "Kolicina hrane: " + kolicinaHrane + "\n";
         tekst = tekst + "Razina obrazovanja: " + razinaObrazovanja + "\n";
-        tekst = tekst + "Standard zivota: " + standardZivota;
+        tekst = tekst + "Standard zivota: " + standardZivota + "\n";
+        tekst = tekst + "U strajku: " + jeUStrajku;
         return tekst;
     }
 
@@ -50,6 +53,24 @@ public class RadnickaKlasa extends KlasaIgraca {
         boolean placaDobra = vlada.getMinimalnaPlaca() >= 6.0;
         boolean porezDobar = vlada.getStopaPoreza() <= 0.25;
         return placaDobra && porezDobar;
+    }
+
+    public void pokreniStrajk() {
+        if (jeUStrajku) {
+            System.out.println("Radnicka klasa je vec u strajku.");
+        } else {
+            jeUStrajku = true;
+            System.out.println("Radnicka klasa je pokrenula strajk, proizvodnja je zaustavljena.");
+        }
+    }
+
+    public void prekiniStrajk() {
+        if (jeUStrajku) {
+            jeUStrajku = false;
+            System.out.println("Strajk je zavrsen, radnici se vracaju na posao.");
+        } else {
+            System.out.println("Radnicka klasa trenutno nije u strajku.");
+        }
     }
 
     public void azurirajStandardZivota() {
@@ -67,6 +88,10 @@ public class RadnickaKlasa extends KlasaIgraca {
         double stopaNezaposlenosti = izracunajStopuNezaposlenosti();
         if (stopaNezaposlenosti > 0.4) {
             privremena = privremena - 8;
+        }
+
+        if (jeUStrajku) {
+            privremena = privremena - 5;
         }
 
         if (privremena > 100) {
@@ -158,5 +183,9 @@ public class RadnickaKlasa extends KlasaIgraca {
 
     public void setStandardZivota(int standardZivota) {
         this.standardZivota = standardZivota;
+    }
+
+    public boolean isJeUStrajku() {
+        return jeUStrajku;
     }
 }
