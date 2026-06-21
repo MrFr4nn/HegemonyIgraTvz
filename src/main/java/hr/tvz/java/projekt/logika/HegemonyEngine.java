@@ -1,6 +1,7 @@
 package hr.tvz.java.projekt.logika;
 
 import hr.tvz.java.projekt.model.KlasaIgraca;
+import hr.tvz.java.projekt.model.SrednjaKlasa;
 import hr.tvz.java.projekt.model.Vlada;
 
 import java.util.ArrayList;
@@ -10,6 +11,8 @@ public class HegemonyEngine {
 
     public static final String FAZA_PRIPREMA = "PRIPREMA";
     public static final String FAZA_AKCIJA = "AKCIJA";
+    public static final String FAZA_PROIZVODNJA = "PROIZVODNJA";
+    public static final String FAZA_POTROSNJA = "POTROSNJA";
     public static final String FAZA_GLASANJE = "GLASANJE";
     public static final String FAZA_KRAJ_RUNDE = "KRAJ_RUNDE";
 
@@ -19,10 +22,10 @@ public class HegemonyEngine {
     private int brojRunde;
     private RedoslijedPoteza redoslijedPoteza;
     private SinkronizatorGlasanja sinkronizatorGlasanja;
+    private ObradaProizvodnje obradaProizvodnje;
     private boolean igraZavrsena;
     private Glasanje trenutnoGlasanje;
-    private static final int MAKSIMALNI_BROJ_RUNDI = 10;
-    private static final int BODOVI_ZA_POBJEDU = 5;
+    private static final int MAKSIMALNI_BROJ_RUNDI = 5;
 
     public HegemonyEngine(List<KlasaIgraca> listaIgraca) {
         this.listaIgraca = listaIgraca;
@@ -31,19 +34,16 @@ public class HegemonyEngine {
         this.igraZavrsena = false;
         this.redoslijedPoteza = new RedoslijedPoteza(listaIgraca);
         this.sinkronizatorGlasanja = new SinkronizatorGlasanja(listaIgraca.size());
-        this.vlada = pronadjiVladu();
-    }
-
-    private Vlada pronadjiVladu() {
+        this.obradaProizvodnje = new ObradaProizvodnje();
+        Vlada pronadjenaVlada = null;
         int brojac = 0;
         while (brojac < listaIgraca.size()) {
-            KlasaIgraca trenutniIgrac = listaIgraca.get(brojac);
-            if (trenutniIgrac instanceof Vlada) {
-                return (Vlada) trenutniIgrac;
+            if (listaIgraca.get(brojac) instanceof Vlada) {
+                pronadjenaVlada = (Vlada) listaIgraca.get(brojac);
             }
             brojac = brojac + 1;
         }
-        return null;
+        this.vlada = pronadjenaVlada;
     }
 
     public void pokreniNovuRundu() {
@@ -59,7 +59,14 @@ public class HegemonyEngine {
         if (trenutnaFaza.equals(FAZA_PRIPREMA)) {
             trenutnaFaza = FAZA_AKCIJA;
         } else if (trenutnaFaza.equals(FAZA_AKCIJA)) {
+            trenutnaFaza = FAZA_PROIZVODNJA;
+        } else if (trenutnaFaza.equals(FAZA_PROIZVODNJA)) {
+            trenutnaFaza = FAZA_POTROSNJA;
+        } else if (trenutnaFaza.equals(FAZA_POTROSNJA) && trenutnoGlasanje != null) {
             trenutnaFaza = FAZA_GLASANJE;
+        } else if (trenutnaFaza.equals(FAZA_POTROSNJA)) {
+            trenutnaFaza = FAZA_KRAJ_RUNDE;
+            obradiKrajRunde();
         } else if (trenutnaFaza.equals(FAZA_GLASANJE)) {
             trenutnaFaza = FAZA_KRAJ_RUNDE;
             obradiKrajRunde();
@@ -68,32 +75,55 @@ public class HegemonyEngine {
         }
     }
 
+    public String obradiFazuProizvodnje() {
+        return obradaProizvodnje.obradiFazuProizvodnje(listaIgraca);
+    }
+
+    public String obradiFazuPotrosnje() {
+        return obradaProizvodnje.obradiFazuPotrosnje(listaIgraca);
+    }
+
+    public boolean iskoristiAkcijuTrenutnogIgraca(String nazivAkcije) {
+        return redoslijedPoteza.dohvatiApSustavTrenutnogIgraca().iskoristiAkciju(nazivAkcije);
+    }
+
+    public boolean jeAkcijaDostupnaTrenutnomIgracu(String nazivAkcije) {
+        return redoslijedPoteza.dohvatiApSustavTrenutnogIgraca().jeAkcijaDostupna(nazivAkcije);
+    }
+
+    public void postaviLimitAkcijeTrenutnogIgraca(String nazivAkcije, int limit) {
+        redoslijedPoteza.dohvatiApSustavTrenutnogIgraca().postaviLimitAkcije(nazivAkcije, limit);
+    }
+
     public void prebaciPotez() {
         redoslijedPoteza.prebaciNaSljedecegIgraca();
     }
 
+    public boolean jeIgracNaPotezuOdigraoSveApove() {
+        return redoslijedPoteza.jeIgracNaPotezuOdigraoSveApove();
+    }
+
     public void obradiKrajRunde() {
         int brojac = 0;
-        int najboljiRezultat = Integer.MIN_VALUE;
-        KlasaIgraca najboljiIgrac = null;
-
         while (brojac < listaIgraca.size()) {
             KlasaIgraca trenutniIgrac = listaIgraca.get(brojac);
             trenutniIgrac.odigrajPotez();
-            int trenutniRezultat = trenutniIgrac.izracunajUkupniRezultat();
-            if (trenutniRezultat > najboljiRezultat) {
-                najboljiRezultat = trenutniRezultat;
-                najboljiIgrac = trenutniIgrac;
+            if (trenutniIgrac instanceof SrednjaKlasa) {
+                trenutniIgrac.povecajBodove(((SrednjaKlasa) trenutniIgrac).getStandardZivota() / 20);
             }
             brojac = brojac + 1;
         }
 
-        if (najboljiIgrac != null) {
-            najboljiIgrac.povecajBodove(1);
-        }
+        vlada.preracunajLegitimnostUBodove();
+        obradaProizvodnje.primijeniMmfProvjeru(vlada);
 
         if (trenutnoGlasanje != null && trenutnoGlasanje.isGlasanjeZavrseno() && trenutnoGlasanje.isZakonPrihvacen()) {
             vlada.donesiNoviZakon(trenutnoGlasanje.getNazivZakona());
+        }
+        trenutnoGlasanje = null;
+
+        if (brojRunde == MAKSIMALNI_BROJ_RUNDI) {
+            obradaProizvodnje.primijeniFinalnoBodovanje(listaIgraca);
         }
     }
 
@@ -128,13 +158,6 @@ public class HegemonyEngine {
     }
 
     public boolean provjeriPobjedu() {
-        int brojac = 0;
-        while (brojac < listaIgraca.size()) {
-            if (listaIgraca.get(brojac).getBodoviPobjede() >= BODOVI_ZA_POBJEDU) {
-                return true;
-            }
-            brojac = brojac + 1;
-        }
         return igraZavrsena;
     }
 
@@ -160,10 +183,6 @@ public class HegemonyEngine {
 
     public int getBrojRunde() {
         return brojRunde;
-    }
-
-    public int getPozicijaNaPotezu() {
-        return redoslijedPoteza.getPozicijaNaPotezu();
     }
 
     public boolean isIgraZavrsena() {
