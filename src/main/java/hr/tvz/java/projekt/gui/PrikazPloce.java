@@ -9,7 +9,7 @@ import javafx.geometry.Insets;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -25,30 +25,27 @@ public class PrikazPloce {
 
     private KreatorKartice kreatorKartice;
     private List<List<Label>> listaOznakaPoIgracu;
+    private List<VBox> listaKarticaIgraca;
 
     public PrikazPloce() {
         this.kreatorKartice = new KreatorKartice();
         this.listaOznakaPoIgracu = new ArrayList<>();
+        this.listaKarticaIgraca = new ArrayList<>();
     }
 
-    public GridPane napraviDrzavnuPlocu(List<KlasaIgraca> listaIgraca) {
-        GridPane plocaIgre = new GridPane();
-        plocaIgre.setHgap(18);
-        plocaIgre.setVgap(18);
-        plocaIgre.setPadding(new Insets(25));
+    public HBox napraviDrzavnuPlocu(List<KlasaIgraca> listaIgraca) {
+        HBox plocaIgre = new HBox(20);
+        plocaIgre.setPadding(new Insets(30));
         plocaIgre.setBackground(new Background(new BackgroundFill(Color.web(BOJA_PODLOGE), CornerRadii.EMPTY, Insets.EMPTY)));
 
-        Label naslovPloce = new Label("DRZAVNA PLOCA");
-        naslovPloce.setFont(Font.font("Georgia", FontWeight.BOLD, 26));
-        naslovPloce.setTextFill(Color.web("#2B2520"));
-        plocaIgre.add(naslovPloce, 0, 0, listaIgraca.size(), 1);
-
         listaOznakaPoIgracu.clear();
+        listaKarticaIgraca.clear();
 
         int brojac = 0;
         while (brojac < listaIgraca.size()) {
             VBox karticaIgraca = napraviKarticuIgraca(listaIgraca.get(brojac));
-            plocaIgre.add(karticaIgraca, brojac, 1);
+            listaKarticaIgraca.add(karticaIgraca);
+            plocaIgre.getChildren().add(karticaIgraca);
             brojac = brojac + 1;
         }
 
@@ -57,14 +54,17 @@ public class PrikazPloce {
 
     private VBox napraviKarticuIgraca(KlasaIgraca igrac) {
         VBox kartica = new VBox(10);
-        kreatorKartice.postaviOkvirIVanjskiStil(kartica);
+        kreatorKartice.postaviOkvirIVanjskiStil(kartica, igrac.isNaPotezu());
 
         VBox zaglavljeKartice = kreatorKartice.napraviZaglavljeKartice(igrac);
 
         List<Label> oznakePodataka = napraviOznakePodataka(igrac);
-        VBox sadrzajKartice = new VBox(7);
-        sadrzajKartice.setPadding(new Insets(12, 15, 0, 15));
+        VBox sadrzajKartice = new VBox(8);
+        sadrzajKartice.setPadding(new Insets(15, 18, 0, 18));
         sadrzajKartice.getChildren().addAll(oznakePodataka);
+
+        VBox miniGraf = napraviMiniGrafZaIgraca(igrac);
+        sadrzajKartice.getChildren().add(miniGraf);
 
         Label oznakaBodova = kreatorKartice.napraviOznakuBodova(igrac);
         oznakePodataka.add(oznakaBodova);
@@ -75,6 +75,22 @@ public class PrikazPloce {
         return kartica;
     }
 
+    private VBox napraviMiniGrafZaIgraca(KlasaIgraca igrac) {
+        if (igrac instanceof RadnickaKlasa) {
+            RadnickaKlasa radnickaKlasa = (RadnickaKlasa) igrac;
+            return kreatorKartice.napraviMiniGraf(igrac, radnickaKlasa.getStandardZivota(), 100, "Standard zivota");
+        } else if (igrac instanceof SrednjaKlasa) {
+            SrednjaKlasa srednjaKlasa = (SrednjaKlasa) igrac;
+            return kreatorKartice.napraviMiniGraf(igrac, srednjaKlasa.getStandardZivota(), 100, "Standard zivota");
+        } else if (igrac instanceof KapitalistickaKlasa) {
+            KapitalistickaKlasa kapitalist = (KapitalistickaKlasa) igrac;
+            return kreatorKartice.napraviMiniGraf(igrac, kapitalist.getUkupniKapital(), 400, "Ukupni kapital");
+        } else {
+            Vlada vlada = (Vlada) igrac;
+            return kreatorKartice.napraviMiniGraf(igrac, vlada.getLegitimnost(), 100, "Legitimnost");
+        }
+    }
+
     private List<Label> napraviOznakePodataka(KlasaIgraca igrac) {
         List<Label> oznake = new ArrayList<>();
 
@@ -83,6 +99,7 @@ public class PrikazPloce {
             oznake.add(kreatorKartice.napraviOznaku("Standard zivota: " + radnickaKlasa.getStandardZivota()));
             oznake.add(kreatorKartice.napraviOznaku("Kolicina hrane: " + radnickaKlasa.getKolicinaHrane()));
             oznake.add(kreatorKartice.napraviOznaku("Zaposleni: " + radnickaKlasa.getZaposleniRadnici() + " / " + radnickaKlasa.getBrojRadnika()));
+            oznake.add(kreatorKartice.napraviOznaku("U strajku: " + (radnickaKlasa.isJeUStrajku() ? "DA" : "Ne")));
         } else if (igrac instanceof SrednjaKlasa) {
             SrednjaKlasa srednjaKlasa = (SrednjaKlasa) igrac;
             oznake.add(kreatorKartice.napraviOznaku("Standard zivota: " + srednjaKlasa.getStandardZivota()));
@@ -98,6 +115,7 @@ public class PrikazPloce {
             oznake.add(kreatorKartice.napraviOznaku("Proracun: " + String.format("%.2f", vlada.getDrzavniProracun())));
             oznake.add(kreatorKartice.napraviOznaku("Stopa poreza: " + vlada.getStopaPoreza()));
             oznake.add(kreatorKartice.napraviOznaku("Min. placa: " + vlada.getMinimalnaPlaca()));
+            oznake.add(kreatorKartice.napraviOznaku("Legitimnost: " + vlada.getLegitimnost()));
         }
         return oznake;
     }
@@ -115,6 +133,7 @@ public class PrikazPloce {
                 drugiBrojac = drugiBrojac + 1;
             }
             oznakePodataka.get(oznakePodataka.size() - 1).setText("BODOVI: " + igrac.getBodoviPobjede());
+            kreatorKartice.postaviOkvirIVanjskiStil(listaKarticaIgraca.get(brojac), igrac.isNaPotezu());
             brojac = brojac + 1;
         }
     }

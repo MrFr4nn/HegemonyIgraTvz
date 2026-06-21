@@ -8,12 +8,12 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -22,64 +22,67 @@ import java.util.function.Consumer;
 
 public class PocetniEkran {
 
-    private static final String BOJA_PODLOGE = "#EFE7D8";
-
     private Stage glavnaScena;
     private Consumer<List<KlasaIgraca>> akcijaPoOdabiru;
     private ProvjeraOdabira provjeraOdabira;
+    private KreatorKarticeUloge kreatorKartice;
     private int odabraniBrojIgraca;
-    private List<ComboBox<String>> listaIzbornika;
+    private List<String> odabraneUlogePoPoziciji;
+    private List<HBox> redoviPozicija;
     private VBox panelIzbornikaUloga;
+
+    private static final String[] NAZIVI_ULOGA = {"Radnicka klasa", "Srednja klasa", "Kapitalisticka klasa", "Vlada"};
+    private static final String[] BOJE_ULOGA = {"#8C3A36", "#A6862C", "#2B4C70", "#4A4458"};
 
     public PocetniEkran(Stage glavnaScena, Consumer<List<KlasaIgraca>> akcijaPoOdabiru) {
         this.glavnaScena = glavnaScena;
         this.akcijaPoOdabiru = akcijaPoOdabiru;
         this.provjeraOdabira = new ProvjeraOdabira();
+        this.kreatorKartice = new KreatorKarticeUloge();
         this.odabraniBrojIgraca = 2;
-        this.listaIzbornika = new ArrayList<>();
+        this.odabraneUlogePoPoziciji = new ArrayList<>();
+        this.redoviPozicija = new ArrayList<>();
     }
 
     public void prikaziEkran() {
         VBox korijenskiLayout = new VBox(20);
         korijenskiLayout.setPadding(new Insets(35));
         korijenskiLayout.setAlignment(Pos.TOP_CENTER);
-        korijenskiLayout.setBackground(new Background(new BackgroundFill(Color.web(BOJA_PODLOGE), CornerRadii.EMPTY, Insets.EMPTY)));
+        korijenskiLayout.setBackground(napraviGradijentnuPodlogu());
 
         Label naslov = new Label("HEGEMONY: LEAD YOUR CLASS TO VICTORY");
-        naslov.setStyle("-fx-font-family: 'Georgia'; -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2B2520;");
+        naslov.setStyle("-fx-font-family: 'Georgia'; -fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #2B2520;");
 
-        Label podnaslov = new Label("Odaberite broj igraca i ulogu za svakog igraca");
-        podnaslov.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 13px; -fx-text-fill: #6B6357;");
+        Label podnaslov = new Label("Odaberite broj igraca, zatim kliknite karticu za odabir uloge svakog igraca");
+        podnaslov.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 13px; -fx-text-fill: #4A4438;");
 
-        VBox panelPostavki = napraviPanelPostavki();
+        HBox panelBrojaIgraca = napraviPanelBrojaIgraca();
+
+        panelIzbornikaUloga = new VBox(15);
+        panelIzbornikaUloga.setAlignment(Pos.CENTER);
+        azurirajIzbornikeUloga();
 
         Button gumbZapocni = new Button("Zapocni igru");
         StilGumba.primijeniNaglaseni(gumbZapocni);
+        gumbZapocni.setStyle(gumbZapocni.getStyle() + "-fx-font-size: 15px; -fx-padding: 12 30 12 30;");
         gumbZapocni.setOnAction(dogadjaj -> obradiZapocniIgru());
 
-        korijenskiLayout.getChildren().addAll(naslov, podnaslov, panelPostavki, gumbZapocni);
+        korijenskiLayout.getChildren().addAll(naslov, podnaslov, panelBrojaIgraca, panelIzbornikaUloga, gumbZapocni);
 
-        Scene scenaPocetnogEkrana = new Scene(korijenskiLayout, 600, 520);
+        Scene scenaPocetnogEkrana = new Scene(korijenskiLayout, 950, 700);
         glavnaScena.setTitle("Hegemony - Postavke igre");
         glavnaScena.setScene(scenaPocetnogEkrana);
         glavnaScena.show();
     }
 
-    private VBox napraviPanelPostavki() {
-        VBox panelPostavki = new VBox(18);
-        panelPostavki.setAlignment(Pos.TOP_CENTER);
-        panelPostavki.setPadding(new Insets(25));
-        panelPostavki.setMaxWidth(420);
-        panelPostavki.setBackground(new Background(new BackgroundFill(Color.WHITE, new CornerRadii(10), Insets.EMPTY)));
-
-        HBox panelBrojaIgraca = napraviPanelBrojaIgraca();
-
-        panelIzbornikaUloga = new VBox(10);
-        panelIzbornikaUloga.setAlignment(Pos.CENTER);
-        azurirajIzbornikeUloga();
-
-        panelPostavki.getChildren().addAll(panelBrojaIgraca, panelIzbornikaUloga);
-        return panelPostavki;
+    private javafx.scene.layout.Background napraviGradijentnuPodlogu() {
+        Stop[] tockeBoje = {
+                new Stop(0, Color.web("#EFE7D8")),
+                new Stop(0.5, Color.web("#E3D6BE")),
+                new Stop(1, Color.web("#D8C9A8"))
+        };
+        LinearGradient gradijent = new LinearGradient(0, 0, 1, 1, true, CycleMethod.NO_CYCLE, tockeBoje);
+        return new javafx.scene.layout.Background(new javafx.scene.layout.BackgroundFill(gradijent, javafx.scene.layout.CornerRadii.EMPTY, Insets.EMPTY));
     }
 
     private HBox napraviPanelBrojaIgraca() {
@@ -87,7 +90,7 @@ public class PocetniEkran {
         panel.setAlignment(Pos.CENTER);
 
         Label oznaka = new Label("Broj igraca:");
-        oznaka.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 13px; -fx-text-fill: #2B2520;");
+        oznaka.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 14px; -fx-text-fill: #2B2520;");
 
         ComboBox<Integer> izbornikBrojaIgraca = new ComboBox<>();
         izbornikBrojaIgraca.getItems().addAll(2, 3, 4);
@@ -103,59 +106,78 @@ public class PocetniEkran {
 
     private void azurirajIzbornikeUloga() {
         panelIzbornikaUloga.getChildren().clear();
-        listaIzbornika.clear();
+        redoviPozicija.clear();
+        odabraneUlogePoPoziciji.clear();
 
         int brojac = 0;
         while (brojac < odabraniBrojIgraca) {
-            HBox redak = new HBox(12);
-            redak.setAlignment(Pos.CENTER);
+            odabraneUlogePoPoziciji.add(NAZIVI_ULOGA[brojac % NAZIVI_ULOGA.length]);
+            brojac = brojac + 1;
+        }
 
-            Label oznakaPozicije = new Label("Igrac " + (brojac + 1) + ":");
-            oznakaPozicije.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 12px; -fx-text-fill: #2B2520; -fx-min-width: 70;");
+        brojac = 0;
+        while (brojac < odabraniBrojIgraca) {
+            int pozicija = brojac;
+            Label oznakaPozicije = new Label("Igrac " + (pozicija + 1) + ":");
+            oznakaPozicije.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #2B2520;");
 
-            ComboBox<String> izbornikUloge = new ComboBox<>();
-            izbornikUloge.getItems().addAll("Radnicka klasa", "Srednja klasa", "Kapitalisticka klasa", "Vlada");
-            izbornikUloge.setValue(odrediZadanuUlogu(brojac));
-            izbornikUloge.setPrefWidth(220);
+            HBox redKartica = napraviRedKarticaZaPoziciju(pozicija);
+            VBox blokPozicije = new VBox(8, oznakaPozicije, redKartica);
+            blokPozicije.setAlignment(Pos.CENTER);
 
-            listaIzbornika.add(izbornikUloge);
-            redak.getChildren().addAll(oznakaPozicije, izbornikUloge);
-            panelIzbornikaUloga.getChildren().add(redak);
+            panelIzbornikaUloga.getChildren().add(blokPozicije);
             brojac = brojac + 1;
         }
     }
 
-    private String odrediZadanuUlogu(int pozicija) {
-        if (pozicija == 0) {
-            return "Radnicka klasa";
-        } else if (pozicija == 1) {
-            return "Vlada";
-        } else if (pozicija == 2) {
-            return "Srednja klasa";
+    private HBox napraviRedKarticaZaPoziciju(int pozicija) {
+        HBox red = new HBox(12);
+        red.setAlignment(Pos.CENTER);
+
+        int brojac = 0;
+        while (brojac < NAZIVI_ULOGA.length) {
+            String nazivUloge = NAZIVI_ULOGA[brojac];
+            String bojaHex = BOJE_ULOGA[brojac];
+            String svgIkona = dohvatiSvgZaUlogu(brojac);
+            boolean odabrana = odabraneUlogePoPoziciji.get(pozicija).equals(nazivUloge);
+
+            VBox kartica = kreatorKartice.napraviKarticu(nazivUloge, bojaHex, svgIkona, odabrana);
+            kartica.setOnMouseClicked(dogadjaj -> {
+                odabraneUlogePoPoziciji.set(pozicija, nazivUloge);
+                azurirajIzbornikeUloga();
+            });
+
+            red.getChildren().add(kartica);
+            brojac = brojac + 1;
+        }
+        redoviPozicija.add(red);
+        return red;
+    }
+
+    private String dohvatiSvgZaUlogu(int indeks) {
+        if (indeks == 0) {
+            return kreatorKartice.dohvatiIkonuRadnicke();
+        } else if (indeks == 1) {
+            return kreatorKartice.dohvatiIkonuSrednje();
+        } else if (indeks == 2) {
+            return kreatorKartice.dohvatiIkonuKapitalisticke();
         } else {
-            return "Kapitalisticka klasa";
+            return kreatorKartice.dohvatiIkonuVlade();
         }
     }
 
     private void obradiZapocniIgru() {
-        List<String> odabraneUloge = new ArrayList<>();
-        int brojac = 0;
-        while (brojac < listaIzbornika.size()) {
-            odabraneUloge.add(listaIzbornika.get(brojac).getValue());
-            brojac = brojac + 1;
-        }
-
-        if (!provjeraOdabira.provjeriJesuLiUlogeRazlicite(odabraneUloge)) {
+        if (!provjeraOdabira.provjeriJesuLiUlogeRazlicite(odabraneUlogePoPoziciji)) {
             prikaziUpozorenje("Svaka uloga mora biti odabrana samo jednom.");
             return;
         }
 
-        if (!provjeraOdabira.sadrziVladu(odabraneUloge)) {
+        if (!provjeraOdabira.sadrziVladu(odabraneUlogePoPoziciji)) {
             prikaziUpozorenje("Igra mora imati barem jednog igraca s ulogom Vlada.");
             return;
         }
 
-        List<KlasaIgraca> listaIgraca = provjeraOdabira.napraviIgraceOdUloga(odabraneUloge);
+        List<KlasaIgraca> listaIgraca = provjeraOdabira.napraviIgraceOdUloga(odabraneUlogePoPoziciji);
         akcijaPoOdabiru.accept(listaIgraca);
     }
 
