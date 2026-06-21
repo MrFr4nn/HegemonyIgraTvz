@@ -6,7 +6,6 @@ import hr.tvz.java.projekt.model.RadnickaKlasa;
 import hr.tvz.java.projekt.model.SrednjaKlasa;
 import hr.tvz.java.projekt.model.Vlada;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -22,33 +21,33 @@ import java.util.List;
 
 public class PrikazPloce {
 
-    private List<VBox> listaKarticaIgraca;
+    private static final String BOJA_PODLOGE = "#EFE7D8";
+
+    private KreatorKartice kreatorKartice;
     private List<List<Label>> listaOznakaPoIgracu;
 
     public PrikazPloce() {
-        this.listaKarticaIgraca = new ArrayList<>();
+        this.kreatorKartice = new KreatorKartice();
         this.listaOznakaPoIgracu = new ArrayList<>();
     }
 
     public GridPane napraviDrzavnuPlocu(List<KlasaIgraca> listaIgraca) {
         GridPane plocaIgre = new GridPane();
-        plocaIgre.setHgap(15);
-        plocaIgre.setVgap(15);
-        plocaIgre.setPadding(new Insets(20));
-        plocaIgre.setBackground(new Background(new BackgroundFill(Color.web("#2b3a42"), CornerRadii.EMPTY, Insets.EMPTY)));
+        plocaIgre.setHgap(18);
+        plocaIgre.setVgap(18);
+        plocaIgre.setPadding(new Insets(25));
+        plocaIgre.setBackground(new Background(new BackgroundFill(Color.web(BOJA_PODLOGE), CornerRadii.EMPTY, Insets.EMPTY)));
 
-        Label naslovPloce = new Label("DRZAVNA PLOCA - HEGEMONY TVZ");
-        naslovPloce.setFont(Font.font("Arial", FontWeight.BOLD, 22));
-        naslovPloce.setTextFill(Color.GOLD);
+        Label naslovPloce = new Label("DRZAVNA PLOCA");
+        naslovPloce.setFont(Font.font("Georgia", FontWeight.BOLD, 26));
+        naslovPloce.setTextFill(Color.web("#2B2520"));
         plocaIgre.add(naslovPloce, 0, 0, listaIgraca.size(), 1);
 
-        listaKarticaIgraca.clear();
         listaOznakaPoIgracu.clear();
 
         int brojac = 0;
         while (brojac < listaIgraca.size()) {
             VBox karticaIgraca = napraviKarticuIgraca(listaIgraca.get(brojac));
-            listaKarticaIgraca.add(karticaIgraca);
             plocaIgre.add(karticaIgraca, brojac, 1);
             brojac = brojac + 1;
         }
@@ -57,23 +56,21 @@ public class PrikazPloce {
     }
 
     private VBox napraviKarticuIgraca(KlasaIgraca igrac) {
-        VBox kartica = new VBox(8);
-        kartica.setPadding(new Insets(15));
-        kartica.setAlignment(Pos.TOP_LEFT);
-        kartica.setBackground(new Background(new BackgroundFill(odrediBojuPodloge(igrac), new CornerRadii(10), Insets.EMPTY)));
+        VBox kartica = new VBox(10);
+        kreatorKartice.postaviOkvirIVanjskiStil(kartica);
 
-        Label naslovKartice = new Label(igrac.getNaziv());
-        naslovKartice.setFont(Font.font("Arial", FontWeight.BOLD, 14));
-        naslovKartice.setTextFill(odrediBojuNaslova(igrac));
+        VBox zaglavljeKartice = kreatorKartice.napraviZaglavljeKartice(igrac);
 
         List<Label> oznakePodataka = napraviOznakePodataka(igrac);
-        Label oznakaBodova = new Label("Bodovi: " + igrac.getBodoviPobjede());
-        oznakaBodova.setTextFill(Color.WHITE);
+        VBox sadrzajKartice = new VBox(7);
+        sadrzajKartice.setPadding(new Insets(12, 15, 0, 15));
+        sadrzajKartice.getChildren().addAll(oznakePodataka);
+
+        Label oznakaBodova = kreatorKartice.napraviOznakuBodova(igrac);
         oznakePodataka.add(oznakaBodova);
+        sadrzajKartice.getChildren().add(oznakaBodova);
 
-        kartica.getChildren().add(naslovKartice);
-        kartica.getChildren().addAll(oznakePodataka);
-
+        kartica.getChildren().addAll(zaglavljeKartice, sadrzajKartice);
         listaOznakaPoIgracu.add(oznakePodataka);
         return kartica;
     }
@@ -83,57 +80,26 @@ public class PrikazPloce {
 
         if (igrac instanceof RadnickaKlasa) {
             RadnickaKlasa radnickaKlasa = (RadnickaKlasa) igrac;
-            oznake.add(napraviOznaku("Standard zivota: " + radnickaKlasa.getStandardZivota()));
-            oznake.add(napraviOznaku("Kolicina hrane: " + radnickaKlasa.getKolicinaHrane()));
-            oznake.add(napraviOznaku("Zaposleni: " + radnickaKlasa.getZaposleniRadnici() + " / " + radnickaKlasa.getBrojRadnika()));
+            oznake.add(kreatorKartice.napraviOznaku("Standard zivota: " + radnickaKlasa.getStandardZivota()));
+            oznake.add(kreatorKartice.napraviOznaku("Kolicina hrane: " + radnickaKlasa.getKolicinaHrane()));
+            oznake.add(kreatorKartice.napraviOznaku("Zaposleni: " + radnickaKlasa.getZaposleniRadnici() + " / " + radnickaKlasa.getBrojRadnika()));
         } else if (igrac instanceof SrednjaKlasa) {
             SrednjaKlasa srednjaKlasa = (SrednjaKlasa) igrac;
-            oznake.add(napraviOznaku("Standard zivota: " + srednjaKlasa.getStandardZivota()));
-            oznake.add(napraviOznaku("Poduzeca: " + srednjaKlasa.getBrojMalihPoduzeca()));
-            oznake.add(napraviOznaku("Kapital: " + srednjaKlasa.getUstedjeniKapital()));
+            oznake.add(kreatorKartice.napraviOznaku("Standard zivota: " + srednjaKlasa.getStandardZivota()));
+            oznake.add(kreatorKartice.napraviOznaku("Poduzeca: " + srednjaKlasa.getBrojMalihPoduzeca()));
+            oznake.add(kreatorKartice.napraviOznaku("Kapital: " + srednjaKlasa.getUstedjeniKapital()));
         } else if (igrac instanceof KapitalistickaKlasa) {
             KapitalistickaKlasa kapitalistickaKlasa = (KapitalistickaKlasa) igrac;
-            oznake.add(napraviOznaku("Kapital: " + kapitalistickaKlasa.getUkupniKapital()));
-            oznake.add(napraviOznaku("Tvornice: " + kapitalistickaKlasa.getBrojTvornica()));
-            oznake.add(napraviOznaku("Dionice: " + kapitalistickaKlasa.getVrijednostDionica()));
+            oznake.add(kreatorKartice.napraviOznaku("Kapital: " + kapitalistickaKlasa.getUkupniKapital()));
+            oznake.add(kreatorKartice.napraviOznaku("Tvornice: " + kapitalistickaKlasa.getBrojTvornica()));
+            oznake.add(kreatorKartice.napraviOznaku("Dionice: " + kapitalistickaKlasa.getVrijednostDionica()));
         } else {
             Vlada vlada = (Vlada) igrac;
-            oznake.add(napraviOznaku("Proracun: " + String.format("%.2f", vlada.getDrzavniProracun())));
-            oznake.add(napraviOznaku("Stopa poreza: " + vlada.getStopaPoreza()));
-            oznake.add(napraviOznaku("Min. placa: " + vlada.getMinimalnaPlaca()));
+            oznake.add(kreatorKartice.napraviOznaku("Proracun: " + String.format("%.2f", vlada.getDrzavniProracun())));
+            oznake.add(kreatorKartice.napraviOznaku("Stopa poreza: " + vlada.getStopaPoreza()));
+            oznake.add(kreatorKartice.napraviOznaku("Min. placa: " + vlada.getMinimalnaPlaca()));
         }
         return oznake;
-    }
-
-    private Label napraviOznaku(String tekst) {
-        Label oznaka = new Label(tekst);
-        oznaka.setTextFill(Color.WHITE);
-        oznaka.setFont(Font.font("Arial", 12));
-        return oznaka;
-    }
-
-    private Color odrediBojuPodloge(KlasaIgraca igrac) {
-        if (igrac instanceof RadnickaKlasa) {
-            return Color.web("#52423a");
-        } else if (igrac instanceof SrednjaKlasa) {
-            return Color.web("#3a523a");
-        } else if (igrac instanceof KapitalistickaKlasa) {
-            return Color.web("#52473a");
-        } else {
-            return Color.web("#3a4a52");
-        }
-    }
-
-    private Color odrediBojuNaslova(KlasaIgraca igrac) {
-        if (igrac instanceof RadnickaKlasa) {
-            return Color.ORANGE;
-        } else if (igrac instanceof SrednjaKlasa) {
-            return Color.LIGHTGREEN;
-        } else if (igrac instanceof KapitalistickaKlasa) {
-            return Color.GOLD;
-        } else {
-            return Color.LIGHTBLUE;
-        }
     }
 
     public void azurirajPrikaz(List<KlasaIgraca> listaIgraca) {
@@ -148,7 +114,7 @@ public class PrikazPloce {
                 oznakePodataka.get(drugiBrojac).setText(novePodatkovneOznake.get(drugiBrojac).getText());
                 drugiBrojac = drugiBrojac + 1;
             }
-            oznakePodataka.get(oznakePodataka.size() - 1).setText("Bodovi: " + igrac.getBodoviPobjede());
+            oznakePodataka.get(oznakePodataka.size() - 1).setText("BODOVI: " + igrac.getBodoviPobjede());
             brojac = brojac + 1;
         }
     }
