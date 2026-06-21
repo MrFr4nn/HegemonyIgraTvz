@@ -1,5 +1,6 @@
 package hr.tvz.java.projekt.gui;
 
+import hr.tvz.java.projekt.logika.HegemonyEngine;
 import hr.tvz.java.projekt.model.KapitalistickaKlasa;
 import hr.tvz.java.projekt.model.KlasaIgraca;
 import hr.tvz.java.projekt.model.RadnickaKlasa;
@@ -15,16 +16,128 @@ import javafx.scene.text.FontWeight;
 
 public class KontrolePoteza {
 
-    public VBox napraviKontroleZaIgraca(KlasaIgraca igrac, Runnable akcijaNakonPoteza) {
+    public VBox napraviKontroleZaIgraca(HegemonyEngine engineIgre, KlasaIgraca igrac, Runnable akcijaPrijedlog, Runnable akcijaPonovnogPrikaza) {
+        postaviLimiteAkoNisuPostavljeni(engineIgre, igrac);
+
+        VBox panelKontrola = new VBox(8);
+        panelKontrola.setPadding(new Insets(15));
+
+        Label naslovPanela = napraviNaslovPanela("Potezi - " + odrediNazivUloge(igrac), odrediBoju(igrac));
+        Label oznakaAp = new Label("Preostalo akcijskih bodova ove runde gleda se kroz limite gumbova.");
+        oznakaAp.setStyle("-fx-font-size: 10px; -fx-text-fill: #6B6357;");
+
+        panelKontrola.getChildren().addAll(naslovPanela, oznakaAp);
+
         if (igrac instanceof RadnickaKlasa) {
-            return napraviKontroleRadnickeKlase((RadnickaKlasa) igrac, akcijaNakonPoteza);
+            dodajGumboveRadnicke(panelKontrola, engineIgre, (RadnickaKlasa) igrac, akcijaPonovnogPrikaza);
         } else if (igrac instanceof SrednjaKlasa) {
-            return napraviKontroleSrednjeKlase((SrednjaKlasa) igrac, akcijaNakonPoteza);
+            dodajGumboveSrednje(panelKontrola, engineIgre, (SrednjaKlasa) igrac, akcijaPonovnogPrikaza);
         } else if (igrac instanceof KapitalistickaKlasa) {
-            return napraviKontroleKapitalisticke((KapitalistickaKlasa) igrac, akcijaNakonPoteza);
+            dodajGumboveKapitalisticke(panelKontrola, engineIgre, (KapitalistickaKlasa) igrac, akcijaPonovnogPrikaza);
         } else {
-            return napraviKontroleVlade((Vlada) igrac, akcijaNakonPoteza);
+            dodajGumboveVlade(panelKontrola, engineIgre, (Vlada) igrac, akcijaPonovnogPrikaza);
         }
+
+        dodajGumbPrijedlogaZakona(panelKontrola, engineIgre, akcijaPrijedlog);
+        return panelKontrola;
+    }
+
+    private void postaviLimiteAkoNisuPostavljeni(HegemonyEngine engineIgre, KlasaIgraca igrac) {
+        if (igrac instanceof RadnickaKlasa) {
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("Zaposljavanje", 3);
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("Obrazovanje", 2);
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("Strajk", 1);
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("PrijedlogZakona", 1);
+        } else if (igrac instanceof SrednjaKlasa) {
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("OtvoriPoduzece", 2);
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("ObrazovanjeSrednja", 2);
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("PrijedlogZakona", 1);
+        } else if (igrac instanceof KapitalistickaKlasa) {
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("IzgradiTvornicu", 3);
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("Lobiranje", 2);
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("PrijedlogZakona", 1);
+        } else {
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("JavneInvesticije", 2);
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("SocijalniPaket", 3);
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("PrijedlogZakona", 2);
+        }
+    }
+
+    private void dodajGumboveRadnicke(VBox panel, HegemonyEngine engineIgre, RadnickaKlasa radnickaKlasa, Runnable akcija) {
+        dodajAkcijskiGumb(panel, engineIgre, "Zapošljavanje", "Zaposljavanje", () -> {
+            radnickaKlasa.zaposliRadnika(1);
+            akcija.run();
+        });
+        dodajAkcijskiGumb(panel, engineIgre, "Obrazovanje (trosak 10)", "Obrazovanje", () -> {
+            radnickaKlasa.investirajUObrazovanje(10);
+            akcija.run();
+        });
+        dodajAkcijskiGumb(panel, engineIgre, "Sindikalni prosvjed (Strajk)", "Strajk", () -> {
+            radnickaKlasa.pokreniStrajk();
+            akcija.run();
+        });
+    }
+
+    private void dodajGumboveSrednje(VBox panel, HegemonyEngine engineIgre, SrednjaKlasa srednjaKlasa, Runnable akcija) {
+        dodajAkcijskiGumb(panel, engineIgre, "Otvori poduzece (trosak 15)", "OtvoriPoduzece", () -> {
+            srednjaKlasa.otvoriNovoPoduzece(15.0);
+            akcija.run();
+        });
+        dodajAkcijskiGumb(panel, engineIgre, "Obrazovanje (trosak 10)", "ObrazovanjeSrednja", () -> {
+            srednjaKlasa.investirajUObrazovanje(10);
+            akcija.run();
+        });
+    }
+
+    private void dodajGumboveKapitalisticke(VBox panel, HegemonyEngine engineIgre, KapitalistickaKlasa kapitalist, Runnable akcija) {
+        dodajAkcijskiGumb(panel, engineIgre, "Investicija - Izgradi tvornicu (50)", "IzgradiTvornicu", () -> {
+            kapitalist.izgradiTvornicu(50.0);
+            akcija.run();
+        });
+        dodajAkcijskiGumb(panel, engineIgre, "Lobiranje (trosak 30)", "Lobiranje", () -> {
+            kapitalist.ulozUInvesticiju(30.0);
+            akcija.run();
+        });
+    }
+
+    private void dodajGumboveVlade(VBox panel, HegemonyEngine engineIgre, Vlada vlada, Runnable akcija) {
+        dodajAkcijskiGumb(panel, engineIgre, "Javne investicije", "JavneInvesticije", () -> {
+            vlada.povecajLegitimnost(5);
+            akcija.run();
+        });
+        dodajAkcijskiGumb(panel, engineIgre, "Socijalni paket (trosak 15)", "SocijalniPaket", () -> {
+            vlada.isplatiSubvenciju(15.0);
+            akcija.run();
+        });
+    }
+
+    private void dodajGumbPrijedlogaZakona(VBox panel, HegemonyEngine engineIgre, Runnable akcijaPrijedlog) {
+        Button gumbPrijedlog = new Button("Politicki pritisak - Predlozi zakon");
+        StilGumba.primijeniNaglaseni(gumbPrijedlog);
+        if (!engineIgre.jeAkcijaDostupnaTrenutnomIgracu("PrijedlogZakona")) {
+            gumbPrijedlog.setDisable(true);
+        }
+        gumbPrijedlog.setOnAction(dogadjaj -> {
+            if (engineIgre.iskoristiAkcijuTrenutnogIgraca("PrijedlogZakona")) {
+                akcijaPrijedlog.run();
+            }
+        });
+        panel.getChildren().add(gumbPrijedlog);
+    }
+
+    private void dodajAkcijskiGumb(VBox panel, HegemonyEngine engineIgre, String tekst, String nazivAkcije, Runnable efekt) {
+        int preostalo = engineIgre.jeAkcijaDostupnaTrenutnomIgracu(nazivAkcije) ? 1 : 0;
+        Button gumb = new Button(tekst + (preostalo == 0 ? " (iskoristeno)" : ""));
+        StilGumba.primijeniPozitivni(gumb);
+        if (preostalo == 0) {
+            gumb.setDisable(true);
+        }
+        gumb.setOnAction(dogadjaj -> {
+            if (engineIgre.iskoristiAkcijuTrenutnogIgraca(nazivAkcije)) {
+                efekt.run();
+            }
+        });
+        panel.getChildren().add(gumb);
     }
 
     private Label napraviNaslovPanela(String tekst, String bojaHex) {
@@ -34,139 +147,28 @@ public class KontrolePoteza {
         return naslov;
     }
 
-    private VBox napraviKontroleRadnickeKlase(RadnickaKlasa radnickaKlasa, Runnable akcijaNakonPoteza) {
-        VBox panelKontrola = new VBox(8);
-        panelKontrola.setPadding(new Insets(15));
-
-        Label naslovPanela = napraviNaslovPanela("Potezi - Radnicka klasa", "#B0413E");
-
-        Button gumbKupiHranu = new Button("Kupi hranu (trosak 8)");
-        StilGumba.primijeniPozitivni(gumbKupiHranu);
-        gumbKupiHranu.setOnAction(dogadjaj -> {
-            radnickaKlasa.kupiHranu(10, 8);
-            akcijaNakonPoteza.run();
-        });
-
-        Button gumbInvestirajObrazovanje = new Button("Investiraj u obrazovanje (trosak 10)");
-        StilGumba.primijeniNeutralni(gumbInvestirajObrazovanje);
-        gumbInvestirajObrazovanje.setOnAction(dogadjaj -> {
-            radnickaKlasa.investirajUObrazovanje(10);
-            akcijaNakonPoteza.run();
-        });
-
-        Button gumbZaposliRadnika = new Button("Zaposli radnika");
-        StilGumba.primijeniNeutralni(gumbZaposliRadnika);
-        gumbZaposliRadnika.setOnAction(dogadjaj -> {
-            radnickaKlasa.zaposliRadnika(1);
-            akcijaNakonPoteza.run();
-        });
-
-        panelKontrola.getChildren().addAll(naslovPanela, gumbKupiHranu, gumbInvestirajObrazovanje, gumbZaposliRadnika);
-        return panelKontrola;
+    private String odrediNazivUloge(KlasaIgraca igrac) {
+        if (igrac instanceof RadnickaKlasa) {
+            return "Radnicka klasa";
+        } else if (igrac instanceof SrednjaKlasa) {
+            return "Srednja klasa";
+        } else if (igrac instanceof KapitalistickaKlasa) {
+            return "Kapitalisticka klasa";
+        } else {
+            return "Vlada";
+        }
     }
 
-    private VBox napraviKontroleSrednjeKlase(SrednjaKlasa srednjaKlasa, Runnable akcijaNakonPoteza) {
-        VBox panelKontrola = new VBox(8);
-        panelKontrola.setPadding(new Insets(15));
-
-        Label naslovPanela = napraviNaslovPanela("Potezi - Srednja klasa", "#C9A227");
-
-        Button gumbOtvoriPoduzece = new Button("Otvori poduzece (trosak 15)");
-        StilGumba.primijeniPozitivni(gumbOtvoriPoduzece);
-        gumbOtvoriPoduzece.setOnAction(dogadjaj -> {
-            srednjaKlasa.otvoriNovoPoduzece(15.0);
-            akcijaNakonPoteza.run();
-        });
-
-        Button gumbInvestirajObrazovanje = new Button("Investiraj u obrazovanje (trosak 10)");
-        StilGumba.primijeniNeutralni(gumbInvestirajObrazovanje);
-        gumbInvestirajObrazovanje.setOnAction(dogadjaj -> {
-            srednjaKlasa.investirajUObrazovanje(10);
-            akcijaNakonPoteza.run();
-        });
-
-        Button gumbOstvariPrihod = new Button("Ostvari prihod (+20)");
-        StilGumba.primijeniPozitivni(gumbOstvariPrihod);
-        gumbOstvariPrihod.setOnAction(dogadjaj -> {
-            srednjaKlasa.ostvariPrihod(20.0);
-            akcijaNakonPoteza.run();
-        });
-
-        panelKontrola.getChildren().addAll(naslovPanela, gumbOtvoriPoduzece, gumbInvestirajObrazovanje, gumbOstvariPrihod);
-        return panelKontrola;
-    }
-
-    private VBox napraviKontroleKapitalisticke(KapitalistickaKlasa kapitalistickaKlasa, Runnable akcijaNakonPoteza) {
-        VBox panelKontrola = new VBox(8);
-        panelKontrola.setPadding(new Insets(15));
-
-        Label naslovPanela = napraviNaslovPanela("Potezi - Kapitalisticka klasa", "#2E6E8E");
-
-        Button gumbIzgradiTvornicu = new Button("Izgradi tvornicu (trosak 50)");
-        StilGumba.primijeniPozitivni(gumbIzgradiTvornicu);
-        gumbIzgradiTvornicu.setOnAction(dogadjaj -> {
-            kapitalistickaKlasa.izgradiTvornicu(50.0);
-            akcijaNakonPoteza.run();
-        });
-
-        Button gumbUloziInvesticiju = new Button("Ulozi u investiciju (trosak 30)");
-        StilGumba.primijeniNeutralni(gumbUloziInvesticiju);
-        gumbUloziInvesticiju.setOnAction(dogadjaj -> {
-            kapitalistickaKlasa.ulozUInvesticiju(30.0);
-            akcijaNakonPoteza.run();
-        });
-
-        panelKontrola.getChildren().addAll(naslovPanela, gumbIzgradiTvornicu, gumbUloziInvesticiju);
-        return panelKontrola;
-    }
-
-    private VBox napraviKontroleVlade(Vlada vlada, Runnable akcijaNakonPoteza) {
-        VBox panelKontrola = new VBox(8);
-        panelKontrola.setPadding(new Insets(15));
-
-        Label naslovPanela = napraviNaslovPanela("Potezi - Vlada", "#454B52");
-
-        Button gumbPovecajPorez = new Button("Povecaj porez (+0.05)");
-        StilGumba.primijeniNeutralni(gumbPovecajPorez);
-        gumbPovecajPorez.setOnAction(dogadjaj -> {
-            vlada.promijeniStopuPoreza(vlada.getStopaPoreza() + 0.05);
-            akcijaNakonPoteza.run();
-        });
-
-        Button gumbSmanjiPorez = new Button("Smanji porez (-0.05)");
-        StilGumba.primijeniNeutralni(gumbSmanjiPorez);
-        gumbSmanjiPorez.setOnAction(dogadjaj -> {
-            vlada.promijeniStopuPoreza(vlada.getStopaPoreza() - 0.05);
-            akcijaNakonPoteza.run();
-        });
-
-        Button gumbNaplatiPorez = new Button("Naplati porez (od 50 prihoda)");
-        StilGumba.primijeniPozitivni(gumbNaplatiPorez);
-        gumbNaplatiPorez.setOnAction(dogadjaj -> {
-            vlada.naplatiPorez(50.0);
-            akcijaNakonPoteza.run();
-        });
-
-        panelKontrola.getChildren().addAll(naslovPanela, gumbPovecajPorez, gumbSmanjiPorez, gumbNaplatiPorez);
-        return panelKontrola;
-    }
-
-    public VBox napraviPanelPrijedlogaZakona(Runnable akcijaPrijedlogPoreza, Runnable akcijaPrijedlogPlace) {
-        VBox panelKontrola = new VBox(8);
-        panelKontrola.setPadding(new Insets(15));
-
-        Label naslovPanela = napraviNaslovPanela("Vlada predlaze zakon:", "#454B52");
-
-        Button gumbPrijedlogPoreza = new Button("Predlozi zakon o porezu");
-        StilGumba.primijeniNaglaseni(gumbPrijedlogPoreza);
-        gumbPrijedlogPoreza.setOnAction(dogadjaj -> akcijaPrijedlogPoreza.run());
-
-        Button gumbPrijedlogPlace = new Button("Predlozi zakon o minimalnoj placi");
-        StilGumba.primijeniNaglaseni(gumbPrijedlogPlace);
-        gumbPrijedlogPlace.setOnAction(dogadjaj -> akcijaPrijedlogPlace.run());
-
-        panelKontrola.getChildren().addAll(naslovPanela, gumbPrijedlogPoreza, gumbPrijedlogPlace);
-        return panelKontrola;
+    private String odrediBoju(KlasaIgraca igrac) {
+        if (igrac instanceof RadnickaKlasa) {
+            return "#B0413E";
+        } else if (igrac instanceof SrednjaKlasa) {
+            return "#C9A227";
+        } else if (igrac instanceof KapitalistickaKlasa) {
+            return "#2E6E8E";
+        } else {
+            return "#454B52";
+        }
     }
 
     public VBox napraviPanelGlasanja(String nazivZakona, Runnable akcijaZa, Runnable akcijaProtiv) {
