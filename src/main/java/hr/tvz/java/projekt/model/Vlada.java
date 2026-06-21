@@ -12,6 +12,7 @@ public class Vlada extends KlasaIgraca {
     private double minimalnaPlaca;
     private List<String> donesenZakoni;
     private boolean proracunUManjku;
+    private String prijedlogZakona;
 
     public Vlada(String naziv) {
         super(naziv);
@@ -20,6 +21,7 @@ public class Vlada extends KlasaIgraca {
         this.minimalnaPlaca = 5.0;
         this.donesenZakoni = new ArrayList<>();
         this.proracunUManjku = false;
+        this.prijedlogZakona = "";
     }
 
     @Override
@@ -48,6 +50,10 @@ public class Vlada extends KlasaIgraca {
         }
         privremena = privremena + (donesenZakoni.size() * 3);
         return privremena;
+    }
+
+    public boolean izracunajPolitickiRezultat() {
+        return drzavniProracun >= 0;
     }
 
     public void provjeriStanjeProracuna() {
@@ -120,5 +126,13 @@ public class Vlada extends KlasaIgraca {
 
     public boolean isProracunUManjku() {
         return proracunUManjku;
+    }
+
+    public String getPrijedlogZakona() {
+        return prijedlogZakona;
+    }
+
+    public void setPrijedlogZakona(String prijedlogZakona) {
+        this.prijedlogZakona = prijedlogZakona;
     }
 }

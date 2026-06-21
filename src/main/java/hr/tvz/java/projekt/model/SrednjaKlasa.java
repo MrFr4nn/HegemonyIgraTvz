@@ -43,6 +43,11 @@ public class SrednjaKlasa extends KlasaIgraca {
         return privremena;
     }
 
+    public boolean izracunajPolitickiRezultat(Vlada vlada) {
+        double porez = vlada.getStopaPoreza();
+        return porez >= 0.15 && porez <= 0.35;
+    }
+
     public void azurirajStandardZivota() {
         int privremena = standardZivota;
         if (ukupniPrihod > 50) {

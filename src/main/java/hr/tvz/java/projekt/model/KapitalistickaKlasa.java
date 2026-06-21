@@ -43,6 +43,10 @@ public class KapitalistickaKlasa extends KlasaIgraca {
         return privremena;
     }
 
+    public boolean izracunajPolitickiRezultat(Vlada vlada) {
+        return vlada.getStopaPoreza() <= 0.15;
+    }
+
     public void azurirajVrijednostDionica() {
         double privremena = vrijednostDionica;
         if (profitnaStopa > 0.2) {

@@ -46,6 +46,12 @@ public class RadnickaKlasa extends KlasaIgraca {
         return privremena;
     }
 
+    public boolean izracunajPolitickiRezultat(Vlada vlada) {
+        boolean placaDobra = vlada.getMinimalnaPlaca() >= 6.0;
+        boolean porezDobar = vlada.getStopaPoreza() <= 0.25;
+        return placaDobra && porezDobar;
+    }
+
     public void azurirajStandardZivota() {
         int privremena = standardZivota;
         if (kolicinaHrane > 15) {
