@@ -13,6 +13,8 @@ public class Vlada extends KlasaIgraca {
     private List<String> donesenZakoni;
     private boolean proracunUManjku;
     private String prijedlogZakona;
+    private int legitimnost;
+    private boolean podMMFKaznom;
 
     public Vlada(String naziv) {
         super(naziv);
@@ -22,12 +24,15 @@ public class Vlada extends KlasaIgraca {
         this.donesenZakoni = new ArrayList<>();
         this.proracunUManjku = false;
         this.prijedlogZakona = "";
+        this.legitimnost = 50;
+        this.podMMFKaznom = false;
     }
 
     @Override
     public void odigrajPotez() {
         zabrojOdigranihPoteza();
         provjeriStanjeProracuna();
+        provjeriUvjeteBankrota();
     }
 
     @Override
@@ -37,14 +42,16 @@ public class Vlada extends KlasaIgraca {
         tekst = tekst + "Drzavni proracun: " + drzavniProracun + "\n";
         tekst = tekst + "Stopa poreza: " + stopaPoreza + "\n";
         tekst = tekst + "Minimalna placa: " + minimalnaPlaca + "\n";
+        tekst = tekst + "Legitimnost: " + legitimnost + "\n";
         tekst = tekst + "Broj donesenih zakona: " + donesenZakoni.size() + "\n";
-        tekst = tekst + "Proracun u manjku: " + proracunUManjku;
+        tekst = tekst + "Proracun u manjku: " + proracunUManjku + "\n";
+        tekst = tekst + "Pod MMF kaznom: " + podMMFKaznom;
         return tekst;
     }
 
     @Override
     public int izracunajUkupniRezultat() {
-        int privremena = (int) drzavniProracun;
+        int privremena = (int) drzavniProracun + legitimnost;
         if (!proracunUManjku) {
             privremena = privremena + 20;
         }
@@ -64,6 +71,46 @@ public class Vlada extends KlasaIgraca {
         }
     }
 
+    public void provjeriUvjeteBankrota() {
+        if (drzavniProracun < 0 && !podMMFKaznom) {
+            aktivirajMMFKaznu();
+        }
+    }
+
+    public void aktivirajMMFKaznu() {
+        podMMFKaznom = true;
+        stopaPoreza = 0.5;
+        minimalnaPlaca = 1.0;
+        smanjiLegitimnost(15);
+        System.out.println("MMF intervencija! Stopa poreza prisilno postavljena na 0.5, minimalna placa na 1.0.");
+    }
+
+    public void ukloniMMFKaznu() {
+        podMMFKaznom = false;
+    }
+
+    public void povecajLegitimnost(int iznos) {
+        int privremena = legitimnost + iznos;
+        if (privremena > 100) {
+            privremena = 100;
+        }
+        legitimnost = privremena;
+    }
+
+    public void smanjiLegitimnost(int iznos) {
+        int privremena = legitimnost - iznos;
+        if (privremena < 0) {
+            privremena = 0;
+        }
+        legitimnost = privremena;
+    }
+
+    public int preracunajLegitimnostUBodove() {
+        int bodovi = legitimnost / 10;
+        povecajBodove(bodovi);
+        return bodovi;
+    }
+
     public void naplatiPorez(double oporeziviPrihod) {
         double iznos = oporeziviPrihod * stopaPoreza;
         drzavniProracun = drzavniProracun + iznos;
@@ -76,6 +123,7 @@ public class Vlada extends KlasaIgraca {
             System.out.println("Subvencija odbijena, proracun bi previse pao.");
         } else {
             drzavniProracun = privremena;
+            povecajLegitimnost(3);
         }
         provjeriStanjeProracuna();
     }
@@ -134,5 +182,13 @@ public class Vlada extends KlasaIgraca {
 
     public void setPrijedlogZakona(String prijedlogZakona) {
         this.prijedlogZakona = prijedlogZakona;
+    }
+
+    public int getLegitimnost() {
+        return legitimnost;
+    }
+
+    public boolean isPodMMFKaznom() {
+        return podMMFKaznom;
     }
 }
