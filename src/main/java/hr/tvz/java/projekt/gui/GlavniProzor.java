@@ -2,6 +2,7 @@ package hr.tvz.java.projekt.gui;
 
 import hr.tvz.java.projekt.logika.HegemonyEngine;
 import hr.tvz.java.projekt.model.KlasaIgraca;
+import hr.tvz.java.projekt.util.Serijalizator;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -22,6 +23,8 @@ public class GlavniProzor {
     private PrikazPloce prikazPloce;
     private KontrolePoteza kontrolePoteza;
     private UpraviteljAnimacija upraviteljAnimacija;
+    private Serijalizator serijalizator;
+    private UpraviteljTehnickeAnalize upraviteljTehnickeAnalize;
 
     private BorderPane korijenskiLayout;
     private VBox panelKontrolaTrenutniIgrac;
@@ -35,6 +38,8 @@ public class GlavniProzor {
         this.prikazPloce = new PrikazPloce();
         this.kontrolePoteza = new KontrolePoteza();
         this.upraviteljAnimacija = new UpraviteljAnimacija();
+        this.serijalizator = new Serijalizator();
+        this.upraviteljTehnickeAnalize = new UpraviteljTehnickeAnalize(serijalizator);
         this.pozicijaGlasacaUNizu = 0;
     }
 
@@ -80,7 +85,15 @@ public class GlavniProzor {
         Button gumbSljedecaFaza = new Button("Sljedeca faza");
         gumbSljedecaFaza.setOnAction(dogadjaj -> obradiSljedecuFazu());
 
-        donjiPanel.getChildren().addAll(panelKontrolaTrenutniIgrac, gumbSljedecaFaza);
+        Button gumbSpremiStanje = new Button("Spremi stanje");
+        gumbSpremiStanje.setOnAction(dogadjaj -> serijalizator.spremiStanje(engineIgre.getListaIgraca()));
+
+        Button gumbTehnickaAnaliza = new Button("Tehnicka usporedba");
+        gumbTehnickaAnaliza.setOnAction(dogadjaj -> upraviteljTehnickeAnalize.otvoriProzorAnalize());
+
+        VBox blokGumbova = new VBox(8, gumbSljedecaFaza, gumbSpremiStanje, gumbTehnickaAnaliza);
+
+        donjiPanel.getChildren().addAll(panelKontrolaTrenutniIgrac, blokGumbova);
         return donjiPanel;
     }
 
