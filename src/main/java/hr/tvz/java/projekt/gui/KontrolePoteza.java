@@ -7,38 +7,49 @@ import hr.tvz.java.projekt.model.RadnickaKlasa;
 import hr.tvz.java.projekt.model.SrednjaKlasa;
 import hr.tvz.java.projekt.model.Vlada;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 public class KontrolePoteza {
 
+    private KreatorIgraceKarte kreatorIgraceKarte;
+
+    public KontrolePoteza() {
+        this.kreatorIgraceKarte = new KreatorIgraceKarte();
+    }
+
     public VBox napraviKontroleZaIgraca(HegemonyEngine engineIgre, KlasaIgraca igrac, Runnable akcijaPrijedlog, Runnable akcijaPonovnogPrikaza) {
         postaviLimiteAkoNisuPostavljeni(engineIgre, igrac);
 
-        VBox panelKontrola = new VBox(8);
-        panelKontrola.setPadding(new Insets(15));
+        VBox panelKontrola = new VBox(10);
+        panelKontrola.setPadding(new Insets(10));
         StilGumba.primijeniObrubAktivneKlase(panelKontrola, igrac);
 
-        Label naslovPanela = new Label(odrediNazivUloge(igrac).toUpperCase() + " - AKCIJSKA FAZA");
+        Label naslovPanela = new Label(odrediNazivUloge(igrac).toUpperCase() + " - ODABERITE KARTU");
         naslovPanela.setFont(Font.font("Georgia", FontWeight.BOLD, 13));
         naslovPanela.setStyle("-fx-text-fill: " + StilGumba.dohvatiBojuKlase(igrac) + ";");
 
-        panelKontrola.getChildren().add(naslovPanela);
+        HBox redKarata = new HBox(10);
+        redKarata.setAlignment(Pos.CENTER);
 
         if (igrac instanceof RadnickaKlasa) {
-            dodajGumboveRadnicke(panelKontrola, engineIgre, (RadnickaKlasa) igrac, akcijaPonovnogPrikaza);
+            dodajKarteRadnicke(redKarata, engineIgre, (RadnickaKlasa) igrac, akcijaPonovnogPrikaza);
         } else if (igrac instanceof SrednjaKlasa) {
-            dodajGumboveSrednje(panelKontrola, engineIgre, (SrednjaKlasa) igrac, akcijaPonovnogPrikaza);
+            dodajKarteSrednje(redKarata, engineIgre, (SrednjaKlasa) igrac, akcijaPonovnogPrikaza);
         } else if (igrac instanceof KapitalistickaKlasa) {
-            dodajGumboveKapitalisticke(panelKontrola, engineIgre, (KapitalistickaKlasa) igrac, akcijaPonovnogPrikaza);
+            dodajKarteKapitalisticke(redKarata, engineIgre, (KapitalistickaKlasa) igrac, akcijaPonovnogPrikaza);
         } else {
-            dodajGumboveVlade(panelKontrola, engineIgre, (Vlada) igrac, akcijaPonovnogPrikaza);
+            dodajKarteVlade(redKarata, engineIgre, (Vlada) igrac, akcijaPonovnogPrikaza);
         }
 
-        dodajGumbPrijedlogaZakona(panelKontrola, engineIgre, igrac, akcijaPrijedlog);
+        dodajKartuPrijedlogaZakona(redKarata, engineIgre, igrac, akcijaPrijedlog);
+
+        panelKontrola.getChildren().addAll(naslovPanela, redKarata);
         return panelKontrola;
     }
 
@@ -63,81 +74,95 @@ public class KontrolePoteza {
         }
     }
 
-    private void dodajGumboveRadnicke(VBox panel, HegemonyEngine engineIgre, RadnickaKlasa radnickaKlasa, Runnable akcija) {
-        dodajAkcijskiGumb(panel, engineIgre, radnickaKlasa, "Zaposljavanje", "Zaposljavanje", () -> {
-            radnickaKlasa.zaposliRadnika(1);
-            akcija.run();
-        });
-        dodajAkcijskiGumb(panel, engineIgre, radnickaKlasa, "Obrazovanje (trosak 10)", "Obrazovanje", () -> {
-            radnickaKlasa.investirajUObrazovanje(10);
-            akcija.run();
-        });
-        dodajAkcijskiGumb(panel, engineIgre, radnickaKlasa, "Sindikalni prosvjed (Strajk)", "Strajk", () -> {
-            radnickaKlasa.pokreniStrajk();
-            akcija.run();
-        });
+    private void dodajKarteRadnicke(HBox red, HegemonyEngine engineIgre, RadnickaKlasa radnickaKlasa, Runnable akcija) {
+        dodajKartu(red, engineIgre, radnickaKlasa, "Zaposljavanje",
+                "Posalji radnika u firmu", "M4 8 H20 V18 H4 Z M9 8 V5 H15 V8", "Zaposljavanje", () -> {
+                    radnickaKlasa.zaposliRadnika(1);
+                    akcija.run();
+                });
+        dodajKartu(red, engineIgre, radnickaKlasa, "Obrazovanje",
+                "Podigni kvalifikaciju (trosak 10)", "M4 18 L12 14 L20 18 L12 22 Z M12 14 V4", "Obrazovanje", () -> {
+                    radnickaKlasa.investirajUObrazovanje(10);
+                    akcija.run();
+                });
+        dodajKartu(red, engineIgre, radnickaKlasa, "Sindikalni prosvjed",
+                "Pokreni strajk u tvrtki", "M12 2 L13 10 L21 10 L14 14 L17 22 L12 17 L7 22 L10 14 L3 10 L11 10 Z", "Strajk", () -> {
+                    radnickaKlasa.pokreniStrajk();
+                    akcija.run();
+                });
     }
 
-    private void dodajGumboveSrednje(VBox panel, HegemonyEngine engineIgre, SrednjaKlasa srednjaKlasa, Runnable akcija) {
-        dodajAkcijskiGumb(panel, engineIgre, srednjaKlasa, "Otvori poduzece (trosak 15)", "OtvoriPoduzece", () -> {
-            srednjaKlasa.otvoriNovoPoduzece(15.0);
-            akcija.run();
-        });
-        dodajAkcijskiGumb(panel, engineIgre, srednjaKlasa, "Obrazovanje (trosak 10)", "ObrazovanjeSrednja", () -> {
-            srednjaKlasa.investirajUObrazovanje(10);
-            akcija.run();
-        });
+    private void dodajKarteSrednje(HBox red, HegemonyEngine engineIgre, SrednjaKlasa srednjaKlasa, Runnable akcija) {
+        dodajKartu(red, engineIgre, srednjaKlasa, "Otvori poduzece",
+                "Pokreni novi posao (trosak 15)", "M4 10 H20 V20 H4 Z M9 10 V6 H15 V10", "OtvoriPoduzece", () -> {
+                    srednjaKlasa.otvoriNovoPoduzece(15.0);
+                    akcija.run();
+                });
+        dodajKartu(red, engineIgre, srednjaKlasa, "Obrazovanje",
+                "Podigni kvalifikaciju (trosak 10)", "M4 18 L12 14 L20 18 L12 22 Z M12 14 V4", "ObrazovanjeSrednja", () -> {
+                    srednjaKlasa.investirajUObrazovanje(10);
+                    akcija.run();
+                });
     }
 
-    private void dodajGumboveKapitalisticke(VBox panel, HegemonyEngine engineIgre, KapitalistickaKlasa kapitalist, Runnable akcija) {
-        dodajAkcijskiGumb(panel, engineIgre, kapitalist, "Investicija - Izgradi tvornicu (50)", "IzgradiTvornicu", () -> {
-            kapitalist.izgradiTvornicu(50.0);
-            akcija.run();
-        });
-        dodajAkcijskiGumb(panel, engineIgre, kapitalist, "Lobiranje (trosak 30)", "Lobiranje", () -> {
-            kapitalist.ulozUInvesticiju(30.0);
-            akcija.run();
-        });
+    private void dodajKarteKapitalisticke(HBox red, HegemonyEngine engineIgre, KapitalistickaKlasa kapitalist, Runnable akcija) {
+        dodajKartu(red, engineIgre, kapitalist, "Investicija",
+                "Izgradi tvornicu (trosak 50)", "M3 18 H21 V20 H3 Z M5 18 V10 H7 V18 Z M9 18 V6 H11 V18 Z M13 18 V11 H15 V18 Z", "IzgradiTvornicu", () -> {
+                    kapitalist.izgradiTvornicu(50.0);
+                    akcija.run();
+                });
+        dodajKartu(red, engineIgre, kapitalist, "Lobiranje",
+                "Plati za politicki utjecaj (trosak 30)", "M4 20 H20 V21 H4 Z M12 4 L20 10 H4 Z", "Lobiranje", () -> {
+                    kapitalist.ulozUInvesticiju(30.0);
+                    akcija.run();
+                });
     }
 
-    private void dodajGumboveVlade(VBox panel, HegemonyEngine engineIgre, Vlada vlada, Runnable akcija) {
-        dodajAkcijskiGumb(panel, engineIgre, vlada, "Javne investicije", "JavneInvesticije", () -> {
-            vlada.povecajLegitimnost(5);
-            akcija.run();
-        });
-        dodajAkcijskiGumb(panel, engineIgre, vlada, "Socijalni paket (trosak 15)", "SocijalniPaket", () -> {
-            vlada.isplatiSubvenciju(15.0);
-            akcija.run();
-        });
+    private void dodajKarteVlade(HBox red, HegemonyEngine engineIgre, Vlada vlada, Runnable akcija) {
+        dodajKartu(red, engineIgre, vlada, "Javne investicije",
+                "Izgradi javnu ustanovu", "M4 20 H20 V21 H4 Z M6 20 V11 H8 V20 Z M11 20 V11 H13 V20 Z M16 20 V11 H18 V20 Z M3 11 L12 4 L21 11 Z", "JavneInvesticije", () -> {
+                    vlada.povecajLegitimnost(5);
+                    akcija.run();
+                });
+        dodajKartu(red, engineIgre, vlada, "Socijalni paket",
+                "Isplati pomoc (trosak 15)", "M12 2 C16 2 19 5 19 9 C19 13 12 22 12 22 C12 22 5 13 5 9 C5 5 8 2 12 2 Z", "SocijalniPaket", () -> {
+                    vlada.isplatiSubvenciju(15.0);
+                    akcija.run();
+                });
     }
 
-    private void dodajGumbPrijedlogaZakona(VBox panel, HegemonyEngine engineIgre, KlasaIgraca igrac, Runnable akcijaPrijedlog) {
-        Button gumbPrijedlog = new Button("Politicki pritisak - Predlozi zakon");
-        StilGumba.primijeniAkcijskiGumb(gumbPrijedlog, igrac);
-        if (!engineIgre.jeAkcijaDostupnaTrenutnomIgracu("PrijedlogZakona")) {
-            gumbPrijedlog.setDisable(true);
+    private void dodajKartuPrijedlogaZakona(HBox red, HegemonyEngine engineIgre, KlasaIgraca igrac, Runnable akcijaPrijedlog) {
+        boolean dostupna = engineIgre.jeAkcijaDostupnaTrenutnomIgracu("PrijedlogZakona");
+        String bojaHex = StilGumba.dohvatiBojuKlase(igrac);
+        VBox karta = kreatorIgraceKarte.napraviKartu("Politicki pritisak",
+                "Predlozi promjenu zakona", "M5 21 H19 M12 3 L19 9 H5 Z M7 9 V21 M17 9 V21", bojaHex, !dostupna);
+
+        if (dostupna) {
+            kreatorIgraceKarte.omoguciHover(karta, bojaHex);
+            karta.setOnMouseClicked(dogadjaj -> {
+                if (engineIgre.iskoristiAkcijuTrenutnogIgraca("PrijedlogZakona")) {
+                    akcijaPrijedlog.run();
+                }
+            });
         }
-        gumbPrijedlog.setOnAction(dogadjaj -> {
-            if (engineIgre.iskoristiAkcijuTrenutnogIgraca("PrijedlogZakona")) {
-                akcijaPrijedlog.run();
-            }
-        });
-        panel.getChildren().add(gumbPrijedlog);
+        red.getChildren().add(karta);
     }
 
-    private void dodajAkcijskiGumb(VBox panel, HegemonyEngine engineIgre, KlasaIgraca igrac, String tekst, String nazivAkcije, Runnable efekt) {
+    private void dodajKartu(HBox red, HegemonyEngine engineIgre, KlasaIgraca igrac, String naziv, String opis,
+                            String svgIkona, String nazivAkcije, Runnable efekt) {
         boolean dostupna = engineIgre.jeAkcijaDostupnaTrenutnomIgracu(nazivAkcije);
-        Button gumb = new Button(tekst + (!dostupna ? " (iskoristeno)" : ""));
-        StilGumba.primijeniAkcijskiGumb(gumb, igrac);
-        if (!dostupna) {
-            gumb.setDisable(true);
+        String bojaHex = StilGumba.dohvatiBojuKlase(igrac);
+        VBox karta = kreatorIgraceKarte.napraviKartu(naziv, opis, svgIkona, bojaHex, !dostupna);
+
+        if (dostupna) {
+            kreatorIgraceKarte.omoguciHover(karta, bojaHex);
+            karta.setOnMouseClicked(dogadjaj -> {
+                if (engineIgre.iskoristiAkcijuTrenutnogIgraca(nazivAkcije)) {
+                    efekt.run();
+                }
+            });
         }
-        gumb.setOnAction(dogadjaj -> {
-            if (engineIgre.iskoristiAkcijuTrenutnogIgraca(nazivAkcije)) {
-                efekt.run();
-            }
-        });
-        panel.getChildren().add(gumb);
+        red.getChildren().add(karta);
     }
 
     private String odrediNazivUloge(KlasaIgraca igrac) {
