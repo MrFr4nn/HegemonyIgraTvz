@@ -11,11 +11,30 @@ import javafx.scene.paint.Color;
 
 public class KreatorAkcijskeTrake {
 
+    public VBox napraviGornjiPanel(Label oznakaFazeIgre, Label oznakaAnimacije) {
+        VBox gornjiPanel = new VBox(6);
+        gornjiPanel.setAlignment(Pos.CENTER);
+        gornjiPanel.setPadding(new Insets(15, 10, 25, 10));
+        gornjiPanel.setStyle("-fx-background-color: " + StilGumba.POZADINA_TAMNA + ";");
+
+        Label naslov = new Label("HEGEMONY: LEAD YOUR CLASS TO VICTORY");
+        naslov.setStyle("-fx-font-family: 'Arial Black'; -fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #00D4FF; "
+                + "-fx-effect: dropshadow(gaussian, rgba(0,212,255,0.5), 15, 0.3, 0, 0);");
+
+        oznakaFazeIgre.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: "
+                + StilGumba.TEKST_SVIJETLI + ";");
+
+        oznakaAnimacije.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 11px; -fx-text-fill: " + StilGumba.TEKST_SIVI + ";");
+
+        gornjiPanel.getChildren().addAll(naslov, oznakaFazeIgre, oznakaAnimacije);
+        return gornjiPanel;
+    }
+
     public VBox napraviAkcijskuTraku(Label oznakaApBrojaca, VBox panelKontrolaTrenutniIgrac, HBox redAlatnihGumbova) {
         VBox akcijskaTraka = new VBox(12);
         akcijskaTraka.setPadding(new Insets(20, 30, 25, 30));
-        akcijskaTraka.setStyle("-fx-background-color: linear-gradient(to bottom, #2B2520, #3A332B); "
-                + "-fx-background-radius: 18 18 0 0;");
+        akcijskaTraka.setStyle("-fx-background-color: " + StilGumba.POVRSINA_TAMNA + "; "
+                + "-fx-border-color: #00D4FF; -fx-border-width: 2 0 0 0;");
         akcijskaTraka.setEffect(napraviSjenuTrake());
 
         akcijskaTraka.getChildren().addAll(oznakaApBrojaca, panelKontrolaTrenutniIgrac, redAlatnihGumbova);
@@ -24,9 +43,9 @@ public class KreatorAkcijskeTrake {
 
     private DropShadow napraviSjenuTrake() {
         DropShadow sjena = new DropShadow();
-        sjena.setRadius(15);
-        sjena.setOffsetY(-4);
-        sjena.setColor(Color.color(0, 0, 0, 0.4));
+        sjena.setRadius(20);
+        sjena.setOffsetY(-5);
+        sjena.setColor(Color.color(0, 0.83, 1, 0.25));
         return sjena;
     }
 
@@ -35,7 +54,7 @@ public class KreatorAkcijskeTrake {
         HBox red = new HBox(10);
         red.setAlignment(Pos.CENTER);
 
-        Button gumbSljedecaFaza = new Button("Sljedeca faza ►");
+        Button gumbSljedecaFaza = new Button("SLJEDECA FAZA ►");
         StilGumba.primijeniNaglaseni(gumbSljedecaFaza);
         gumbSljedecaFaza.setStyle(gumbSljedecaFaza.getStyle() + "-fx-font-size: 14px; -fx-padding: 10 24 10 24;");
         gumbSljedecaFaza.setOnAction(dogadjaj -> akcijaSljedecaFaza.run());

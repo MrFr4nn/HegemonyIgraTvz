@@ -4,7 +4,6 @@ import hr.tvz.java.projekt.logika.HegemonyEngine;
 import hr.tvz.java.projekt.model.KlasaIgraca;
 import hr.tvz.java.projekt.util.Serijalizator;
 import hr.tvz.java.projekt.util.XmlUpravitelj;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -14,6 +13,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -56,21 +56,26 @@ public class GlavniProzor {
 
     public void prikaziProzor() {
         BorderPane korijenskiLayout = new BorderPane();
-        korijenskiLayout.setStyle("-fx-background-color: #EFE7D8;");
+        korijenskiLayout.setStyle("-fx-background-color: " + StilGumba.POZADINA_TAMNA + ";");
+
         HBox plocaIgraca = prikazPloce.napraviDrzavnuPlocu(engineIgre.getListaIgraca());
         plocaIgraca.setAlignment(Pos.CENTER);
         HBox omotacPloce = new HBox(plocaIgraca);
         omotacPloce.setAlignment(Pos.CENTER);
-        omotacPloce.setStyle("-fx-background-color: #EFE7D8;");
+        omotacPloce.setStyle("-fx-background-color: " + StilGumba.POZADINA_TAMNA + ";");
 
         ScrollPane skrolnaPloca = new ScrollPane(omotacPloce);
         skrolnaPloca.setFitToHeight(true);
         skrolnaPloca.setFitToWidth(true);
         skrolnaPloca.setStyle("-fx-background-color: transparent;");
 
+        oznakaFazeIgre = new Label(napraviTekstFaze());
+        oznakaAnimacije = new Label("Spremno za pocetak igre.");
+
         korijenskiLayout.setCenter(skrolnaPloca);
-        korijenskiLayout.setTop(napraviGornjiPanel());
+        korijenskiLayout.setTop(kreatorAkcijskeTrake.napraviGornjiPanel(oznakaFazeIgre, oznakaAnimacije));
         korijenskiLayout.setBottom(napraviAkcijskuTraku());
+
         azurirajPanelPotezaPremaFazi();
 
         Scene glavnaScenaPrikaza = new Scene(korijenskiLayout, 1100, 800);
@@ -79,27 +84,9 @@ public class GlavniProzor {
         glavnaScena.show();
     }
 
-    private VBox napraviGornjiPanel() {
-        VBox gornjiPanel = new VBox(6);
-        gornjiPanel.setAlignment(Pos.CENTER);
-        gornjiPanel.setPadding(new Insets(15, 10, 25, 10));
-        gornjiPanel.setStyle("-fx-background-color: #EFE7D8;");
-
-        Label naslov = new Label("HEGEMONY: LEAD YOUR CLASS TO VICTORY");
-        naslov.setStyle("-fx-font-family: 'Georgia'; -fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2B2520;");
-
-        oznakaFazeIgre = new Label(napraviTekstFaze());
-        oznakaFazeIgre.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 13px; -fx-text-fill: #3A332B;");
-        oznakaAnimacije = new Label("Spremno za pocetak igre.");
-        oznakaAnimacije.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 11px; -fx-text-fill: #6B6357;");
-
-        gornjiPanel.getChildren().addAll(naslov, oznakaFazeIgre, oznakaAnimacije);
-        return gornjiPanel;
-    }
-
     private String napraviTekstFaze() {
-        return "Runda: " + engineIgre.getBrojRunde() + " / 5  |  Faza: " + pretvoriNazivFazeZaPrikaz(engineIgre.getTrenutnaFaza())
-                + "  |  Na potezu: " + engineIgre.dohvatiIgracaNaPotezu().getNaziv();
+        return "RUNDA: " + engineIgre.getBrojRunde() + " / 5  |  FAZA: " + pretvoriNazivFazeZaPrikaz(engineIgre.getTrenutnaFaza())
+                + "  |  NA POTEZU: " + engineIgre.dohvatiIgracaNaPotezu().getNaziv().toUpperCase();
     }
 
     private String pretvoriNazivFazeZaPrikaz(String nazivFaze) {
@@ -132,7 +119,8 @@ public class GlavniProzor {
 
     private void azurirajStilApBrojaca() {
         String boja = StilGumba.dohvatiBojuKlase(engineIgre.dohvatiIgracaNaPotezu());
-        oznakaApBrojaca.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: " + boja + ";");
+        oznakaApBrojaca.setStyle("-fx-font-family: 'Arial Black'; -fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: " + boja
+                + "; -fx-effect: dropshadow(gaussian, " + boja + ", 10, 0.4, 0, 0);");
     }
 
     private void azurirajPanelPotezaPremaFazi() {
@@ -148,9 +136,8 @@ public class GlavniProzor {
         } else if (faza.equals(HegemonyEngine.FAZA_GLASANJE)) {
             upraviteljGlasanja.prikaziPanelGlasanja(panelKontrolaTrenutniIgrac, this::azurirajPanelPotezaPremaFazi);
         } else if (faza.equals(HegemonyEngine.FAZA_KRAJ_RUNDE) || faza.equals(HegemonyEngine.FAZA_PRIPREMA)) {
-            Label oznaka = new Label("Faza " + pretvoriNazivFazeZaPrikaz(faza)
-                    + " — kliknite 'Sljedeca faza' za nastavak.");
-            oznaka.setStyle("-fx-text-fill: #E3D9C4; -fx-font-size: 13px;");
+            Label oznaka = new Label("FAZA " + pretvoriNazivFazeZaPrikaz(faza) + " — KLIKNITE 'SLJEDECA FAZA' ZA NASTAVAK");
+            oznaka.setStyle("-fx-text-fill: " + StilGumba.TEKST_SVIJETLI + "; -fx-font-size: 13px; -fx-font-weight: bold;");
             panelKontrolaTrenutniIgrac.getChildren().add(oznaka);
         } else {
             KlasaIgraca igracNaPotezu = engineIgre.dohvatiIgracaNaPotezu();

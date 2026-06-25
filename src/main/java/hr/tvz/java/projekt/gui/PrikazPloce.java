@@ -21,7 +21,7 @@ import java.util.List;
 
 public class PrikazPloce {
 
-    private static final String BOJA_PODLOGE = "#EFE7D8";
+    private static final String BOJA_PODLOGE = StilGumba.POZADINA_TAMNA;
 
     private KreatorKartice kreatorKartice;
     private List<List<Label>> listaOznakaPoIgracu;
