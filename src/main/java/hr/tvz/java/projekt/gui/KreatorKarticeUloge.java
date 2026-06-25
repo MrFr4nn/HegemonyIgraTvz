@@ -26,7 +26,7 @@ public class KreatorKarticeUloge {
         VBox kartica = new VBox(8);
         kartica.setAlignment(Pos.CENTER);
         kartica.setPadding(new Insets(18));
-        kartica.setPrefSize(170, 190);
+        kartica.setPrefSize(175, 195);
         kartica.setCursor(javafx.scene.Cursor.HAND);
 
         primijeniStilKartice(kartica, bojaHex, odabrana);
@@ -34,24 +34,21 @@ public class KreatorKarticeUloge {
 
         SVGPath ikona = new SVGPath();
         ikona.setContent(svgIkona);
-        Color bojaIkone = odabrana ? Color.WHITE : Color.web(bojaHex);
+        Color bojaIkone = Color.web(bojaHex);
         ikona.setFill(bojaIkone);
-        ikona.setStroke(bojaIkone);
-        ikona.setStrokeWidth(0.5);
-        ikona.setOpacity(1.0);
         ikona.setScaleX(1.7);
         ikona.setScaleY(1.7);
 
-        Label naslov = new Label(nazivUloge);
-        naslov.setFont(Font.font("Georgia", FontWeight.BOLD, 14));
-        naslov.setTextFill(odabrana ? Color.WHITE : Color.web("#2B2520"));
+        Label naslov = new Label(nazivUloge.toUpperCase());
+        naslov.setFont(Font.font("Arial Black", FontWeight.BOLD, 14));
+        naslov.setTextFill(Color.web(StilGumba.TEKST_SVIJETLI));
         naslov.setWrapText(true);
         naslov.setAlignment(Pos.CENTER);
         naslov.setStyle("-fx-text-alignment: center;");
 
         Label opis = new Label(opisUloge);
         opis.setFont(Font.font("Verdana", 10));
-        opis.setTextFill(odabrana ? Color.web("#F0F0F0") : Color.web("#6B6357"));
+        opis.setTextFill(Color.web(StilGumba.TEKST_SIVI));
         opis.setWrapText(true);
         opis.setAlignment(Pos.CENTER);
         opis.setStyle("-fx-text-alignment: center;");
@@ -62,27 +59,32 @@ public class KreatorKarticeUloge {
 
     public void primijeniStilKartice(VBox kartica, String bojaHex, boolean odabrana) {
         if (odabrana) {
-            kartica.setBackground(new Background(new BackgroundFill(Color.web(bojaHex), new CornerRadii(14), Insets.EMPTY)));
+            kartica.setBackground(new Background(new BackgroundFill(Color.web(StilGumba.POVRSINA_TAMNA), new CornerRadii(6), Insets.EMPTY)));
             kartica.setBorder(new Border(new BorderStroke(Color.web(bojaHex), BorderStrokeStyle.SOLID,
-                    new CornerRadii(14), new BorderWidths(3))));
+                    new CornerRadii(6), new BorderWidths(3))));
+            kartica.setEffect(StilGumba.napraviNeonSjenu(bojaHex));
         } else {
-            kartica.setBackground(new Background(new BackgroundFill(Color.WHITE, new CornerRadii(14), Insets.EMPTY)));
-            kartica.setBorder(new Border(new BorderStroke(Color.web(bojaHex), BorderStrokeStyle.SOLID,
-                    new CornerRadii(14), new BorderWidths(2.5))));
+            kartica.setBackground(new Background(new BackgroundFill(Color.web(StilGumba.POVRSINA_TAMNA), new CornerRadii(6), Insets.EMPTY)));
+            kartica.setBorder(new Border(new BorderStroke(Color.web(StilGumba.TEKST_SIVI), BorderStrokeStyle.SOLID,
+                    new CornerRadii(6), new BorderWidths(1.5))));
+            kartica.setEffect(napraviObicnuSjenu());
         }
-        kartica.setEffect(napraviSjenu());
     }
 
     private void dodajHoverEfekt(VBox kartica, String bojaHex, boolean odabrana) {
         if (odabrana) {
             return;
         }
-        Color bojaPozadine = Color.web(bojaHex);
-        Color svijetlaVerzija = bojaPozadine.deriveColor(0, 1, 1, 0.15);
-        kartica.setOnMouseEntered(dogadjaj -> kartica.setBackground(
-                new Background(new BackgroundFill(svijetlaVerzija, new CornerRadii(14), Insets.EMPTY))));
-        kartica.setOnMouseExited(dogadjaj -> kartica.setBackground(
-                new Background(new BackgroundFill(Color.WHITE, new CornerRadii(14), Insets.EMPTY))));
+        kartica.setOnMouseEntered(dogadjaj -> {
+            kartica.setBorder(new Border(new BorderStroke(Color.web(bojaHex), BorderStrokeStyle.SOLID,
+                    new CornerRadii(6), new BorderWidths(2.5))));
+            kartica.setEffect(StilGumba.napraviNeonSjenu(bojaHex));
+        });
+        kartica.setOnMouseExited(dogadjaj -> {
+            kartica.setBorder(new Border(new BorderStroke(Color.web(StilGumba.TEKST_SIVI), BorderStrokeStyle.SOLID,
+                    new CornerRadii(6), new BorderWidths(1.5))));
+            kartica.setEffect(napraviObicnuSjenu());
+        });
     }
 
     public void animirajOdabir(VBox kartica) {
@@ -99,11 +101,11 @@ public class KreatorKarticeUloge {
         animacija.play();
     }
 
-    private DropShadow napraviSjenu() {
+    private DropShadow napraviObicnuSjenu() {
         DropShadow sjena = new DropShadow();
-        sjena.setRadius(10);
-        sjena.setOffsetY(4);
-        sjena.setColor(Color.color(0, 0, 0, 0.3));
+        sjena.setRadius(8);
+        sjena.setOffsetY(3);
+        sjena.setColor(Color.color(0, 0, 0, 0.6));
         return sjena;
     }
 

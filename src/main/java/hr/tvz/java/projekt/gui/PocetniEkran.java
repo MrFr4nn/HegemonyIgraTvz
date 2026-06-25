@@ -31,7 +31,7 @@ public class PocetniEkran {
     private Label oznakaSazetka;
 
     private static final String[] NAZIVI_ULOGA = {"Radnicka klasa", "Srednja klasa", "Kapitalisticka klasa", "Vlada"};
-    private static final String[] BOJE_ULOGA = {"#8C3A36", "#A6862C", "#2B4C70", "#4A4458"};
+    private static final String[] BOJE_ULOGA = {"#FF3B5C", "#F5D400", "#00F5A0", "#00D4FF"};
 
     public PocetniEkran(Stage glavnaScena, Consumer<List<KlasaIgraca>> akcijaPoOdabiru) {
         this.glavnaScena = glavnaScena;
@@ -60,10 +60,11 @@ public class PocetniEkran {
         korijenskiLayout.setBackground(kreatorSazetka.napraviGradijentnuPodlogu());
 
         Label naslov = new Label("HEGEMONY: LEAD YOUR CLASS TO VICTORY");
-        naslov.setStyle("-fx-font-family: 'Georgia'; -fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #2B2520;");
+        naslov.setStyle("-fx-font-family: 'Arial Black'; -fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #00D4FF; "
+                + "-fx-effect: dropshadow(gaussian, rgba(0,212,255,0.6), 20, 0.3, 0, 0);");
 
         Label podnaslov = new Label("Odaberite broj igraca, zatim kliknite karticu za odabir uloge svakog igraca");
-        podnaslov.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 13px; -fx-text-fill: #4A4438;");
+        podnaslov.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 13px; -fx-text-fill: " + StilGumba.TEKST_SIVI + ";");
 
         HBox panelBrojaIgraca = kreatorSazetka.napraviPanelBrojaIgraca(odabraniBrojIgraca, novaVrijednost -> {
             odabraniBrojIgraca = novaVrijednost;
@@ -102,8 +103,9 @@ public class PocetniEkran {
         int brojac = 0;
         while (brojac < odabraniBrojIgraca) {
             int pozicija = brojac;
-            Label oznakaPozicije = new Label("Igrac " + (pozicija + 1) + ":");
-            oznakaPozicije.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #2B2520;");
+            Label oznakaPozicije = new Label("IGRAC " + (pozicija + 1) + ":");
+            oznakaPozicije.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: "
+                    + StilGumba.TEKST_SVIJETLI + ";");
 
             HBox redKartica = napraviRedKarticaZaPoziciju(pozicija);
             VBox blokPozicije = new VBox(8, oznakaPozicije, redKartica);
@@ -113,7 +115,7 @@ public class PocetniEkran {
 
             if (brojac < odabraniBrojIgraca - 1) {
                 Separator separator = new Separator();
-                separator.setStyle("-fx-background-color: #C9B896;");
+                separator.setStyle("-fx-background-color: " + StilGumba.TEKST_SIVI + ";");
                 panelIzbornikaUloga.getChildren().add(separator);
             }
             brojac = brojac + 1;

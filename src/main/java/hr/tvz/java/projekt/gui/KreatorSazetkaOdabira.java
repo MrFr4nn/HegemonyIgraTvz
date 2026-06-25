@@ -9,9 +9,6 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Stop;
 
 import java.util.List;
 
@@ -19,19 +16,19 @@ public class KreatorSazetkaOdabira {
 
     public Label napraviOznakuBrojaca() {
         Label oznaka = new Label();
-        oznaka.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #4A4438;");
+        oznaka.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #00D4FF;");
         return oznaka;
     }
 
     public Label napraviOznakuSazetka() {
         Label oznaka = new Label();
-        oznaka.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 12px; -fx-text-fill: #2B2520;");
+        oznaka.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 12px; -fx-text-fill: " + StilGumba.TEKST_SVIJETLI + ";");
         oznaka.setWrapText(true);
         return oznaka;
     }
 
     public void azurirajBrojacPopunjenosti(Label oznakaBrojaca, int odabraniBrojIgraca) {
-        oznakaBrojaca.setText("Postavke odabrane za " + odabraniBrojIgraca + " / " + odabraniBrojIgraca + " igraca.");
+        oznakaBrojaca.setText("POSTAVKE ODABRANE ZA " + odabraniBrojIgraca + " / " + odabraniBrojIgraca + " IGRACA");
     }
 
     public void azurirajSazetak(Label oznakaSazetka, List<String> odabraneUlogePoPoziciji) {
@@ -48,25 +45,20 @@ public class KreatorSazetkaOdabira {
     }
 
     public Background napraviGradijentnuPodlogu() {
-        Stop[] tockeBoje = {
-                new Stop(0, Color.web("#EFE7D8")),
-                new Stop(0.5, Color.web("#E3D6BE")),
-                new Stop(1, Color.web("#D8C9A8"))
-        };
-        LinearGradient gradijent = new LinearGradient(0, 0, 1, 1, true, CycleMethod.NO_CYCLE, tockeBoje);
-        return new Background(new BackgroundFill(gradijent, CornerRadii.EMPTY, Insets.EMPTY));
+        return new Background(new BackgroundFill(Color.web(StilGumba.POZADINA_TAMNA), CornerRadii.EMPTY, Insets.EMPTY));
     }
 
     public HBox napraviPanelBrojaIgraca(int pocetnaVrijednost, java.util.function.IntConsumer akcijaPromjene) {
         HBox panel = new HBox(12);
         panel.setAlignment(Pos.CENTER);
 
-        Label oznaka = new Label("Broj igraca:");
-        oznaka.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 14px; -fx-text-fill: #2B2520;");
+        Label oznaka = new Label("BROJ IGRACA:");
+        oznaka.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: " + StilGumba.TEKST_SVIJETLI + ";");
 
         ComboBox<Integer> izbornikBrojaIgraca = new ComboBox<>();
         izbornikBrojaIgraca.getItems().addAll(2, 3, 4);
         izbornikBrojaIgraca.setValue(pocetnaVrijednost);
+        izbornikBrojaIgraca.setStyle("-fx-background-color: " + StilGumba.POVRSINA_TAMNA + "; -fx-text-fill: " + StilGumba.TEKST_SVIJETLI + ";");
         izbornikBrojaIgraca.setOnAction(dogadjaj -> akcijaPromjene.accept(izbornikBrojaIgraca.getValue()));
 
         panel.getChildren().addAll(oznaka, izbornikBrojaIgraca);
