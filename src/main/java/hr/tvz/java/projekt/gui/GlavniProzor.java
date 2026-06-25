@@ -56,8 +56,15 @@ public class GlavniProzor {
         BorderPane korijenskiLayout = new BorderPane();
         korijenskiLayout.setStyle("-fx-background-color: #EFE7D8;");
 
-        ScrollPane skrolnaPloca = new ScrollPane(prikazPloce.napraviDrzavnuPlocu(engineIgre.getListaIgraca()));
+        HBox plocaIgraca = prikazPloce.napraviDrzavnuPlocu(engineIgre.getListaIgraca());
+        plocaIgraca.setAlignment(Pos.CENTER);
+        HBox omotacPloce = new HBox(plocaIgraca);
+        omotacPloce.setAlignment(Pos.CENTER);
+        omotacPloce.setStyle("-fx-background-color: #EFE7D8;");
+
+        ScrollPane skrolnaPloca = new ScrollPane(omotacPloce);
         skrolnaPloca.setFitToHeight(true);
+        skrolnaPloca.setFitToWidth(true);
         skrolnaPloca.setStyle("-fx-background-color: transparent;");
 
         korijenskiLayout.setCenter(skrolnaPloca);

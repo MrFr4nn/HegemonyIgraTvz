@@ -104,17 +104,17 @@ public class PrikazPloce {
             SrednjaKlasa srednjaKlasa = (SrednjaKlasa) igrac;
             oznake.add(kreatorKartice.napraviOznaku("Standard zivota: " + srednjaKlasa.getStandardZivota()));
             oznake.add(kreatorKartice.napraviOznaku("Poduzeca: " + srednjaKlasa.getBrojMalihPoduzeca()));
-            oznake.add(kreatorKartice.napraviOznaku("Kapital: " + srednjaKlasa.getUstedjeniKapital()));
+            oznake.add(kreatorKartice.napraviOznaku("Kapital: " + String.format("%.2f", srednjaKlasa.getUstedjeniKapital())));
         } else if (igrac instanceof KapitalistickaKlasa) {
             KapitalistickaKlasa kapitalistickaKlasa = (KapitalistickaKlasa) igrac;
-            oznake.add(kreatorKartice.napraviOznaku("Kapital: " + kapitalistickaKlasa.getUkupniKapital()));
+            oznake.add(kreatorKartice.napraviOznaku("Kapital: " + String.format("%.2f", kapitalistickaKlasa.getUkupniKapital())));
             oznake.add(kreatorKartice.napraviOznaku("Tvornice: " + kapitalistickaKlasa.getBrojTvornica()));
-            oznake.add(kreatorKartice.napraviOznaku("Dionice: " + kapitalistickaKlasa.getVrijednostDionica()));
+            oznake.add(kreatorKartice.napraviOznaku("Dionice: " + String.format("%.2f", kapitalistickaKlasa.getVrijednostDionica())));
         } else {
             Vlada vlada = (Vlada) igrac;
             oznake.add(kreatorKartice.napraviOznaku("Proracun: " + String.format("%.2f", vlada.getDrzavniProracun())));
-            oznake.add(kreatorKartice.napraviOznaku("Stopa poreza: " + vlada.getStopaPoreza()));
-            oznake.add(kreatorKartice.napraviOznaku("Min. placa: " + vlada.getMinimalnaPlaca()));
+            oznake.add(kreatorKartice.napraviOznaku("Stopa poreza: " + String.format("%.2f", vlada.getStopaPoreza())));
+            oznake.add(kreatorKartice.napraviOznaku("Min. placa: " + String.format("%.2f", vlada.getMinimalnaPlaca())));
             oznake.add(kreatorKartice.napraviOznaku("Legitimnost: " + vlada.getLegitimnost()));
         }
         return oznake;

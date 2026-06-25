@@ -26,12 +26,12 @@ public class ObradaProizvodnje {
             KapitalistickaKlasa kapitalist = (KapitalistickaKlasa) igrac;
             double proizvedeno = kapitalist.getBrojTvornica() * 10.0;
             kapitalist.setUkupniKapital(kapitalist.getUkupniKapital() + proizvedeno);
-            return kapitalist.getNaziv() + " je proizveo: " + proizvedeno;
+            return kapitalist.getNaziv() + " je proizveo: " + String.format("%.2f", proizvedeno);
         } else if (igrac instanceof SrednjaKlasa) {
             SrednjaKlasa srednjaKlasa = (SrednjaKlasa) igrac;
             double proizvedeno = srednjaKlasa.getBrojMalihPoduzeca() * 6.0;
             srednjaKlasa.ostvariPrihod(proizvedeno);
-            return srednjaKlasa.getNaziv() + " je proizveo: " + proizvedeno;
+            return srednjaKlasa.getNaziv() + " je proizveo: " + String.format("%.2f", proizvedeno);
         } else if (igrac instanceof RadnickaKlasa) {
             RadnickaKlasa radnickaKlasa = (RadnickaKlasa) igrac;
             int kolicinaHrane = radnickaKlasa.getZaposleniRadnici();
