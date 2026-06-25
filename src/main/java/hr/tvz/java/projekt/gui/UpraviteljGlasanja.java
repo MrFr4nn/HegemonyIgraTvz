@@ -40,6 +40,7 @@ public class UpraviteljGlasanja {
 
         if (engineIgre.getTrenutnoGlasanje().isGlasanjeZavrseno()) {
             Label oznakaIshoda = new Label(engineIgre.getTrenutnoGlasanje().ispisiRezultatGlasanja());
+            oznakaIshoda.setStyle("-fx-text-fill: #E3D9C4; -fx-font-size: 13px;");
             panelKontrolaTrenutniIgrac.getChildren().add(oznakaIshoda);
             return;
         }
@@ -57,14 +58,17 @@ public class UpraviteljGlasanja {
         }
 
         KlasaIgraca trenutniGlasac = listaIgraca.get(pozicijaGlasacaUNizu);
+        String bojaHex = StilGumba.dohvatiBojuKlase(trenutniGlasac);
+
         VBox panelGlasanja = kontrolePoteza.napraviPanelGlasanja(
                 engineIgre.getTrenutnoGlasanje().getNazivZakona(),
+                trenutniGlasac.getNaziv(),
+                bojaHex,
                 () -> obradiGlas(trenutniGlasac.getNaziv(), true, akcijaPonovnogPrikaza),
                 () -> obradiGlas(trenutniGlasac.getNaziv(), false, akcijaPonovnogPrikaza)
         );
-        Label oznakaTko = new Label("Glasa: " + trenutniGlasac.getNaziv());
         panelKontrolaTrenutniIgrac.getChildren().clear();
-        panelKontrolaTrenutniIgrac.getChildren().addAll(oznakaTko, panelGlasanja);
+        panelKontrolaTrenutniIgrac.getChildren().add(panelGlasanja);
     }
 
     public void obradiPrijedlogZakona(String naziviPredlagaca, String nazivZakona) {
