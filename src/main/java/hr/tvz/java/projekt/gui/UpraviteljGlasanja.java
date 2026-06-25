@@ -40,7 +40,7 @@ public class UpraviteljGlasanja {
 
         if (engineIgre.getTrenutnoGlasanje().isGlasanjeZavrseno()) {
             Label oznakaIshoda = new Label(engineIgre.getTrenutnoGlasanje().ispisiRezultatGlasanja());
-            oznakaIshoda.setStyle("-fx-text-fill: #E3D9C4; -fx-font-size: 13px;");
+            oznakaIshoda.setStyle("-fx-text-fill: " + StilGumba.TEKST_SVIJETLI + "; -fx-font-size: 13px; -fx-font-weight: bold;");
             panelKontrolaTrenutniIgrac.getChildren().add(oznakaIshoda);
             return;
         }

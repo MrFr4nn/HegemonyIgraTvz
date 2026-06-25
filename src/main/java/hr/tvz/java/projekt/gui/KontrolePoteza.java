@@ -33,7 +33,7 @@ public class KontrolePoteza {
         StilGumba.primijeniObrubAktivneKlase(panelKontrola, igrac);
 
         Label naslovPanela = new Label(odrediNazivUloge(igrac).toUpperCase() + " - ODABERITE KARTU");
-        naslovPanela.setFont(Font.font("Georgia", FontWeight.BOLD, 13));
+        naslovPanela.setFont(Font.font("Arial Black", FontWeight.BOLD, 13));
         naslovPanela.setStyle("-fx-text-fill: " + StilGumba.dohvatiBojuKlase(igrac) + ";");
 
         HBox redKarata = new HBox(10);
@@ -107,12 +107,12 @@ public class KontrolePoteza {
         panelKontrola.setPadding(new Insets(10));
 
         Label oznakaTko = new Label("GLASA: " + nazivGlasaca.toUpperCase());
-        oznakaTko.setFont(Font.font("Georgia", FontWeight.BOLD, 13));
-        oznakaTko.setStyle("-fx-text-fill: " + bojaHex + ";");
+        oznakaTko.setFont(Font.font("Arial Black", FontWeight.BOLD, 15));
+        oznakaTko.setStyle("-fx-text-fill: " + bojaHex + "; -fx-effect: dropshadow(gaussian, " + bojaHex + ", 12, 0.4, 0, 0);");
 
-        Label naslovPanela = new Label("Zakon: " + nazivZakona);
+        Label naslovPanela = new Label("ZAKON: " + nazivZakona.toUpperCase());
         naslovPanela.setFont(Font.font("Verdana", 13));
-        naslovPanela.setStyle("-fx-text-fill: #E3D9C4;");
+        naslovPanela.setStyle("-fx-text-fill: " + StilGumba.TEKST_SVIJETLI + ";");
 
         HBox redGumbova = new HBox(20);
         redGumbova.setAlignment(Pos.CENTER);
