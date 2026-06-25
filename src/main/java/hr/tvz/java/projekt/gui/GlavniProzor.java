@@ -6,7 +6,6 @@ import hr.tvz.java.projekt.util.Serijalizator;
 import hr.tvz.java.projekt.util.XmlUpravitelj;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
@@ -32,6 +31,7 @@ public class GlavniProzor {
     private UpraviteljGlasanja upraviteljGlasanja;
     private KreatorAkcijskeTrake kreatorAkcijskeTrake;
     private KreatorIzvjestaja kreatorIzvjestaja;
+    private KreatorZavrsnogEkrana kreatorZavrsnogEkrana;
 
     private VBox panelKontrolaTrenutniIgrac;
     private Label oznakaFazeIgre;
@@ -52,6 +52,7 @@ public class GlavniProzor {
         this.upraviteljGlasanja = new UpraviteljGlasanja(engineIgre, kontrolePoteza, xmlUpravitelj);
         this.kreatorAkcijskeTrake = new KreatorAkcijskeTrake();
         this.kreatorIzvjestaja = new KreatorIzvjestaja();
+        this.kreatorZavrsnogEkrana = new KreatorZavrsnogEkrana();
     }
 
     public void prikaziProzor() {
@@ -182,10 +183,6 @@ public class GlavniProzor {
     }
 
     private void prikaziObavijestKraja() {
-        Alert obavijest = new Alert(Alert.AlertType.INFORMATION);
-        obavijest.setTitle("Kraj igre");
-        obavijest.setHeaderText("Igra je zavrsena!");
-        obavijest.setContentText("Pobjednik je: " + engineIgre.dohvatiPobjednika());
-        obavijest.showAndWait();
+        kreatorZavrsnogEkrana.prikaziEkranPobjede(engineIgre.dohvatiPobjednika(), engineIgre.getListaIgraca());
     }
 }

@@ -19,7 +19,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 
 import java.util.List;
 
@@ -31,8 +30,8 @@ public class KreatorIzvjestaja {
         panel.setPadding(new Insets(5));
 
         Label oznakaNaslova = new Label(naslov.toUpperCase());
-        oznakaNaslova.setFont(Font.font("Georgia", FontWeight.BOLD, 14));
-        oznakaNaslova.setStyle("-fx-text-fill: #E3D9C4;");
+        oznakaNaslova.setFont(Font.font("Arial Black", FontWeight.BOLD, 14));
+        oznakaNaslova.setStyle("-fx-text-fill: #00D4FF;");
 
         VBox blokRedova = new VBox(6);
         blokRedova.setAlignment(Pos.CENTER);
@@ -44,12 +43,7 @@ public class KreatorIzvjestaja {
             brojac = brojac + 1;
         }
 
-        ScrollPane skrolnaLista = new ScrollPane(blokRedova);
-        skrolnaLista.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
-        skrolnaLista.setPrefHeight(110);
-        skrolnaLista.setFitToWidth(true);
-
-        panel.getChildren().addAll(oznakaNaslova, skrolnaLista);
+        panel.getChildren().addAll(oznakaNaslova, blokRedova);
         return panel;
     }
 
@@ -61,9 +55,9 @@ public class KreatorIzvjestaja {
 
         String bojaHex = StilGumba.dohvatiBojuKlase(igrac);
 
-        redak.setBackground(new Background(new BackgroundFill(Color.web("#3A332B"), new CornerRadii(8), Insets.EMPTY)));
+        redak.setBackground(new Background(new BackgroundFill(Color.web(StilGumba.POVRSINA_TAMNA), new CornerRadii(4), Insets.EMPTY)));
         redak.setBorder(new Border(new BorderStroke(Color.web(bojaHex), BorderStrokeStyle.SOLID,
-                new CornerRadii(8), new BorderWidths(0, 0, 0, 4))));
+                new CornerRadii(4), new BorderWidths(0, 0, 0, 4))));
 
         Label oznakaIgraca = new Label(skratiNazivIgraca(igrac));
         oznakaIgraca.setFont(Font.font("Verdana", FontWeight.BOLD, 11));
@@ -72,7 +66,7 @@ public class KreatorIzvjestaja {
 
         Label oznakaTeksta = new Label(skratiOpisRetka(tekstRetka));
         oznakaTeksta.setFont(Font.font("Verdana", 11));
-        oznakaTeksta.setStyle("-fx-text-fill: #E3D9C4;");
+        oznakaTeksta.setStyle("-fx-text-fill: " + StilGumba.TEKST_SVIJETLI + ";");
         oznakaTeksta.setWrapText(true);
 
         redak.getChildren().addAll(oznakaIgraca, oznakaTeksta);
