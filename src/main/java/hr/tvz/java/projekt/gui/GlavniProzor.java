@@ -10,12 +10,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class GlavniProzor {
@@ -31,6 +31,7 @@ public class GlavniProzor {
     private UpraviteljReplay upraviteljReplay;
     private UpraviteljGlasanja upraviteljGlasanja;
     private KreatorAkcijskeTrake kreatorAkcijskeTrake;
+    private KreatorIzvjestaja kreatorIzvjestaja;
 
     private VBox panelKontrolaTrenutniIgrac;
     private Label oznakaFazeIgre;
@@ -50,12 +51,12 @@ public class GlavniProzor {
         this.upraviteljReplay = new UpraviteljReplay(xmlUpravitelj);
         this.upraviteljGlasanja = new UpraviteljGlasanja(engineIgre, kontrolePoteza, xmlUpravitelj);
         this.kreatorAkcijskeTrake = new KreatorAkcijskeTrake();
+        this.kreatorIzvjestaja = new KreatorIzvjestaja();
     }
 
     public void prikaziProzor() {
         BorderPane korijenskiLayout = new BorderPane();
         korijenskiLayout.setStyle("-fx-background-color: #EFE7D8;");
-
         HBox plocaIgraca = prikazPloce.napraviDrzavnuPlocu(engineIgre.getListaIgraca());
         plocaIgraca.setAlignment(Pos.CENTER);
         HBox omotacPloce = new HBox(plocaIgraca);
@@ -70,7 +71,6 @@ public class GlavniProzor {
         korijenskiLayout.setCenter(skrolnaPloca);
         korijenskiLayout.setTop(napraviGornjiPanel());
         korijenskiLayout.setBottom(napraviAkcijskuTraku());
-
         azurirajPanelPotezaPremaFazi();
 
         Scene glavnaScenaPrikaza = new Scene(korijenskiLayout, 1100, 800);
@@ -90,7 +90,6 @@ public class GlavniProzor {
 
         oznakaFazeIgre = new Label(napraviTekstFaze());
         oznakaFazeIgre.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 13px; -fx-text-fill: #3A332B;");
-
         oznakaAnimacije = new Label("Spremno za pocetak igre.");
         oznakaAnimacije.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 11px; -fx-text-fill: #6B6357;");
 
@@ -139,9 +138,9 @@ public class GlavniProzor {
         azurirajStilApBrojaca();
 
         if (faza.equals(HegemonyEngine.FAZA_PROIZVODNJA)) {
-            prikaziIzvjestaj("Faza Proizvodnje", engineIgre.obradiFazuProizvodnje());
+            prikaziVizualniIzvjestaj("Faza Proizvodnje", engineIgre.obradiFazuProizvodnje());
         } else if (faza.equals(HegemonyEngine.FAZA_POTROSNJA)) {
-            prikaziIzvjestaj("Faza Potrosnje", engineIgre.obradiFazuPotrosnje());
+            prikaziVizualniIzvjestaj("Faza Potrosnje", engineIgre.obradiFazuPotrosnje());
         } else if (faza.equals(HegemonyEngine.FAZA_GLASANJE)) {
             upraviteljGlasanja.prikaziPanelGlasanja(panelKontrolaTrenutniIgrac, this::azurirajPanelPotezaPremaFazi);
         } else if (faza.equals(HegemonyEngine.FAZA_KRAJ_RUNDE) || faza.equals(HegemonyEngine.FAZA_PRIPREMA)) {
@@ -157,13 +156,11 @@ public class GlavniProzor {
         }
     }
 
-    private void prikaziIzvjestaj(String naslovIzvjestaja, String sadrzaj) {
-        Label naslov = new Label(naslovIzvjestaja);
-        naslov.setStyle("-fx-text-fill: #E3D9C4; -fx-font-weight: bold;");
-        TextArea poljeIzvjestaja = new TextArea(sadrzaj);
-        poljeIzvjestaja.setEditable(false);
-        poljeIzvjestaja.setPrefHeight(100);
-        panelKontrolaTrenutniIgrac.getChildren().addAll(naslov, poljeIzvjestaja);
+    private void prikaziVizualniIzvjestaj(String naslovIzvjestaja, String sadrzaj) {
+        List<String> redovi = new ArrayList<>(Arrays.asList(sadrzaj.split("\n")));
+        redovi.removeIf(String::isBlank);
+        VBox panelIzvjestaja = kreatorIzvjestaja.napraviPanelIzvjestaja(naslovIzvjestaja, redovi, engineIgre.getListaIgraca());
+        panelKontrolaTrenutniIgrac.getChildren().add(panelIzvjestaja);
     }
 
     private void obradiPotezIgraca() {
