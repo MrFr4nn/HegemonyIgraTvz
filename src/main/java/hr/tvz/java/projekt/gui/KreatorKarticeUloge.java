@@ -34,9 +34,13 @@ public class KreatorKarticeUloge {
 
         SVGPath ikona = new SVGPath();
         ikona.setContent(svgIkona);
-        ikona.setFill(odabrana ? Color.WHITE : Color.web(bojaHex));
-        ikona.setScaleX(1.6);
-        ikona.setScaleY(1.6);
+        Color bojaIkone = odabrana ? Color.WHITE : Color.web(bojaHex);
+        ikona.setFill(bojaIkone);
+        ikona.setStroke(bojaIkone);
+        ikona.setStrokeWidth(0.5);
+        ikona.setOpacity(1.0);
+        ikona.setScaleX(1.7);
+        ikona.setScaleY(1.7);
 
         Label naslov = new Label(nazivUloge);
         naslov.setFont(Font.font("Georgia", FontWeight.BOLD, 14));
@@ -64,7 +68,7 @@ public class KreatorKarticeUloge {
         } else {
             kartica.setBackground(new Background(new BackgroundFill(Color.WHITE, new CornerRadii(14), Insets.EMPTY)));
             kartica.setBorder(new Border(new BorderStroke(Color.web(bojaHex), BorderStrokeStyle.SOLID,
-                    new CornerRadii(14), new BorderWidths(2))));
+                    new CornerRadii(14), new BorderWidths(2.5))));
         }
         kartica.setEffect(napraviSjenu());
     }
@@ -74,7 +78,7 @@ public class KreatorKarticeUloge {
             return;
         }
         Color bojaPozadine = Color.web(bojaHex);
-        Color svijetlaVerzija = bojaPozadine.deriveColor(0, 1, 1, 0.12);
+        Color svijetlaVerzija = bojaPozadine.deriveColor(0, 1, 1, 0.15);
         kartica.setOnMouseEntered(dogadjaj -> kartica.setBackground(
                 new Background(new BackgroundFill(svijetlaVerzija, new CornerRadii(14), Insets.EMPTY))));
         kartica.setOnMouseExited(dogadjaj -> kartica.setBackground(
