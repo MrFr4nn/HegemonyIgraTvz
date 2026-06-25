@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class SustavAkcijskihBodova {
 
-    private static final int MAKSIMALNI_AP_PO_RUNDI = 5;
+    private static final int MAKSIMALNI_AP_PO_RUNDI = 1;
 
     private int potrosenAp;
     private Map<String, Integer> brojKoristenjaPoAkciji;
