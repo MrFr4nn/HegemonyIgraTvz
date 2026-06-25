@@ -4,6 +4,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -53,15 +54,39 @@ public class KreatorSazetkaOdabira {
         panel.setAlignment(Pos.CENTER);
 
         Label oznaka = new Label("BROJ IGRACA:");
-        oznaka.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: " + StilGumba.TEKST_SVIJETLI + ";");
+        oznaka.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: "
+                + StilGumba.TEKST_SVIJETLI + ";");
 
         ComboBox<Integer> izbornikBrojaIgraca = new ComboBox<>();
         izbornikBrojaIgraca.getItems().addAll(2, 3, 4);
         izbornikBrojaIgraca.setValue(pocetnaVrijednost);
-        izbornikBrojaIgraca.setStyle("-fx-background-color: " + StilGumba.POVRSINA_TAMNA + "; -fx-text-fill: " + StilGumba.TEKST_SVIJETLI + ";");
+        izbornikBrojaIgraca.setStyle(
+                "-fx-background-color: " + StilGumba.POVRSINA_TAMNA + "; "
+                        + "-fx-border-color: #00D4FF; -fx-border-width: 2; -fx-border-radius: 4; -fx-background-radius: 4; "
+                        + "-fx-mark-color: #00D4FF; -fx-text-fill: " + StilGumba.TEKST_SVIJETLI + "; "
+                        + "-fx-font-size: 13px; -fx-font-weight: bold;"
+        );
+        izbornikBrojaIgraca.setCellFactory(listaIzbornika -> napraviCelijuBrojaIgraca());
+        izbornikBrojaIgraca.setButtonCell(napraviCelijuBrojaIgraca());
         izbornikBrojaIgraca.setOnAction(dogadjaj -> akcijaPromjene.accept(izbornikBrojaIgraca.getValue()));
 
         panel.getChildren().addAll(oznaka, izbornikBrojaIgraca);
         return panel;
+    }
+
+    private ListCell<Integer> napraviCelijuBrojaIgraca() {
+        return new ListCell<Integer>() {
+            @Override
+            protected void updateItem(Integer broj, boolean prazno) {
+                super.updateItem(broj, prazno);
+                if (prazno || broj == null) {
+                    setText(null);
+                } else {
+                    setText(String.valueOf(broj));
+                    setStyle("-fx-text-fill: " + StilGumba.TEKST_SVIJETLI + "; -fx-background-color: "
+                            + StilGumba.POVRSINA_TAMNA + ";");
+                }
+            }
+        };
     }
 }

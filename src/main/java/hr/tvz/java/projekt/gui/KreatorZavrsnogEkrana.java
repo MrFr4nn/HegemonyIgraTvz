@@ -40,11 +40,11 @@ public class KreatorZavrsnogEkrana {
         naslovIgraJeZavrsena.setStyle("-fx-text-fill: " + StilGumba.TEKST_SIVI + ";");
 
         Label naslovPobjednika = new Label("POBJEDNIK: " + nazivPobjednika.toUpperCase());
-        naslovPobjednika.setFont(Font.font("Arial Black", FontWeight.BOLD, 30));
-        naslovPobjednika.setStyle("-fx-text-fill: #00D4FF; -fx-effect: dropshadow(gaussian, #00D4FF, 25, 0.5, 0, 0);");
+        naslovPobjednika.setFont(Font.font("Arial Black", FontWeight.BOLD, 26));
         naslovPobjednika.setWrapText(true);
         naslovPobjednika.setAlignment(Pos.CENTER);
-        naslovPobjednika.setStyle(naslovPobjednika.getStyle() + "-fx-text-alignment: center;");
+        naslovPobjednika.setStyle("-fx-text-fill: #00D4FF; -fx-text-alignment: center; "
+                + "-fx-effect: dropshadow(gaussian, rgba(0,212,255,0.45), 12, 0.25, 0, 0);");
 
         VBox rangLista = napraviRangListu(listaIgraca);
 

@@ -42,8 +42,10 @@ public class KreatorKartice {
         ikona.setFill(Color.web(bojaTraka));
 
         Label oznakaUloge = new Label(odrediNazivUloge(igrac).toUpperCase());
-        oznakaUloge.setFont(Font.font("Arial Black", FontWeight.BOLD, 16));
+        oznakaUloge.setFont(Font.font("Arial Black", FontWeight.BOLD, 14));
         oznakaUloge.setTextFill(Color.web(bojaTraka));
+        oznakaUloge.setWrapText(true);
+        oznakaUloge.setMaxWidth(180);
 
         redIkoneINaziva.getChildren().addAll(ikona, oznakaUloge);
 

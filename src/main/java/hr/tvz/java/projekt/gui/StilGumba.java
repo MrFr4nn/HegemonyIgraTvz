@@ -59,35 +59,41 @@ public class StilGumba {
     }
 
     public static void primijeniNeutralni(Button gumb) {
-        gumb.setStyle(OSNOVNI_STIL + "-fx-background-color: " + POVRSINA_TAMNA + "; -fx-text-fill: " + TEKST_SVIJETLI
-                + "; -fx-border-color: " + TEKST_SIVI + "; -fx-border-width: 1.5;");
-        dodajHoverEfekt(gumb, POVRSINA_TAMNA, "#22222E", TEKST_SVIJETLI);
+        String stilOsnovni = OSNOVNI_STIL + "-fx-background-color: " + POVRSINA_TAMNA + "; -fx-text-fill: " + TEKST_SVIJETLI
+                + "; -fx-border-color: " + TEKST_SIVI + "; -fx-border-width: 1.5;";
+        String stilHover = OSNOVNI_STIL + "-fx-background-color: #22222E; -fx-text-fill: " + TEKST_SVIJETLI
+                + "; -fx-border-color: " + TEKST_SIVI + "; -fx-border-width: 1.5;";
+        gumb.setStyle(stilOsnovni);
+        gumb.setOnMouseEntered(dogadjaj -> gumb.setStyle(stilHover));
+        gumb.setOnMouseExited(dogadjaj -> gumb.setStyle(stilOsnovni));
     }
 
     public static void primijeniPozitivni(Button gumb) {
-        gumb.setStyle(OSNOVNI_STIL + "-fx-background-color: " + POZADINA_TAMNA + "; -fx-text-fill: #00F5A0; "
-                + "-fx-border-color: #00F5A0; -fx-border-width: 2;");
-        dodajHoverEfekt(gumb, POZADINA_TAMNA, "#00F5A0", POZADINA_TAMNA);
+        String stilOsnovni = OSNOVNI_STIL + "-fx-background-color: " + POZADINA_TAMNA + "; -fx-text-fill: #00F5A0; "
+                + "-fx-border-color: #00F5A0; -fx-border-width: 2;";
+        String stilHover = OSNOVNI_STIL + "-fx-background-color: #00F5A0; -fx-text-fill: " + POZADINA_TAMNA + "; "
+                + "-fx-border-color: #00F5A0; -fx-border-width: 2;";
+        gumb.setStyle(stilOsnovni);
+        gumb.setOnMouseEntered(dogadjaj -> gumb.setStyle(stilHover));
+        gumb.setOnMouseExited(dogadjaj -> gumb.setStyle(stilOsnovni));
     }
 
     public static void primijeniNegativni(Button gumb) {
-        gumb.setStyle(OSNOVNI_STIL + "-fx-background-color: " + POZADINA_TAMNA + "; -fx-text-fill: #FF3B5C; "
-                + "-fx-border-color: #FF3B5C; -fx-border-width: 2;");
-        dodajHoverEfekt(gumb, POZADINA_TAMNA, "#FF3B5C", POZADINA_TAMNA);
+        String stilOsnovni = OSNOVNI_STIL + "-fx-background-color: " + POZADINA_TAMNA + "; -fx-text-fill: #FF3B5C; "
+                + "-fx-border-color: #FF3B5C; -fx-border-width: 2;";
+        String stilHover = OSNOVNI_STIL + "-fx-background-color: #FF3B5C; -fx-text-fill: " + POZADINA_TAMNA + "; "
+                + "-fx-border-color: #FF3B5C; -fx-border-width: 2;";
+        gumb.setStyle(stilOsnovni);
+        gumb.setOnMouseEntered(dogadjaj -> gumb.setStyle(stilHover));
+        gumb.setOnMouseExited(dogadjaj -> gumb.setStyle(stilOsnovni));
     }
 
     public static void primijeniNaglaseni(Button gumb) {
-        gumb.setStyle(OSNOVNI_STIL + "-fx-background-color: #00D4FF; -fx-text-fill: " + POZADINA_TAMNA + "; "
-                + "-fx-border-color: #00D4FF; -fx-border-width: 2; -fx-font-size: 13px;");
-        dodajHoverEfekt(gumb, "#00D4FF", "#5CE5FF", POZADINA_TAMNA);
-    }
-
-    private static void dodajHoverEfekt(Button gumb, String bojaOsnovna, String bojaHover, String bojaTeksta) {
-        String bojaObrubaOsnovna = bojaOsnovna.equals(POVRSINA_TAMNA) ? TEKST_SIVI : bojaOsnovna;
-        String stilOsnovni = OSNOVNI_STIL + "-fx-background-color: " + bojaOsnovna + "; -fx-text-fill: " + bojaTeksta + ";"
-                + "-fx-border-color: " + bojaObrubaOsnovna + "; -fx-border-width: 2;";
-        String stilHover = OSNOVNI_STIL + "-fx-background-color: " + bojaHover + "; -fx-text-fill: " + bojaTeksta + ";"
-                + "-fx-border-color: " + bojaHover + "; -fx-border-width: 2;";
+        String stilOsnovni = OSNOVNI_STIL + "-fx-background-color: #00D4FF; -fx-text-fill: " + POZADINA_TAMNA + "; "
+                + "-fx-border-color: #00D4FF; -fx-border-width: 2; -fx-font-size: 13px;";
+        String stilHover = OSNOVNI_STIL + "-fx-background-color: #5CE5FF; -fx-text-fill: " + POZADINA_TAMNA + "; "
+                + "-fx-border-color: #5CE5FF; -fx-border-width: 2; -fx-font-size: 13px;";
+        gumb.setStyle(stilOsnovni);
         gumb.setOnMouseEntered(dogadjaj -> gumb.setStyle(stilHover));
         gumb.setOnMouseExited(dogadjaj -> gumb.setStyle(stilOsnovni));
     }
