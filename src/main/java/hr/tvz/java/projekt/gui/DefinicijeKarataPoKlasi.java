@@ -12,22 +12,29 @@ public class DefinicijeKarataPoKlasi {
 
     public void postaviLimiteAkoNisuPostavljeni(HegemonyEngine engineIgre, KlasaIgraca igrac) {
         if (igrac instanceof RadnickaKlasa) {
-            engineIgre.postaviLimitAkcijeTrenutnogIgraca("Zaposljavanje", 3);
-            engineIgre.postaviLimitAkcijeTrenutnogIgraca("Obrazovanje", 2);
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("Zaposljavanje", 1);
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("Obrazovanje", 1);
             engineIgre.postaviLimitAkcijeTrenutnogIgraca("Strajk", 1);
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("OtpustiRadnika", 1);
             engineIgre.postaviLimitAkcijeTrenutnogIgraca("PrijedlogZakona", 1);
         } else if (igrac instanceof SrednjaKlasa) {
-            engineIgre.postaviLimitAkcijeTrenutnogIgraca("OtvoriPoduzece", 2);
-            engineIgre.postaviLimitAkcijeTrenutnogIgraca("ObrazovanjeSrednja", 2);
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("OtvoriPoduzece", 1);
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("ObrazovanjeSrednja", 1);
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("OstvariPrihod", 1);
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("ZatvoriPoduzece", 1);
             engineIgre.postaviLimitAkcijeTrenutnogIgraca("PrijedlogZakona", 1);
         } else if (igrac instanceof KapitalistickaKlasa) {
-            engineIgre.postaviLimitAkcijeTrenutnogIgraca("IzgradiTvornicu", 3);
-            engineIgre.postaviLimitAkcijeTrenutnogIgraca("Lobiranje", 2);
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("IzgradiTvornicu", 1);
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("Lobiranje", 1);
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("ProdajTvornicu", 1);
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("PlatiPorez", 1);
             engineIgre.postaviLimitAkcijeTrenutnogIgraca("PrijedlogZakona", 1);
         } else {
-            engineIgre.postaviLimitAkcijeTrenutnogIgraca("JavneInvesticije", 2);
-            engineIgre.postaviLimitAkcijeTrenutnogIgraca("SocijalniPaket", 3);
-            engineIgre.postaviLimitAkcijeTrenutnogIgraca("PrijedlogZakona", 2);
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("JavneInvesticije", 1);
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("SocijalniPaket", 1);
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("NaplatiPorez", 1);
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("Dekret", 1);
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("PrijedlogZakona", 1);
         }
     }
 
@@ -48,6 +55,11 @@ public class DefinicijeKarataPoKlasi {
                     radnickaKlasa.pokreniStrajk();
                     akcija.run();
                 });
+        kontrolePoteza.dodajKartu(red, engineIgre, radnickaKlasa, "Otpusti radnika",
+                "Smanji broj zaposlenih", "M19 13 H5 V11 H19 Z", "OtpustiRadnika", () -> {
+                    radnickaKlasa.otpustiRadnika(1);
+                    akcija.run();
+                });
     }
 
     public void dodajKarteSrednje(HBox red, KontrolePoteza kontrolePoteza, HegemonyEngine engineIgre,
@@ -62,6 +74,16 @@ public class DefinicijeKarataPoKlasi {
                     srednjaKlasa.investirajUObrazovanje(10);
                     akcija.run();
                 });
+        kontrolePoteza.dodajKartu(red, engineIgre, srednjaKlasa, "Ostvari prihod",
+                "Prodaj robu na trzistu (+20)", "M4 20 L12 4 L20 20 Z", "OstvariPrihod", () -> {
+                    srednjaKlasa.ostvariPrihod(20.0);
+                    akcija.run();
+                });
+        kontrolePoteza.dodajKartu(red, engineIgre, srednjaKlasa, "Zatvori poduzece",
+                "Smanji broj poduzeca", "M19 13 H5 V11 H19 Z", "ZatvoriPoduzece", () -> {
+                    srednjaKlasa.zatvoriPoduzece();
+                    akcija.run();
+                });
     }
 
     public void dodajKarteKapitalisticke(HBox red, KontrolePoteza kontrolePoteza, HegemonyEngine engineIgre,
@@ -74,6 +96,16 @@ public class DefinicijeKarataPoKlasi {
         kontrolePoteza.dodajKartu(red, engineIgre, kapitalist, "Lobiranje",
                 "Plati za politicki utjecaj (trosak 30)", "M4 20 H20 V21 H4 Z M12 4 L20 10 H4 Z", "Lobiranje", () -> {
                     kapitalist.ulozUInvesticiju(30.0);
+                    akcija.run();
+                });
+        kontrolePoteza.dodajKartu(red, engineIgre, kapitalist, "Prodaj tvornicu",
+                "Otkupna vrijednost (+25)", "M19 13 H5 V11 H19 Z", "ProdajTvornicu", () -> {
+                    kapitalist.prodajTvornicu(25.0);
+                    akcija.run();
+                });
+        kontrolePoteza.dodajKartu(red, engineIgre, kapitalist, "Plati porez",
+                "Podmiri poreznu obvezu (10)", "M12 6 V18 M9 9 H15 M9 15 H15", "PlatiPorez", () -> {
+                    kapitalist.platiPorez(10.0);
                     akcija.run();
                 });
     }
@@ -92,6 +124,16 @@ public class DefinicijeKarataPoKlasi {
                 "M12 2 C16 2 19 5 19 9 C19 13 12 22 12 22 C12 22 5 13 5 9 C5 5 8 2 12 2 Z",
                 "SocijalniPaket", () -> {
                     vlada.isplatiSubvenciju(15.0);
+                    akcija.run();
+                });
+        kontrolePoteza.dodajKartu(red, engineIgre, vlada, "Naplati porez",
+                "Prihod od poreza (od 50 baze)", "M12 6 V18 M9 9 H15 M9 15 H15", "NaplatiPorez", () -> {
+                    vlada.naplatiPorez(50.0);
+                    akcija.run();
+                });
+        kontrolePoteza.dodajKartu(red, engineIgre, vlada, "Dekret",
+                "Pojacaj legitimnost prisilno", "M12 3 L20 8 V16 L12 21 L4 16 V8 Z", "Dekret", () -> {
+                    vlada.povecajLegitimnost(10);
                     akcija.run();
                 });
     }

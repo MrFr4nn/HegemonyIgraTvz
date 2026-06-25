@@ -98,8 +98,12 @@ public class GlavniProzor {
     }
 
     private String napraviTekstFaze() {
-        return "Runda: " + engineIgre.getBrojRunde() + " / 5  |  Faza: " + engineIgre.getTrenutnaFaza()
+        return "Runda: " + engineIgre.getBrojRunde() + " / 5  |  Faza: " + pretvoriNazivFazeZaPrikaz(engineIgre.getTrenutnaFaza())
                 + "  |  Na potezu: " + engineIgre.dohvatiIgracaNaPotezu().getNaziv();
+    }
+
+    private String pretvoriNazivFazeZaPrikaz(String nazivFaze) {
+        return nazivFaze.replace("_", " ");
     }
 
     private VBox napraviAkcijskuTraku() {
@@ -144,7 +148,8 @@ public class GlavniProzor {
         } else if (faza.equals(HegemonyEngine.FAZA_GLASANJE)) {
             upraviteljGlasanja.prikaziPanelGlasanja(panelKontrolaTrenutniIgrac, this::azurirajPanelPotezaPremaFazi);
         } else if (faza.equals(HegemonyEngine.FAZA_KRAJ_RUNDE) || faza.equals(HegemonyEngine.FAZA_PRIPREMA)) {
-            Label oznaka = new Label("Faza " + faza + " — kliknite 'Sljedeca faza' za nastavak.");
+            Label oznaka = new Label("Faza " + pretvoriNazivFazeZaPrikaz(faza)
+                    + " — kliknite 'Sljedeca faza' za nastavak.");
             oznaka.setStyle("-fx-text-fill: #E3D9C4; -fx-font-size: 13px;");
             panelKontrolaTrenutniIgrac.getChildren().add(oznaka);
         } else {
