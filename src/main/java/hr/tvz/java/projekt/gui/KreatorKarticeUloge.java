@@ -1,5 +1,7 @@
 package hr.tvz.java.projekt.gui;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.effect.DropShadow;
@@ -16,17 +18,19 @@ import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.control.Label;
+import javafx.util.Duration;
 
 public class KreatorKarticeUloge {
 
-    public VBox napraviKarticu(String nazivUloge, String bojaHex, String svgIkona, boolean odabrana) {
-        VBox kartica = new VBox(10);
+    public VBox napraviKarticu(String nazivUloge, String opisUloge, String bojaHex, String svgIkona, boolean odabrana) {
+        VBox kartica = new VBox(8);
         kartica.setAlignment(Pos.CENTER);
-        kartica.setPadding(new Insets(20));
-        kartica.setPrefSize(150, 160);
+        kartica.setPadding(new Insets(18));
+        kartica.setPrefSize(170, 190);
         kartica.setCursor(javafx.scene.Cursor.HAND);
 
         primijeniStilKartice(kartica, bojaHex, odabrana);
+        dodajHoverEfekt(kartica, bojaHex, odabrana);
 
         SVGPath ikona = new SVGPath();
         ikona.setContent(svgIkona);
@@ -35,27 +39,60 @@ public class KreatorKarticeUloge {
         ikona.setScaleY(1.6);
 
         Label naslov = new Label(nazivUloge);
-        naslov.setFont(Font.font("Georgia", FontWeight.BOLD, 13));
+        naslov.setFont(Font.font("Georgia", FontWeight.BOLD, 14));
         naslov.setTextFill(odabrana ? Color.WHITE : Color.web("#2B2520"));
         naslov.setWrapText(true);
         naslov.setAlignment(Pos.CENTER);
         naslov.setStyle("-fx-text-alignment: center;");
 
-        kartica.getChildren().addAll(ikona, naslov);
+        Label opis = new Label(opisUloge);
+        opis.setFont(Font.font("Verdana", 10));
+        opis.setTextFill(odabrana ? Color.web("#F0F0F0") : Color.web("#6B6357"));
+        opis.setWrapText(true);
+        opis.setAlignment(Pos.CENTER);
+        opis.setStyle("-fx-text-alignment: center;");
+
+        kartica.getChildren().addAll(ikona, naslov, opis);
         return kartica;
     }
 
     public void primijeniStilKartice(VBox kartica, String bojaHex, boolean odabrana) {
         if (odabrana) {
-            kartica.setBackground(new Background(new BackgroundFill(Color.web(bojaHex), new CornerRadii(12), Insets.EMPTY)));
+            kartica.setBackground(new Background(new BackgroundFill(Color.web(bojaHex), new CornerRadii(14), Insets.EMPTY)));
             kartica.setBorder(new Border(new BorderStroke(Color.web(bojaHex), BorderStrokeStyle.SOLID,
-                    new CornerRadii(12), new BorderWidths(3))));
+                    new CornerRadii(14), new BorderWidths(3))));
         } else {
-            kartica.setBackground(new Background(new BackgroundFill(Color.WHITE, new CornerRadii(12), Insets.EMPTY)));
+            kartica.setBackground(new Background(new BackgroundFill(Color.WHITE, new CornerRadii(14), Insets.EMPTY)));
             kartica.setBorder(new Border(new BorderStroke(Color.web(bojaHex), BorderStrokeStyle.SOLID,
-                    new CornerRadii(12), new BorderWidths(2))));
+                    new CornerRadii(14), new BorderWidths(2))));
         }
         kartica.setEffect(napraviSjenu());
+    }
+
+    private void dodajHoverEfekt(VBox kartica, String bojaHex, boolean odabrana) {
+        if (odabrana) {
+            return;
+        }
+        Color bojaPozadine = Color.web(bojaHex);
+        Color svijetlaVerzija = bojaPozadine.deriveColor(0, 1, 1, 0.12);
+        kartica.setOnMouseEntered(dogadjaj -> kartica.setBackground(
+                new Background(new BackgroundFill(svijetlaVerzija, new CornerRadii(14), Insets.EMPTY))));
+        kartica.setOnMouseExited(dogadjaj -> kartica.setBackground(
+                new Background(new BackgroundFill(Color.WHITE, new CornerRadii(14), Insets.EMPTY))));
+    }
+
+    public void animirajOdabir(VBox kartica) {
+        Timeline animacija = new Timeline();
+        KeyFrame uvecaj = new KeyFrame(Duration.millis(80), dogadjaj -> {
+            kartica.setScaleX(1.08);
+            kartica.setScaleY(1.08);
+        });
+        KeyFrame vratiNazad = new KeyFrame(Duration.millis(160), dogadjaj -> {
+            kartica.setScaleX(1.0);
+            kartica.setScaleY(1.0);
+        });
+        animacija.getKeyFrames().addAll(uvecaj, vratiNazad);
+        animacija.play();
     }
 
     private DropShadow napraviSjenu() {
@@ -75,10 +112,27 @@ public class KreatorKarticeUloge {
     }
 
     public String dohvatiIkonuKapitalisticke() {
-        return "M4 10 H20 V18 H4 Z M4 10 L12 4 L20 10 M8 13 H10 V16 H8 Z M14 13 H16 V16 H14 Z";
+        return "M3 18 H21 V20 H3 Z M5 18 V10 H7 V18 Z M9 18 V6 H11 V18 Z M13 18 V11 H15 V18 Z M17 18 V8 H19 V18 Z";
     }
 
     public String dohvatiIkonuVlade() {
-        return "M4 20 V10 L12 4 L20 10 V20 M9 20 V14 H15 V20";
+        return "M4 20 H20 V21 H4 Z M5 20 V11 H6.5 V20 Z M8 20 V11 H9.5 V20 Z M11.25 20 V11 H12.75 V20 Z "
+                + "M14.5 20 V11 H16 V20 Z M17.5 20 V11 H19 V20 Z M3 11 L12 4 L21 11 Z";
+    }
+
+    public String dohvatiOpisRadnicke() {
+        return "Cilj: puna zaposlenost i visok standard zivota";
+    }
+
+    public String dohvatiOpisSrednje() {
+        return "Cilj: balans izmedju rada i vlastitog poduzeca";
+    }
+
+    public String dohvatiOpisKapitalisticke() {
+        return "Cilj: maksimizirati profit i kapital";
+    }
+
+    public String dohvatiOpisVlade() {
+        return "Cilj: stabilan proracun i legitimnost";
     }
 }
