@@ -13,6 +13,7 @@ public class UpraviteljGlasanja {
     private HegemonyEngine engineIgre;
     private KontrolePoteza kontrolePoteza;
     private XmlUpravitelj xmlUpravitelj;
+    private KreatorIzbornikaZakona kreatorIzbornikaZakona;
     private int pozicijaGlasacaUNizu;
     private String nazivPredlagaca;
 
@@ -20,6 +21,7 @@ public class UpraviteljGlasanja {
         this.engineIgre = engineIgre;
         this.kontrolePoteza = kontrolePoteza;
         this.xmlUpravitelj = xmlUpravitelj;
+        this.kreatorIzbornikaZakona = new KreatorIzbornikaZakona();
         this.pozicijaGlasacaUNizu = 0;
         this.nazivPredlagaca = "";
     }
@@ -31,6 +33,18 @@ public class UpraviteljGlasanja {
 
     public void zabiljeziPredlagaca(String naziv) {
         this.nazivPredlagaca = naziv;
+    }
+
+    public void prikaziIzbornikZakona(VBox panelKontrolaTrenutniIgrac, String nazivVlade, Runnable akcijaNakonOdabira) {
+        panelKontrolaTrenutniIgrac.getChildren().clear();
+        VBox izbornik = kreatorIzbornikaZakona.napraviIzbornikZakona(engineIgre.getKatalogZakona(), indeksZakona -> {
+            engineIgre.pokreniGlasanjeOZakonu(indeksZakona);
+            zabiljeziPredlagaca(nazivVlade);
+            xmlUpravitelj.dodajPotezUPovijest(engineIgre.getBrojRunde(), nazivVlade, "Predlozen zakon: "
+                    + engineIgre.getTrenutnoGlasanje().getNazivZakona());
+            akcijaNakonOdabira.run();
+        });
+        panelKontrolaTrenutniIgrac.getChildren().add(izbornik);
     }
 
     public void prikaziPanelGlasanja(VBox panelKontrolaTrenutniIgrac, Runnable akcijaPonovnogPrikaza) {
@@ -69,13 +83,6 @@ public class UpraviteljGlasanja {
         );
         panelKontrolaTrenutniIgrac.getChildren().clear();
         panelKontrolaTrenutniIgrac.getChildren().add(panelGlasanja);
-    }
-
-    public void obradiPrijedlogZakona(String naziviPredlagaca, String nazivZakona) {
-        engineIgre.pokreniNovoGlasanje(nazivZakona);
-        zabiljeziPredlagaca(naziviPredlagaca);
-        pozicijaGlasacaUNizu = 0;
-        xmlUpravitelj.dodajPotezUPovijest(engineIgre.getBrojRunde(), naziviPredlagaca, "Predlozen zakon: " + nazivZakona);
     }
 
     private void obradiGlas(String nazivIgraca, boolean glasZa, Runnable akcijaPonovnogPrikaza) {

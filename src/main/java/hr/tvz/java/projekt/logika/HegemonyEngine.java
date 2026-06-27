@@ -3,7 +3,6 @@ package hr.tvz.java.projekt.logika;
 import hr.tvz.java.projekt.model.KlasaIgraca;
 import hr.tvz.java.projekt.model.Vlada;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class HegemonyEngine {
@@ -76,6 +75,12 @@ public class HegemonyEngine {
         }
     }
 
+    public void prebaciNaSljedecuFazuDokNijeGlasanjeIliKraj() {
+        while (!trenutnaFaza.equals(FAZA_GLASANJE) && !trenutnaFaza.equals(FAZA_KRAJ_RUNDE)) {
+            prebaciNaSljedecuFazu();
+        }
+    }
+
     public String obradiFazuProizvodnje() {
         return obradaProizvodnje.obradiFazuProizvodnje(listaIgraca);
     }
@@ -124,13 +129,7 @@ public class HegemonyEngine {
     }
 
     public void simulirajGlasanjeUNiti(List<Runnable> akcijeIgraca) {
-        List<String> naziviIgraca = new ArrayList<>();
-        int brojac = 0;
-        while (brojac < listaIgraca.size()) {
-            naziviIgraca.add(listaIgraca.get(brojac).getNaziv());
-            brojac = brojac + 1;
-        }
-        sinkronizatorGlasanja.simulirajGlasanjeUNiti(akcijeIgraca, naziviIgraca);
+        sinkronizatorGlasanja.simulirajGlasanjeUNiti(akcijeIgraca, listaIgraca);
     }
 
     public void pokreniNovoGlasanje(String nazivZakona) {

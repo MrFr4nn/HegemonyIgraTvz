@@ -2,9 +2,10 @@ package hr.tvz.java.projekt;
 
 import hr.tvz.java.projekt.gui.GlavniProzor;
 import hr.tvz.java.projekt.gui.PocetniEkran;
+import javafx.animation.PauseTransition;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public class PokretacAplikacije extends Application {
 
@@ -12,11 +13,13 @@ public class PokretacAplikacije extends Application {
     public void start(Stage glavnaScena) {
         glavnaScena.setResizable(true);
         PocetniEkran pocetniEkran = new PocetniEkran(glavnaScena, listaIgraca -> {
-            Platform.runLater(() -> {
+            PauseTransition odgoda = new PauseTransition(Duration.millis(50));
+            odgoda.setOnFinished(dogadjaj -> {
                 GlavniProzor glavniProzor = new GlavniProzor(glavnaScena, listaIgraca);
                 glavniProzor.prikaziProzor();
                 glavnaScena.setIconified(false);
             });
+            odgoda.play();
         });
         pocetniEkran.prikaziEkran();
     }

@@ -32,7 +32,6 @@ public class GlavniProzor {
     private KreatorAkcijskeTrake kreatorAkcijskeTrake;
     private KreatorIzvjestaja kreatorIzvjestaja;
     private KreatorZavrsnogEkrana kreatorZavrsnogEkrana;
-    private KreatorIzbornikaZakona kreatorIzbornikaZakona;
 
     private VBox panelKontrolaTrenutniIgrac;
     private Label oznakaFazeIgre;
@@ -54,7 +53,6 @@ public class GlavniProzor {
         this.kreatorAkcijskeTrake = new KreatorAkcijskeTrake();
         this.kreatorIzvjestaja = new KreatorIzvjestaja();
         this.kreatorZavrsnogEkrana = new KreatorZavrsnogEkrana();
-        this.kreatorIzbornikaZakona = new KreatorIzbornikaZakona();
     }
 
     public void prikaziProzor() {
@@ -145,20 +143,18 @@ public class GlavniProzor {
         } else {
             KlasaIgraca igracNaPotezu = engineIgre.dohvatiIgracaNaPotezu();
             VBox kontrole = kontrolePoteza.napraviKontroleZaIgraca(engineIgre, igracNaPotezu,
-                    () -> prikaziIzbornikZakona(igracNaPotezu.getNaziv()),
+                    () -> upraviteljGlasanja.prikaziIzbornikZakona(panelKontrolaTrenutniIgrac, igracNaPotezu.getNaziv(),
+                            this::prebaciIzravnoNaGlasanje),
                     this::obradiPotezIgraca);
             panelKontrolaTrenutniIgrac.getChildren().add(kontrole);
         }
     }
 
-    private void prikaziIzbornikZakona(String nazivVlade) {
-        panelKontrolaTrenutniIgrac.getChildren().clear();
-        VBox izbornik = kreatorIzbornikaZakona.napraviIzbornikZakona(engineIgre.getKatalogZakona(), indeksZakona -> {
-            engineIgre.pokreniGlasanjeOZakonu(indeksZakona);
-            upraviteljGlasanja.zabiljeziPredlagaca(nazivVlade);
-            obradiPotezIgraca();
-        });
-        panelKontrolaTrenutniIgrac.getChildren().add(izbornik);
+    private void prebaciIzravnoNaGlasanje() {
+        prikazPloce.azurirajPrikaz(engineIgre.getListaIgraca());
+        engineIgre.prebaciNaSljedecuFazuDokNijeGlasanjeIliKraj();
+        oznakaFazeIgre.setText(napraviTekstFaze());
+        azurirajPanelPotezaPremaFazi();
     }
 
     private void prikaziVizualniIzvjestaj(String naslovIzvjestaja, String sadrzaj) {

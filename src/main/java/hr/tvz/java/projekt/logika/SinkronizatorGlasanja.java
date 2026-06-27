@@ -1,5 +1,7 @@
 package hr.tvz.java.projekt.logika;
 
+import hr.tvz.java.projekt.model.KlasaIgraca;
+
 import java.util.List;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
@@ -12,11 +14,11 @@ public class SinkronizatorGlasanja {
         this.prepreka = new CyclicBarrier(brojIgraca);
     }
 
-    public void simulirajGlasanjeUNiti(List<Runnable> akcijeIgraca, List<String> naziviIgraca) {
+    public void simulirajGlasanjeUNiti(List<Runnable> akcijeIgraca, List<KlasaIgraca> listaIgraca) {
         int brojac = 0;
         while (brojac < akcijeIgraca.size()) {
             Runnable akcijaIgraca = akcijeIgraca.get(brojac);
-            String oznakaIgraca = naziviIgraca.get(brojac);
+            String oznakaIgraca = listaIgraca.get(brojac).getNaziv();
             Thread nitIgraca = new Thread(() -> {
                 akcijaIgraca.run();
                 cekajNaPrepreci(oznakaIgraca);
