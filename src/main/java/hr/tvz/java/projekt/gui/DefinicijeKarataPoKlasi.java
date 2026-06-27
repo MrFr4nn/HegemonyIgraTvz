@@ -16,25 +16,22 @@ public class DefinicijeKarataPoKlasi {
             engineIgre.postaviLimitAkcijeTrenutnogIgraca("Obrazovanje", 1);
             engineIgre.postaviLimitAkcijeTrenutnogIgraca("Strajk", 1);
             engineIgre.postaviLimitAkcijeTrenutnogIgraca("OtpustiRadnika", 1);
-            engineIgre.postaviLimitAkcijeTrenutnogIgraca("PrijedlogZakona", 1);
         } else if (igrac instanceof SrednjaKlasa) {
             engineIgre.postaviLimitAkcijeTrenutnogIgraca("OtvoriPoduzece", 1);
             engineIgre.postaviLimitAkcijeTrenutnogIgraca("ObrazovanjeSrednja", 1);
             engineIgre.postaviLimitAkcijeTrenutnogIgraca("OstvariPrihod", 1);
             engineIgre.postaviLimitAkcijeTrenutnogIgraca("ZatvoriPoduzece", 1);
-            engineIgre.postaviLimitAkcijeTrenutnogIgraca("PrijedlogZakona", 1);
         } else if (igrac instanceof KapitalistickaKlasa) {
             engineIgre.postaviLimitAkcijeTrenutnogIgraca("IzgradiTvornicu", 1);
             engineIgre.postaviLimitAkcijeTrenutnogIgraca("Lobiranje", 1);
             engineIgre.postaviLimitAkcijeTrenutnogIgraca("ProdajTvornicu", 1);
             engineIgre.postaviLimitAkcijeTrenutnogIgraca("PlatiPorez", 1);
-            engineIgre.postaviLimitAkcijeTrenutnogIgraca("PrijedlogZakona", 1);
         } else {
             engineIgre.postaviLimitAkcijeTrenutnogIgraca("JavneInvesticije", 1);
             engineIgre.postaviLimitAkcijeTrenutnogIgraca("SocijalniPaket", 1);
             engineIgre.postaviLimitAkcijeTrenutnogIgraca("NaplatiPorez", 1);
             engineIgre.postaviLimitAkcijeTrenutnogIgraca("Dekret", 1);
-            engineIgre.postaviLimitAkcijeTrenutnogIgraca("PrijedlogZakona", 1);
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca("PokreniGlasanje", 1);
         }
     }
 

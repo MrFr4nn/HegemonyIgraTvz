@@ -32,6 +32,7 @@ public class GlavniProzor {
     private KreatorAkcijskeTrake kreatorAkcijskeTrake;
     private KreatorIzvjestaja kreatorIzvjestaja;
     private KreatorZavrsnogEkrana kreatorZavrsnogEkrana;
+    private KreatorIzbornikaZakona kreatorIzbornikaZakona;
 
     private VBox panelKontrolaTrenutniIgrac;
     private Label oznakaFazeIgre;
@@ -53,6 +54,7 @@ public class GlavniProzor {
         this.kreatorAkcijskeTrake = new KreatorAkcijskeTrake();
         this.kreatorIzvjestaja = new KreatorIzvjestaja();
         this.kreatorZavrsnogEkrana = new KreatorZavrsnogEkrana();
+        this.kreatorIzbornikaZakona = new KreatorIzbornikaZakona();
     }
 
     public void prikaziProzor() {
@@ -115,7 +117,7 @@ public class GlavniProzor {
         if (!engineIgre.getTrenutnaFaza().equals(HegemonyEngine.FAZA_AKCIJA)) {
             return "";
         }
-        return "AKCIJSKI BODOVI PREOSTALO: " + engineIgre.dohvatiPreostaleApTrenutnogIgraca() + " / 5";
+        return "AKCIJSKI BODOVI PREOSTALO: " + engineIgre.dohvatiPreostaleApTrenutnogIgraca() + " / 1";
     }
 
     private void azurirajStilApBrojaca() {
@@ -143,10 +145,20 @@ public class GlavniProzor {
         } else {
             KlasaIgraca igracNaPotezu = engineIgre.dohvatiIgracaNaPotezu();
             VBox kontrole = kontrolePoteza.napraviKontroleZaIgraca(engineIgre, igracNaPotezu,
-                    () -> upraviteljGlasanja.obradiPrijedlogZakona(igracNaPotezu.getNaziv(), "Promjena ekonomske politike"),
+                    () -> prikaziIzbornikZakona(igracNaPotezu.getNaziv()),
                     this::obradiPotezIgraca);
             panelKontrolaTrenutniIgrac.getChildren().add(kontrole);
         }
+    }
+
+    private void prikaziIzbornikZakona(String nazivVlade) {
+        panelKontrolaTrenutniIgrac.getChildren().clear();
+        VBox izbornik = kreatorIzbornikaZakona.napraviIzbornikZakona(engineIgre.getKatalogZakona(), indeksZakona -> {
+            engineIgre.pokreniGlasanjeOZakonu(indeksZakona);
+            upraviteljGlasanja.zabiljeziPredlagaca(nazivVlade);
+            obradiPotezIgraca();
+        });
+        panelKontrolaTrenutniIgrac.getChildren().add(izbornik);
     }
 
     private void prikaziVizualniIzvjestaj(String naslovIzvjestaja, String sadrzaj) {

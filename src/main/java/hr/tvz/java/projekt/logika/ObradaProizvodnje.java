@@ -102,4 +102,40 @@ public class ObradaProizvodnje {
             brojac = brojac + 1;
         }
     }
+
+    public void obradiKrajRunde(List<KlasaIgraca> listaIgraca, Vlada vlada, Glasanje trenutnoGlasanje,
+                                KatalogZakona katalogZakona, int brojRunde, int maksimalniBrojRundi) {
+        int brojac = 0;
+        while (brojac < listaIgraca.size()) {
+            KlasaIgraca trenutniIgrac = listaIgraca.get(brojac);
+            trenutniIgrac.odigrajPotez();
+            if (trenutniIgrac instanceof SrednjaKlasa) {
+                trenutniIgrac.povecajBodove(((SrednjaKlasa) trenutniIgrac).getStandardZivota() / 20);
+            }
+            brojac = brojac + 1;
+        }
+
+        vlada.preracunajLegitimnostUBodove();
+        primijeniMmfProvjeru(vlada);
+
+        if (trenutnoGlasanje != null && trenutnoGlasanje.isGlasanjeZavrseno() && trenutnoGlasanje.isZakonPrihvacen()) {
+            primijeniPrihvaceniZakon(trenutnoGlasanje.getNazivZakona(), listaIgraca, vlada, katalogZakona);
+        }
+
+        if (brojRunde == maksimalniBrojRundi) {
+            primijeniFinalnoBodovanje(listaIgraca);
+        }
+    }
+
+    private void primijeniPrihvaceniZakon(String nazivZakona, List<KlasaIgraca> listaIgraca, Vlada vlada, KatalogZakona katalogZakona) {
+        int brojac = 0;
+        while (brojac < katalogZakona.dohvatiBrojZakona()) {
+            if (katalogZakona.dohvatiNaziv(brojac).equals(nazivZakona)) {
+                katalogZakona.primijeniEfekt(brojac, listaIgraca, vlada);
+                vlada.donesiNoviZakon(nazivZakona);
+                break;
+            }
+            brojac = brojac + 1;
+        }
+    }
 }

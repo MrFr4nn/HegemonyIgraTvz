@@ -25,7 +25,7 @@ public class KontrolePoteza {
         this.definicijeKarata = new DefinicijeKarataPoKlasi();
     }
 
-    public VBox napraviKontroleZaIgraca(HegemonyEngine engineIgre, KlasaIgraca igrac, Runnable akcijaPrijedlog, Runnable akcijaPonovnogPrikaza) {
+    public VBox napraviKontroleZaIgraca(HegemonyEngine engineIgre, KlasaIgraca igrac, Runnable akcijaPokreniGlasanje, Runnable akcijaPonovnogPrikaza) {
         definicijeKarata.postaviLimiteAkoNisuPostavljeni(engineIgre, igrac);
 
         VBox panelKontrola = new VBox(10);
@@ -46,30 +46,29 @@ public class KontrolePoteza {
         } else if (igrac instanceof KapitalistickaKlasa) {
             definicijeKarata.dodajKarteKapitalisticke(redKarata, this, engineIgre, (KapitalistickaKlasa) igrac, akcijaPonovnogPrikaza);
         } else {
-            definicijeKarata.dodajKarteVlade(redKarata, this, engineIgre, (Vlada) igrac, akcijaPonovnogPrikaza);
+            dodajKarteVladeIGumbGlasanja(redKarata, engineIgre, (Vlada) igrac, akcijaPonovnogPrikaza, akcijaPokreniGlasanje);
         }
-
-        dodajKartuPrijedlogaZakona(redKarata, engineIgre, igrac, akcijaPrijedlog);
 
         panelKontrola.getChildren().addAll(naslovPanela, redKarata);
         return panelKontrola;
     }
 
-    private void dodajKartuPrijedlogaZakona(HBox red, HegemonyEngine engineIgre, KlasaIgraca igrac, Runnable akcijaPrijedlog) {
-        boolean dostupna = engineIgre.jeAkcijaDostupnaTrenutnomIgracu("PrijedlogZakona");
-        String bojaHex = StilGumba.dohvatiBojuKlase(igrac);
-        VBox karta = kreatorIgraceKarte.napraviKartu("Politicki pritisak",
-                "Predlozi promjenu zakona", "M5 21 H19 M12 3 L19 9 H5 Z M7 9 V21 M17 9 V21", bojaHex, !dostupna);
+    private void dodajKarteVladeIGumbGlasanja(HBox red, HegemonyEngine engineIgre, Vlada vlada,
+                                              Runnable akcijaPonovnogPrikaza, Runnable akcijaPokreniGlasanje) {
+        definicijeKarata.dodajKarteVlade(red, this, engineIgre, vlada, akcijaPonovnogPrikaza);
 
-        if (dostupna) {
-            kreatorIgraceKarte.omoguciHover(karta, bojaHex);
-            karta.setOnMouseClicked(dogadjaj -> {
-                if (engineIgre.iskoristiAkcijuTrenutnogIgraca("PrijedlogZakona")) {
-                    akcijaPrijedlog.run();
-                }
-            });
-        }
-        red.getChildren().add(karta);
+        VBox gumbKarta = new VBox(8);
+        gumbKarta.setAlignment(Pos.CENTER);
+        gumbKarta.setPadding(new Insets(14, 10, 14, 10));
+        gumbKarta.setPrefSize(150, 190);
+
+        Button gumbPokreniGlasanje = new Button("POKRENI\nGLASANJE");
+        StilGumba.primijeniNaglaseni(gumbPokreniGlasanje);
+        gumbPokreniGlasanje.setWrapText(true);
+        gumbPokreniGlasanje.setOnAction(dogadjaj -> akcijaPokreniGlasanje.run());
+
+        gumbKarta.getChildren().add(gumbPokreniGlasanje);
+        red.getChildren().add(gumbKarta);
     }
 
     public void dodajKartu(HBox red, HegemonyEngine engineIgre, KlasaIgraca igrac, String naziv, String opis,

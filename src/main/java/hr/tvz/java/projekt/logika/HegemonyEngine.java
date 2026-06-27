@@ -1,7 +1,6 @@
 package hr.tvz.java.projekt.logika;
 
 import hr.tvz.java.projekt.model.KlasaIgraca;
-import hr.tvz.java.projekt.model.SrednjaKlasa;
 import hr.tvz.java.projekt.model.Vlada;
 
 import java.util.ArrayList;
@@ -23,6 +22,7 @@ public class HegemonyEngine {
     private RedoslijedPoteza redoslijedPoteza;
     private SinkronizatorGlasanja sinkronizatorGlasanja;
     private ObradaProizvodnje obradaProizvodnje;
+    private KatalogZakona katalogZakona;
     private boolean igraZavrsena;
     private Glasanje trenutnoGlasanje;
     private static final int MAKSIMALNI_BROJ_RUNDI = 5;
@@ -35,6 +35,7 @@ public class HegemonyEngine {
         this.redoslijedPoteza = new RedoslijedPoteza(listaIgraca);
         this.sinkronizatorGlasanja = new SinkronizatorGlasanja(listaIgraca.size());
         this.obradaProizvodnje = new ObradaProizvodnje();
+        this.katalogZakona = new KatalogZakona();
         Vlada pronadjenaVlada = null;
         int brojac = 0;
         while (brojac < listaIgraca.size()) {
@@ -107,28 +108,19 @@ public class HegemonyEngine {
         return redoslijedPoteza.dohvatiApSustavTrenutnogIgraca().getPreostaliAp();
     }
 
+    public KatalogZakona getKatalogZakona() {
+        return katalogZakona;
+    }
+
+    public void pokreniGlasanjeOZakonu(int indeksZakona) {
+        pokreniNovoGlasanje(katalogZakona.dohvatiNaziv(indeksZakona));
+        katalogZakona.oznaciIskoristenim(indeksZakona);
+        iskoristiAkcijuTrenutnogIgraca("PokreniGlasanje");
+    }
+
     public void obradiKrajRunde() {
-        int brojac = 0;
-        while (brojac < listaIgraca.size()) {
-            KlasaIgraca trenutniIgrac = listaIgraca.get(brojac);
-            trenutniIgrac.odigrajPotez();
-            if (trenutniIgrac instanceof SrednjaKlasa) {
-                trenutniIgrac.povecajBodove(((SrednjaKlasa) trenutniIgrac).getStandardZivota() / 20);
-            }
-            brojac = brojac + 1;
-        }
-
-        vlada.preracunajLegitimnostUBodove();
-        obradaProizvodnje.primijeniMmfProvjeru(vlada);
-
-        if (trenutnoGlasanje != null && trenutnoGlasanje.isGlasanjeZavrseno() && trenutnoGlasanje.isZakonPrihvacen()) {
-            vlada.donesiNoviZakon(trenutnoGlasanje.getNazivZakona());
-        }
+        obradaProizvodnje.obradiKrajRunde(listaIgraca, vlada, trenutnoGlasanje, katalogZakona, brojRunde, MAKSIMALNI_BROJ_RUNDI);
         trenutnoGlasanje = null;
-
-        if (brojRunde == MAKSIMALNI_BROJ_RUNDI) {
-            obradaProizvodnje.primijeniFinalnoBodovanje(listaIgraca);
-        }
     }
 
     public void simulirajGlasanjeUNiti(List<Runnable> akcijeIgraca) {
