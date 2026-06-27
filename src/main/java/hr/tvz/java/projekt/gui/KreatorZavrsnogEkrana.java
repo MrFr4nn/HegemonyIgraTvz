@@ -26,7 +26,7 @@ import java.util.List;
 
 public class KreatorZavrsnogEkrana {
 
-    public void prikaziEkranPobjede(String nazivPobjednika, List<KlasaIgraca> listaIgraca) {
+    public void prikaziEkranPobjede(String nazivPobjednika, List<KlasaIgraca> listaIgraca, Runnable akcijaNovaIgra) {
         Stage prozorPobjede = new Stage();
         prozorPobjede.setTitle("Kraj igre");
 
@@ -48,13 +48,25 @@ public class KreatorZavrsnogEkrana {
 
         VBox rangLista = napraviRangListu(listaIgraca);
 
+        HBox redGumbova = new HBox(15);
+        redGumbova.setAlignment(Pos.CENTER);
+
+        Button gumbNovaIgra = new Button("NOVA IGRA");
+        StilGumba.primijeniNaglaseniVeliki(gumbNovaIgra);
+        gumbNovaIgra.setOnAction(dogadjaj -> {
+            prozorPobjede.close();
+            akcijaNovaIgra.run();
+        });
+
         Button gumbZatvori = new Button("ZATVORI");
-        StilGumba.primijeniNaglaseniVeliki(gumbZatvori);
+        StilGumba.primijeniNeutralni(gumbZatvori);
         gumbZatvori.setOnAction(dogadjaj -> prozorPobjede.close());
 
-        korijenskiLayout.getChildren().addAll(naslovIgraJeZavrsena, naslovPobjednika, rangLista, gumbZatvori);
+        redGumbova.getChildren().addAll(gumbNovaIgra, gumbZatvori);
 
-        Scene scenaPobjede = new Scene(korijenskiLayout, 600, 600);
+        korijenskiLayout.getChildren().addAll(naslovIgraJeZavrsena, naslovPobjednika, rangLista, redGumbova);
+
+        Scene scenaPobjede = new Scene(korijenskiLayout, 600, 620);
         prozorPobjede.setScene(scenaPobjede);
         prozorPobjede.show();
     }
