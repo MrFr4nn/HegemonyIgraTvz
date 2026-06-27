@@ -86,12 +86,9 @@ public class GlavniProzor {
     }
 
     private String napraviTekstFaze() {
-        return "RUNDA: " + engineIgre.getBrojRunde() + " / 5  |  FAZA: " + pretvoriNazivFazeZaPrikaz(engineIgre.getTrenutnaFaza())
+        String faza = engineIgre.getTrenutnaFaza().replace("_", " ");
+        return "RUNDA: " + engineIgre.getBrojRunde() + " / 5  |  FAZA: " + faza
                 + "  |  NA POTEZU: " + engineIgre.dohvatiIgracaNaPotezu().getNaziv().toUpperCase();
-    }
-
-    private String pretvoriNazivFazeZaPrikaz(String nazivFaze) {
-        return nazivFaze.replace("_", " ");
     }
 
     private VBox napraviAkcijskuTraku() {
@@ -137,7 +134,7 @@ public class GlavniProzor {
         } else if (faza.equals(HegemonyEngine.FAZA_GLASANJE)) {
             upraviteljGlasanja.prikaziPanelGlasanja(panelKontrolaTrenutniIgrac, this::azurirajPanelPotezaPremaFazi);
         } else if (faza.equals(HegemonyEngine.FAZA_KRAJ_RUNDE) || faza.equals(HegemonyEngine.FAZA_PRIPREMA)) {
-            Label oznaka = new Label("FAZA " + pretvoriNazivFazeZaPrikaz(faza) + " — KLIKNITE 'SLJEDECA FAZA' ZA NASTAVAK");
+            Label oznaka = new Label("FAZA " + faza.replace("_", " ") + " — KLIKNITE 'SLJEDECA FAZA' ZA NASTAVAK");
             oznaka.setStyle("-fx-text-fill: " + StilGumba.TEKST_SVIJETLI + "; -fx-font-size: 13px; -fx-font-weight: bold;");
             panelKontrolaTrenutniIgrac.getChildren().add(oznaka);
         } else {
@@ -186,11 +183,9 @@ public class GlavniProzor {
         azurirajPanelPotezaPremaFazi();
 
         if (engineIgre.provjeriPobjedu()) {
-            prikaziObavijestKraja();
+            kreatorZavrsnogEkrana.prikaziEkranPobjede(engineIgre.dohvatiPobjednika(), engineIgre.getListaIgraca(),
+                    () -> new PocetniEkran(glavnaScena, novaListaIgraca ->
+                            new GlavniProzor(glavnaScena, novaListaIgraca).prikaziProzor()).prikaziEkran());
         }
-    }
-
-    private void prikaziObavijestKraja() {
-        kreatorZavrsnogEkrana.prikaziEkranPobjede(engineIgre.dohvatiPobjednika(), engineIgre.getListaIgraca());
     }
 }
