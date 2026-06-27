@@ -78,8 +78,7 @@ public class PocetniEkran {
         oznakaSazetka = kreatorSazetka.napraviOznakuSazetka();
 
         Button gumbZapocni = new Button("Zapocni igru");
-        StilGumba.primijeniNaglaseni(gumbZapocni);
-        gumbZapocni.setStyle(gumbZapocni.getStyle() + "-fx-font-size: 15px; -fx-padding: 12 30 12 30;");
+        StilGumba.primijeniNaglaseniVeliki(gumbZapocni);
         gumbZapocni.setOnAction(dogadjaj -> obradiZapocniIgru());
 
         azurirajIzbornikeUloga();

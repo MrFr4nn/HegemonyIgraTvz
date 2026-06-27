@@ -55,8 +55,7 @@ public class KreatorAkcijskeTrake {
         red.setAlignment(Pos.CENTER);
 
         Button gumbSljedecaFaza = new Button("SLJEDECA FAZA ►");
-        StilGumba.primijeniNaglaseni(gumbSljedecaFaza);
-        gumbSljedecaFaza.setStyle(gumbSljedecaFaza.getStyle() + "-fx-font-size: 14px; -fx-padding: 10 24 10 24;");
+        StilGumba.primijeniNaglaseniVeliki(gumbSljedecaFaza);
         gumbSljedecaFaza.setOnAction(dogadjaj -> akcijaSljedecaFaza.run());
 
         Button gumbSpremiStanje = new Button("Spremi stanje");

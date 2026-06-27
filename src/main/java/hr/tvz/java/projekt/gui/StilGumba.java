@@ -97,4 +97,34 @@ public class StilGumba {
         gumb.setOnMouseEntered(dogadjaj -> gumb.setStyle(stilHover));
         gumb.setOnMouseExited(dogadjaj -> gumb.setStyle(stilOsnovni));
     }
+
+    public static void primijeniNaglaseniVeliki(Button gumb) {
+        String stilOsnovni = OSNOVNI_STIL + "-fx-background-color: #00D4FF; -fx-text-fill: " + POZADINA_TAMNA + "; "
+                + "-fx-border-color: #00D4FF; -fx-border-width: 2; -fx-font-size: 15px; -fx-padding: 12 30 12 30;";
+        String stilHover = OSNOVNI_STIL + "-fx-background-color: #5CE5FF; -fx-text-fill: " + POZADINA_TAMNA + "; "
+                + "-fx-border-color: #5CE5FF; -fx-border-width: 2; -fx-font-size: 15px; -fx-padding: 12 30 12 30;";
+        gumb.setStyle(stilOsnovni);
+        gumb.setOnMouseEntered(dogadjaj -> gumb.setStyle(stilHover));
+        gumb.setOnMouseExited(dogadjaj -> gumb.setStyle(stilOsnovni));
+    }
+
+    public static void primijeniPozitivniVeliki(Button gumb) {
+        String stilOsnovni = OSNOVNI_STIL + "-fx-background-color: " + POZADINA_TAMNA + "; -fx-text-fill: #00F5A0; "
+                + "-fx-border-color: #00F5A0; -fx-border-width: 2; -fx-font-size: 14px; -fx-padding: 12 30 12 30;";
+        String stilHover = OSNOVNI_STIL + "-fx-background-color: #00F5A0; -fx-text-fill: " + POZADINA_TAMNA + "; "
+                + "-fx-border-color: #00F5A0; -fx-border-width: 2; -fx-font-size: 14px; -fx-padding: 12 30 12 30;";
+        gumb.setStyle(stilOsnovni);
+        gumb.setOnMouseEntered(dogadjaj -> gumb.setStyle(stilHover));
+        gumb.setOnMouseExited(dogadjaj -> gumb.setStyle(stilOsnovni));
+    }
+
+    public static void primijeniNegativniVeliki(Button gumb) {
+        String stilOsnovni = OSNOVNI_STIL + "-fx-background-color: " + POZADINA_TAMNA + "; -fx-text-fill: #FF3B5C; "
+                + "-fx-border-color: #FF3B5C; -fx-border-width: 2; -fx-font-size: 14px; -fx-padding: 12 30 12 30;";
+        String stilHover = OSNOVNI_STIL + "-fx-background-color: #FF3B5C; -fx-text-fill: " + POZADINA_TAMNA + "; "
+                + "-fx-border-color: #FF3B5C; -fx-border-width: 2; -fx-font-size: 14px; -fx-padding: 12 30 12 30;";
+        gumb.setStyle(stilOsnovni);
+        gumb.setOnMouseEntered(dogadjaj -> gumb.setStyle(stilHover));
+        gumb.setOnMouseExited(dogadjaj -> gumb.setStyle(stilOsnovni));
+    }
 }

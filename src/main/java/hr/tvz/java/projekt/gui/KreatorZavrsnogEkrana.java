@@ -49,8 +49,7 @@ public class KreatorZavrsnogEkrana {
         VBox rangLista = napraviRangListu(listaIgraca);
 
         Button gumbZatvori = new Button("ZATVORI");
-        StilGumba.primijeniNaglaseni(gumbZatvori);
-        gumbZatvori.setStyle(gumbZatvori.getStyle() + "-fx-font-size: 14px; -fx-padding: 12 30 12 30;");
+        StilGumba.primijeniNaglaseniVeliki(gumbZatvori);
         gumbZatvori.setOnAction(dogadjaj -> prozorPobjede.close());
 
         korijenskiLayout.getChildren().addAll(naslovIgraJeZavrsena, naslovPobjednika, rangLista, gumbZatvori);

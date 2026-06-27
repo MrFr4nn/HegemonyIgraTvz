@@ -118,13 +118,11 @@ public class KontrolePoteza {
         redGumbova.setAlignment(Pos.CENTER);
 
         Button gumbZa = new Button("✓  ZA");
-        StilGumba.primijeniPozitivni(gumbZa);
-        gumbZa.setStyle(gumbZa.getStyle() + "-fx-font-size: 14px; -fx-padding: 12 30 12 30;");
+        StilGumba.primijeniPozitivniVeliki(gumbZa);
         gumbZa.setOnAction(dogadjaj -> akcijaZa.run());
 
         Button gumbProtiv = new Button("✗  PROTIV");
-        StilGumba.primijeniNegativni(gumbProtiv);
-        gumbProtiv.setStyle(gumbProtiv.getStyle() + "-fx-font-size: 14px; -fx-padding: 12 30 12 30;");
+        StilGumba.primijeniNegativniVeliki(gumbProtiv);
         gumbProtiv.setOnAction(dogadjaj -> akcijaProtiv.run());
 
         redGumbova.getChildren().addAll(gumbZa, gumbProtiv);
