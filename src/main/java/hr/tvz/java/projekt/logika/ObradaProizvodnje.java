@@ -14,8 +14,7 @@ public class ObradaProizvodnje {
         String izvjestaj = "";
         int brojac = 0;
         while (brojac < listaIgraca.size()) {
-            KlasaIgraca igrac = listaIgraca.get(brojac);
-            izvjestaj = izvjestaj + obradiProizvodnjuZaIgraca(igrac) + "\n";
+            izvjestaj = izvjestaj + obradiProizvodnjuZaIgraca(listaIgraca.get(brojac)) + "\n";
             brojac = brojac + 1;
         }
         return izvjestaj;
@@ -24,21 +23,27 @@ public class ObradaProizvodnje {
     private String obradiProizvodnjuZaIgraca(KlasaIgraca igrac) {
         if (igrac instanceof KapitalistickaKlasa) {
             KapitalistickaKlasa kapitalist = (KapitalistickaKlasa) igrac;
-            double proizvedeno = kapitalist.getBrojTvornica() * 10.0;
+            double proizvedeno = kapitalist.getBrojTvornica() * 15.0;
             kapitalist.setUkupniKapital(kapitalist.getUkupniKapital() + proizvedeno);
-            return kapitalist.getNaziv() + " je proizveo: " + String.format("%.2f", proizvedeno);
+            return kapitalist.getNaziv() + " tvornice proizvele: +" + String.format("%.0f", proizvedeno) + " kapitala";
         } else if (igrac instanceof SrednjaKlasa) {
             SrednjaKlasa srednjaKlasa = (SrednjaKlasa) igrac;
-            double proizvedeno = srednjaKlasa.getBrojMalihPoduzeca() * 6.0;
+            double proizvedeno = srednjaKlasa.getBrojMalihPoduzeca() * 8.0;
             srednjaKlasa.ostvariPrihod(proizvedeno);
-            return srednjaKlasa.getNaziv() + " je proizveo: " + String.format("%.2f", proizvedeno);
+            return srednjaKlasa.getNaziv() + " poduzeca zaradila: +" + String.format("%.0f", proizvedeno) + " kapitala";
         } else if (igrac instanceof RadnickaKlasa) {
             RadnickaKlasa radnickaKlasa = (RadnickaKlasa) igrac;
+            if (radnickaKlasa.isJeUStrajku()) {
+                return radnickaKlasa.getNaziv() + " je u strajku - nema prihoda od rada.";
+            }
             int kolicinaHrane = radnickaKlasa.getZaposleniRadnici();
             radnickaKlasa.setKolicinaHrane(radnickaKlasa.getKolicinaHrane() + kolicinaHrane);
-            return radnickaKlasa.getNaziv() + " je zaradio hranu kroz rad: " + kolicinaHrane;
+            return radnickaKlasa.getNaziv() + " zaradila hranu: +" + kolicinaHrane + " jedinica";
         } else {
-            return igrac.getNaziv() + " nema proizvodnju u ovoj fazi.";
+            Vlada vlada = (Vlada) igrac;
+            double naplaceniPorez = vlada.getStopaPoreza() * 100.0;
+            vlada.setDrzavniProracun(vlada.getDrzavniProracun() + naplaceniPorez);
+            return vlada.getNaziv() + " naplatila automatski porez: +" + String.format("%.0f", naplaceniPorez);
         }
     }
 
@@ -46,8 +51,7 @@ public class ObradaProizvodnje {
         String izvjestaj = "";
         int brojac = 0;
         while (brojac < listaIgraca.size()) {
-            KlasaIgraca igrac = listaIgraca.get(brojac);
-            izvjestaj = izvjestaj + obradiPotrosnjuZaIgraca(igrac) + "\n";
+            izvjestaj = izvjestaj + obradiPotrosnjuZaIgraca(listaIgraca.get(brojac)) + "\n";
             brojac = brojac + 1;
         }
         return izvjestaj;
@@ -59,7 +63,7 @@ public class ObradaProizvodnje {
         } else if (igrac instanceof SrednjaKlasa) {
             return obradiPotrosnjuSrednje((SrednjaKlasa) igrac);
         } else {
-            return igrac.getNaziv() + " ne treba trositi hranu.";
+            return igrac.getNaziv() + " nema troskova potrosnje.";
         }
     }
 
@@ -67,22 +71,23 @@ public class ObradaProizvodnje {
         int potreba = radnickaKlasa.getBrojRadnika() / 2;
         if (radnickaKlasa.getKolicinaHrane() >= potreba) {
             radnickaKlasa.potrosiHranu(potreba);
-            return radnickaKlasa.getNaziv() + " je prehranio sve radnike, potroseno: " + potreba;
+            return radnickaKlasa.getNaziv() + " prehranila sve radnike (potroseno: " + potreba + ")";
         } else {
-            radnickaKlasa.smanjiBodove(2);
+            int manjak = potreba - radnickaKlasa.getKolicinaHrane();
             radnickaKlasa.potrosiHranu(radnickaKlasa.getKolicinaHrane());
-            return radnickaKlasa.getNaziv() + " nema dovoljno hrane! Kazna: -2 boda.";
+            radnickaKlasa.smanjiBodove(1);
+            return radnickaKlasa.getNaziv() + " manjak hrane (" + manjak + " jedinica) — kazna: -1 bod";
         }
     }
 
     private String obradiPotrosnjuSrednje(SrednjaKlasa srednjaKlasa) {
-        double potrebaZaKapitalom = 5.0;
-        if (srednjaKlasa.getUstedjeniKapital() >= potrebaZaKapitalom) {
-            srednjaKlasa.setUstedjeniKapital(srednjaKlasa.getUstedjeniKapital() - potrebaZaKapitalom);
-            return srednjaKlasa.getNaziv() + " je pokrila osnovne potrebe.";
+        double potreba = 5.0;
+        if (srednjaKlasa.getUstedjeniKapital() >= potreba) {
+            srednjaKlasa.setUstedjeniKapital(srednjaKlasa.getUstedjeniKapital() - potreba);
+            return srednjaKlasa.getNaziv() + " pokrila osnovne troskove (potroseno: 5 kapitala)";
         } else {
             srednjaKlasa.smanjiBodove(1);
-            return srednjaKlasa.getNaziv() + " nema dovoljno kapitala za potrebe! Kazna: -1 bod.";
+            return srednjaKlasa.getNaziv() + " nema dovoljno kapitala za troskove — kazna: -1 bod";
         }
     }
 
@@ -96,7 +101,7 @@ public class ObradaProizvodnje {
             KlasaIgraca igrac = listaIgraca.get(brojac);
             if (igrac instanceof KapitalistickaKlasa) {
                 KapitalistickaKlasa kapitalist = (KapitalistickaKlasa) igrac;
-                int bonusBodovi = (int) (kapitalist.getUkupniKapital() / 20);
+                int bonusBodovi = kapitalist.getBrojTvornica() * 10;
                 kapitalist.povecajBodove(bonusBodovi);
             }
             brojac = brojac + 1;
@@ -105,16 +110,7 @@ public class ObradaProizvodnje {
 
     public void obradiKrajRunde(List<KlasaIgraca> listaIgraca, Vlada vlada, Glasanje trenutnoGlasanje,
                                 KatalogZakona katalogZakona, int brojRunde, int maksimalniBrojRundi) {
-        int brojac = 0;
-        while (brojac < listaIgraca.size()) {
-            KlasaIgraca trenutniIgrac = listaIgraca.get(brojac);
-            trenutniIgrac.odigrajPotez();
-            if (trenutniIgrac instanceof SrednjaKlasa) {
-                trenutniIgrac.povecajBodove(((SrednjaKlasa) trenutniIgrac).getStandardZivota() / 20);
-            }
-            brojac = brojac + 1;
-        }
-
+        dodijelijBodoveSvimIgracima(listaIgraca);
         vlada.preracunajLegitimnostUBodove();
         primijeniMmfProvjeru(vlada);
 
@@ -127,7 +123,26 @@ public class ObradaProizvodnje {
         }
     }
 
-    private void primijeniPrihvaceniZakon(String nazivZakona, List<KlasaIgraca> listaIgraca, Vlada vlada, KatalogZakona katalogZakona) {
+    private void dodijelijBodoveSvimIgracima(List<KlasaIgraca> listaIgraca) {
+        int brojac = 0;
+        while (brojac < listaIgraca.size()) {
+            KlasaIgraca igrac = listaIgraca.get(brojac);
+            if (igrac instanceof RadnickaKlasa) {
+                RadnickaKlasa r = (RadnickaKlasa) igrac;
+                igrac.povecajBodove(r.getZaposleniRadnici() * 2);
+            } else if (igrac instanceof SrednjaKlasa) {
+                SrednjaKlasa s = (SrednjaKlasa) igrac;
+                igrac.povecajBodove(s.getBrojMalihPoduzeca() * 5 + (int) (s.getUstedjeniKapital() / 10));
+            } else if (igrac instanceof KapitalistickaKlasa) {
+                KapitalistickaKlasa k = (KapitalistickaKlasa) igrac;
+                igrac.povecajBodove((int) (k.getUkupniKapital() / 5));
+            }
+            brojac = brojac + 1;
+        }
+    }
+
+    private void primijeniPrihvaceniZakon(String nazivZakona, List<KlasaIgraca> listaIgraca,
+                                          Vlada vlada, KatalogZakona katalogZakona) {
         int brojac = 0;
         while (brojac < katalogZakona.dohvatiBrojZakona()) {
             if (katalogZakona.dohvatiNaziv(brojac).equals(nazivZakona)) {
