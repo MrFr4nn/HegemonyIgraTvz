@@ -6,6 +6,7 @@ import hr.tvz.java.projekt.model.KlasaIgraca;
 import hr.tvz.java.projekt.model.RadnickaKlasa;
 import hr.tvz.java.projekt.model.SrednjaKlasa;
 import hr.tvz.java.projekt.model.Vlada;
+import hr.tvz.java.projekt.util.XmlUpravitelj;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -19,10 +20,12 @@ public class KontrolePoteza {
 
     private KreatorIgraceKarte kreatorIgraceKarte;
     private DefinicijeKarataPoKlasi definicijeKarata;
+    private XmlUpravitelj xmlUpravitelj;
 
-    public KontrolePoteza() {
+    public KontrolePoteza(XmlUpravitelj xmlUpravitelj) {
         this.kreatorIgraceKarte = new KreatorIgraceKarte();
         this.definicijeKarata = new DefinicijeKarataPoKlasi();
+        this.xmlUpravitelj = xmlUpravitelj;
     }
 
     public VBox napraviKontroleZaIgraca(HegemonyEngine engineIgre, KlasaIgraca igrac, Runnable akcijaPokreniGlasanje, Runnable akcijaPonovnogPrikaza) {
@@ -81,6 +84,7 @@ public class KontrolePoteza {
             kreatorIgraceKarte.omoguciHover(karta, bojaHex);
             karta.setOnMouseClicked(dogadjaj -> {
                 if (engineIgre.iskoristiAkcijuTrenutnogIgraca(nazivAkcije)) {
+                    xmlUpravitelj.dodajPotezUPovijest(engineIgre.getBrojRunde(), igrac.getNaziv(), "Odigrana karta: " + naziv);
                     efekt.run();
                 }
             });

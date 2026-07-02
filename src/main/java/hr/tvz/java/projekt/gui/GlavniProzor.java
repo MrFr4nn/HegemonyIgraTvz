@@ -42,12 +42,12 @@ public class GlavniProzor {
         this.glavnaScena = glavnaScena;
         this.engineIgre = new HegemonyEngine(listaIgraca);
         this.prikazPloce = new PrikazPloce();
-        this.kontrolePoteza = new KontrolePoteza();
         this.upraviteljAnimacija = new UpraviteljAnimacija();
         this.serijalizator = new Serijalizator();
         this.upraviteljTehnickeAnalize = new UpraviteljTehnickeAnalize(serijalizator);
         this.xmlUpravitelj = new XmlUpravitelj();
         this.xmlUpravitelj.pokreniNovuPovijest();
+        this.kontrolePoteza = new KontrolePoteza(xmlUpravitelj);
         this.upraviteljReplay = new UpraviteljReplay(xmlUpravitelj);
         this.upraviteljGlasanja = new UpraviteljGlasanja(engineIgre, kontrolePoteza, xmlUpravitelj);
         this.kreatorAkcijskeTrake = new KreatorAkcijskeTrake();
@@ -175,7 +175,7 @@ public class GlavniProzor {
         oznakaFazeIgre.setText(napraviTekstFaze());
 
         if (engineIgre.getTrenutnaFaza().equals(HegemonyEngine.FAZA_PRIPREMA)) {
-            upraviteljAnimacija.pokreniAnimacijuDonosenjaZakona(oznakaAnimacije, "Nova runda zapoceta");
+            oznakaAnimacije.setText("Nova runda zapoceta.");
             upraviteljGlasanja.resetirajPoziciju();
         }
 
