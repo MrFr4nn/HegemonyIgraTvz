@@ -177,6 +177,7 @@ public class GlavniProzor {
         if (engineIgre.getTrenutnaFaza().equals(HegemonyEngine.FAZA_PRIPREMA)) {
             oznakaAnimacije.setText("Nova runda zapoceta.");
             upraviteljGlasanja.resetirajPoziciju();
+            kontrolePoteza.osvjeziPoolZaNovuRundu();
         }
 
         prikazPloce.azurirajPrikaz(engineIgre.getListaIgraca());

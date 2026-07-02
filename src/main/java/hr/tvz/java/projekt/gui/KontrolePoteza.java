@@ -28,7 +28,12 @@ public class KontrolePoteza {
         this.xmlUpravitelj = xmlUpravitelj;
     }
 
-    public VBox napraviKontroleZaIgraca(HegemonyEngine engineIgre, KlasaIgraca igrac, Runnable akcijaPokreniGlasanje, Runnable akcijaPonovnogPrikaza) {
+    public void osvjeziPoolZaNovuRundu() {
+        definicijeKarata.osvjeziPoolZaNovuRundu();
+    }
+
+    public VBox napraviKontroleZaIgraca(HegemonyEngine engineIgre, KlasaIgraca igrac,
+                                        Runnable akcijaPokreniGlasanje, Runnable akcijaPonovnogPrikaza) {
         definicijeKarata.postaviLimiteAkoNisuPostavljeni(engineIgre, igrac);
 
         VBox panelKontrola = new VBox(10);
@@ -104,7 +109,8 @@ public class KontrolePoteza {
         }
     }
 
-    public VBox napraviPanelGlasanja(String nazivZakona, String nazivGlasaca, String bojaHex, Runnable akcijaZa, Runnable akcijaProtiv) {
+    public VBox napraviPanelGlasanja(String nazivZakona, String nazivGlasaca, String bojaHex,
+                                     Runnable akcijaZa, Runnable akcijaProtiv) {
         VBox panelKontrola = new VBox(12);
         panelKontrola.setAlignment(Pos.CENTER);
         panelKontrola.setPadding(new Insets(10));
