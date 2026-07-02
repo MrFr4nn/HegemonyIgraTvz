@@ -25,25 +25,25 @@ public class ObradaProizvodnje {
             KapitalistickaKlasa kapitalist = (KapitalistickaKlasa) igrac;
             double proizvedeno = kapitalist.getBrojTvornica() * 15.0;
             kapitalist.setUkupniKapital(kapitalist.getUkupniKapital() + proizvedeno);
-            return kapitalist.getNaziv() + " tvornice proizvele: +" + String.format("%.0f", proizvedeno) + " kapitala";
+            return kapitalist.getNaziv() + " tvornice: +" + String.format("%.0f", proizvedeno) + " kapitala";
         } else if (igrac instanceof SrednjaKlasa) {
             SrednjaKlasa srednjaKlasa = (SrednjaKlasa) igrac;
             double proizvedeno = srednjaKlasa.getBrojMalihPoduzeca() * 8.0;
             srednjaKlasa.ostvariPrihod(proizvedeno);
-            return srednjaKlasa.getNaziv() + " poduzeca zaradila: +" + String.format("%.0f", proizvedeno) + " kapitala";
+            return srednjaKlasa.getNaziv() + " poduzeca: +" + String.format("%.0f", proizvedeno) + " kapitala";
         } else if (igrac instanceof RadnickaKlasa) {
             RadnickaKlasa radnickaKlasa = (RadnickaKlasa) igrac;
             if (radnickaKlasa.isJeUStrajku()) {
-                return radnickaKlasa.getNaziv() + " je u strajku - nema prihoda od rada.";
+                return radnickaKlasa.getNaziv() + " je u strajku - nema prihoda.";
             }
             int kolicinaHrane = radnickaKlasa.getZaposleniRadnici();
             radnickaKlasa.setKolicinaHrane(radnickaKlasa.getKolicinaHrane() + kolicinaHrane);
-            return radnickaKlasa.getNaziv() + " zaradila hranu: +" + kolicinaHrane + " jedinica";
+            return radnickaKlasa.getNaziv() + " zaradila: +" + kolicinaHrane + " hrane";
         } else {
             Vlada vlada = (Vlada) igrac;
             double naplaceniPorez = vlada.getStopaPoreza() * 100.0;
             vlada.setDrzavniProracun(vlada.getDrzavniProracun() + naplaceniPorez);
-            return vlada.getNaziv() + " naplatila automatski porez: +" + String.format("%.0f", naplaceniPorez);
+            return vlada.getNaziv() + " automatski porez: +" + String.format("%.0f", naplaceniPorez);
         }
     }
 
@@ -71,12 +71,18 @@ public class ObradaProizvodnje {
         int potreba = radnickaKlasa.getBrojRadnika() / 2;
         if (radnickaKlasa.getKolicinaHrane() >= potreba) {
             radnickaKlasa.potrosiHranu(potreba);
-            return radnickaKlasa.getNaziv() + " prehranila sve radnike (potroseno: " + potreba + ")";
+            return radnickaKlasa.getNaziv() + " prehranila radnike (potroseno: " + potreba + ")";
         } else {
             int manjak = potreba - radnickaKlasa.getKolicinaHrane();
             radnickaKlasa.potrosiHranu(radnickaKlasa.getKolicinaHrane());
-            radnickaKlasa.smanjiBodove(1);
-            return radnickaKlasa.getNaziv() + " manjak hrane (" + manjak + " jedinica) — kazna: -1 bod";
+            int standardPrije = radnickaKlasa.getStandardZivota();
+            int novStandard = standardPrije - (manjak * 3);
+            if (novStandard < 0) {
+                novStandard = 0;
+            }
+            radnickaKlasa.setStandardZivota(novStandard);
+            return radnickaKlasa.getNaziv() + " manjak hrane (" + manjak + ") - standard pao s "
+                    + standardPrije + " na " + novStandard;
         }
     }
 
@@ -84,10 +90,18 @@ public class ObradaProizvodnje {
         double potreba = 5.0;
         if (srednjaKlasa.getUstedjeniKapital() >= potreba) {
             srednjaKlasa.setUstedjeniKapital(srednjaKlasa.getUstedjeniKapital() - potreba);
-            return srednjaKlasa.getNaziv() + " pokrila osnovne troskove (potroseno: 5 kapitala)";
+            return srednjaKlasa.getNaziv() + " pokrila troskove (potroseno: 5 kapitala)";
         } else {
-            srednjaKlasa.smanjiBodove(1);
-            return srednjaKlasa.getNaziv() + " nema dovoljno kapitala za troskove — kazna: -1 bod";
+            double manjak = potreba - srednjaKlasa.getUstedjeniKapital();
+            srednjaKlasa.setUstedjeniKapital(0.0);
+            int standardPrije = srednjaKlasa.getStandardZivota();
+            int novStandard = standardPrije - (int) (manjak * 2);
+            if (novStandard < 0) {
+                novStandard = 0;
+            }
+            srednjaKlasa.setStandardZivota(novStandard);
+            return srednjaKlasa.getNaziv() + " manjak kapitala - standard pao s "
+                    + standardPrije + " na " + novStandard;
         }
     }
 
@@ -114,7 +128,8 @@ public class ObradaProizvodnje {
         vlada.preracunajLegitimnostUBodove();
         primijeniMmfProvjeru(vlada);
 
-        if (trenutnoGlasanje != null && trenutnoGlasanje.isGlasanjeZavrseno() && trenutnoGlasanje.isZakonPrihvacen()) {
+        if (trenutnoGlasanje != null && trenutnoGlasanje.isGlasanjeZavrseno()
+                && trenutnoGlasanje.isZakonPrihvacen()) {
             primijeniPrihvaceniZakon(trenutnoGlasanje.getNazivZakona(), listaIgraca, vlada, katalogZakona);
         }
 
@@ -129,13 +144,16 @@ public class ObradaProizvodnje {
             KlasaIgraca igrac = listaIgraca.get(brojac);
             if (igrac instanceof RadnickaKlasa) {
                 RadnickaKlasa r = (RadnickaKlasa) igrac;
-                igrac.povecajBodove(r.getZaposleniRadnici() * 2);
+                int bodovi = r.getZaposleniRadnici() * 2;
+                igrac.povecajBodove(bodovi);
             } else if (igrac instanceof SrednjaKlasa) {
                 SrednjaKlasa s = (SrednjaKlasa) igrac;
-                igrac.povecajBodove(s.getBrojMalihPoduzeca() * 5 + (int) (s.getUstedjeniKapital() / 10));
+                int bodovi = s.getBrojMalihPoduzeca() * 5 + (int) (s.getUstedjeniKapital() / 10);
+                igrac.povecajBodove(bodovi);
             } else if (igrac instanceof KapitalistickaKlasa) {
                 KapitalistickaKlasa k = (KapitalistickaKlasa) igrac;
-                igrac.povecajBodove((int) (k.getUkupniKapital() / 5));
+                int bodovi = (int) (k.getUkupniKapital() / 5);
+                igrac.povecajBodove(bodovi);
             }
             brojac = brojac + 1;
         }
