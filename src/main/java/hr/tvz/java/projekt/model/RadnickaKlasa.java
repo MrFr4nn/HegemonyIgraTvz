@@ -14,10 +14,10 @@ public class RadnickaKlasa extends KlasaIgraca {
     public RadnickaKlasa(String naziv) {
         super(naziv);
         this.brojRadnika = 10;
-        this.zaposleniRadnici = 6;
-        this.kolicinaHrane = 20;
-        this.razinaObrazovanja = 1;
-        this.standardZivota = 50;
+        this.zaposleniRadnici = 0;
+        this.kolicinaHrane = 0;
+        this.razinaObrazovanja = 0;
+        this.standardZivota = 0;
         this.jeUStrajku = false;
     }
 
@@ -55,52 +55,30 @@ public class RadnickaKlasa extends KlasaIgraca {
         return placaDobra && porezDobar;
     }
 
-    public void pokreniStrajk() {
+    public void azurirajStandardZivota() {
         if (jeUStrajku) {
-            System.out.println("Radnicka klasa je vec u strajku.");
-        } else {
-            jeUStrajku = true;
-            System.out.println("Radnicka klasa je pokrenula strajk, proizvodnja je zaustavljena.");
+            return;
         }
+        if (zaposleniRadnici > 5) {
+            standardZivota = standardZivota + (zaposleniRadnici - 5) * 2;
+        }
+        if (kolicinaHrane > 0) {
+            standardZivota = standardZivota + 3;
+        }
+        if (razinaObrazovanja > 0) {
+            standardZivota = standardZivota + razinaObrazovanja * 2;
+        }
+        if (standardZivota > 100) {
+            standardZivota = 100;
+        }
+    }
+
+    public void pokreniStrajk() {
+        jeUStrajku = true;
     }
 
     public void prekiniStrajk() {
-        if (jeUStrajku) {
-            jeUStrajku = false;
-            System.out.println("Strajk je zavrsen, radnici se vracaju na posao.");
-        } else {
-            System.out.println("Radnicka klasa trenutno nije u strajku.");
-        }
-    }
-
-    public void azurirajStandardZivota() {
-        int privremena = standardZivota;
-        if (kolicinaHrane > 15) {
-            privremena = privremena + 5;
-        } else if (kolicinaHrane < 5) {
-            privremena = privremena - 10;
-        }
-
-        if (razinaObrazovanja > 2) {
-            privremena = privremena + 3;
-        }
-
-        double stopaNezaposlenosti = izracunajStopuNezaposlenosti();
-        if (stopaNezaposlenosti > 0.4) {
-            privremena = privremena - 8;
-        }
-
-        if (jeUStrajku) {
-            privremena = privremena - 5;
-        }
-
-        if (privremena > 100) {
-            privremena = 100;
-        }
-        if (privremena < 0) {
-            privremena = 0;
-        }
-        standardZivota = privremena;
+        jeUStrajku = false;
     }
 
     public double izracunajStopuNezaposlenosti() {
@@ -108,15 +86,13 @@ public class RadnickaKlasa extends KlasaIgraca {
             return 0.0;
         }
         int nezaposleni = brojRadnika - zaposleniRadnici;
-        double stopa = (double) nezaposleni / (double) brojRadnika;
-        return stopa;
+        return (double) nezaposleni / (double) brojRadnika;
     }
 
     public void potrosiHranu(int kolicina) {
         int privremena = kolicinaHrane - kolicina;
         if (privremena < 0) {
             kolicinaHrane = 0;
-            System.out.println("Upozorenje: Nema dovoljno hrane, standard zivota ce pasti.");
         } else {
             kolicinaHrane = privremena;
         }
@@ -124,15 +100,10 @@ public class RadnickaKlasa extends KlasaIgraca {
 
     public void kupiHranu(int kolicina, int trosak) {
         kolicinaHrane = kolicinaHrane + kolicina;
-        System.out.println("Radnicka klasa je kupila hranu za iznos: " + trosak);
     }
 
     public void investirajUObrazovanje(int trosak) {
-        if (trosak >= 10) {
-            razinaObrazovanja = razinaObrazovanja + 1;
-        } else {
-            System.out.println("Nedovoljno sredstava za povecanje razine obrazovanja.");
-        }
+        razinaObrazovanja = razinaObrazovanja + 1;
     }
 
     public void zaposliRadnika(int brojNovih) {
@@ -142,6 +113,7 @@ public class RadnickaKlasa extends KlasaIgraca {
         } else {
             zaposleniRadnici = privremena;
         }
+        standardZivota = standardZivota + 5;
     }
 
     public void otpustiRadnika(int brojOtpustenih) {
@@ -151,41 +123,19 @@ public class RadnickaKlasa extends KlasaIgraca {
         } else {
             zaposleniRadnici = privremena;
         }
+        standardZivota = standardZivota - 3;
+        if (standardZivota < 0) {
+            standardZivota = 0;
+        }
     }
 
-    public int getBrojRadnika() {
-        return brojRadnika;
-    }
-
-    public void setBrojRadnika(int brojRadnika) {
-        this.brojRadnika = brojRadnika;
-    }
-
-    public int getZaposleniRadnici() {
-        return zaposleniRadnici;
-    }
-
-    public int getKolicinaHrane() {
-        return kolicinaHrane;
-    }
-
-    public void setKolicinaHrane(int kolicinaHrane) {
-        this.kolicinaHrane = kolicinaHrane;
-    }
-
-    public int getRazinaObrazovanja() {
-        return razinaObrazovanja;
-    }
-
-    public int getStandardZivota() {
-        return standardZivota;
-    }
-
-    public void setStandardZivota(int standardZivota) {
-        this.standardZivota = standardZivota;
-    }
-
-    public boolean isJeUStrajku() {
-        return jeUStrajku;
-    }
+    public int getBrojRadnika() { return brojRadnika; }
+    public void setBrojRadnika(int brojRadnika) { this.brojRadnika = brojRadnika; }
+    public int getZaposleniRadnici() { return zaposleniRadnici; }
+    public int getKolicinaHrane() { return kolicinaHrane; }
+    public void setKolicinaHrane(int kolicinaHrane) { this.kolicinaHrane = kolicinaHrane; }
+    public int getRazinaObrazovanja() { return razinaObrazovanja; }
+    public int getStandardZivota() { return standardZivota; }
+    public void setStandardZivota(int standardZivota) { this.standardZivota = standardZivota; }
+    public boolean isJeUStrajku() { return jeUStrajku; }
 }
