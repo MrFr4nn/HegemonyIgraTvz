@@ -12,7 +12,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -117,8 +116,8 @@ public class GlavniProzor {
 
     private void azurirajStilApBrojaca() {
         String boja = StilGumba.dohvatiBojuKlase(engineIgre.dohvatiIgracaNaPotezu());
-        oznakaApBrojaca.setStyle("-fx-font-family: 'Arial Black'; -fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: " + boja
-                + "; -fx-effect: dropshadow(gaussian, " + boja + ", 10, 0.4, 0, 0);");
+        oznakaApBrojaca.setStyle("-fx-font-family: 'Arial Black'; -fx-font-size: 14px; "
+                + "-fx-font-weight: bold; -fx-text-fill: " + boja + ";");
     }
 
     private void azurirajPanelPotezaPremaFazi() {
@@ -138,6 +137,13 @@ public class GlavniProzor {
             oznaka.setStyle("-fx-text-fill: " + StilGumba.TEKST_SVIJETLI + "; -fx-font-size: 13px; -fx-font-weight: bold;");
             panelKontrolaTrenutniIgrac.getChildren().add(oznaka);
         } else {
+            if (engineIgre.jesuLiSviIgraciOdigrali()) {
+                engineIgre.prebaciNaSljedecuFazu();
+                oznakaFazeIgre.setText(napraviTekstFaze());
+                prikazPloce.azurirajPrikaz(engineIgre.getListaIgraca());
+                azurirajPanelPotezaPremaFazi();
+                return;
+            }
             KlasaIgraca igracNaPotezu = engineIgre.dohvatiIgracaNaPotezu();
             VBox kontrole = kontrolePoteza.napraviKontroleZaIgraca(engineIgre, igracNaPotezu,
                     () -> upraviteljGlasanja.prikaziIzbornikZakona(panelKontrolaTrenutniIgrac, igracNaPotezu.getNaziv(),

@@ -109,6 +109,10 @@ public class HegemonyEngine {
         return redoslijedPoteza.jeIgracNaPotezuOdigraoSveApove();
     }
 
+    public boolean jesuLiSviIgraciOdigrali() {
+        return redoslijedPoteza.jesuLiSviIgraciOdigraliSveApove();
+    }
+
     public int dohvatiPreostaleApTrenutnogIgraca() {
         return redoslijedPoteza.dohvatiApSustavTrenutnogIgraca().getPreostaliAp();
     }

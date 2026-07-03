@@ -41,16 +41,13 @@ public class KapitalistickaKlasa extends KlasaIgraca {
     public void izgradiTvornicu(double trosak) {
         brojTvornica = brojTvornica + 1;
         ukupniKapital = ukupniKapital - trosak;
-        if (ukupniKapital < 0) {
-            ukupniKapital = 0;
-        }
     }
 
     public void prodajTvornicu(double prihod) {
         if (brojTvornica > 0) {
             brojTvornica = brojTvornica - 1;
-            ukupniKapital = ukupniKapital + prihod;
         }
+        ukupniKapital = ukupniKapital + prihod;
     }
 
     public void ulozUInvesticiju(double iznos) {
@@ -60,9 +57,6 @@ public class KapitalistickaKlasa extends KlasaIgraca {
 
     public void platiPorez(double iznos) {
         ukupniKapital = ukupniKapital - iznos;
-        if (ukupniKapital < 0) {
-            ukupniKapital = 0;
-        }
     }
 
     public double getUkupniKapital() { return ukupniKapital; }
