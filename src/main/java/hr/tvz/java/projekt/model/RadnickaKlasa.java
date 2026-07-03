@@ -37,6 +37,7 @@ public class RadnickaKlasa extends KlasaIgraca {
         tekst = tekst + "Ukupno radnika: " + brojRadnika + "\n";
         tekst = tekst + "Zaposleni radnici: " + zaposleniRadnici + "\n";
         tekst = tekst + "Kolicina hrane: " + kolicinaHrane + "\n";
+
         tekst = tekst + "Razina obrazovanja: " + razinaObrazovanja + "\n";
         tekst = tekst + "Standard zivota: " + standardZivota + "\n";
         tekst = tekst + "U strajku: " + jeUStrajku;

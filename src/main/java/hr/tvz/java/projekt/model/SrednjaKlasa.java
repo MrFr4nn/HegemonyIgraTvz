@@ -64,7 +64,7 @@ public class SrednjaKlasa extends KlasaIgraca {
             brojMalihPoduzeca = brojMalihPoduzeca - 1;
             standardZivota = standardZivota - 3;
             if (standardZivota < 0) {
-                standardZivota = 0;
+                standardZivota = standardZivota - 1;
             }
         }
     }
