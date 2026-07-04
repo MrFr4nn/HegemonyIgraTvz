@@ -2,152 +2,195 @@ package hr.tvz.java.projekt.util;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 public class XmlUpravitelj {
 
     private static final String PUTANJA_DATOTEKE = "povijest.xml";
-
+    private static final String PUTANJA_SHEME = "povijest.xsd";
     private Document trenutniDokument;
-    private Element korijenskiElement;
 
     public void pokreniNovuPovijest() {
         try {
-            DocumentBuilderFactory tvornica = DocumentBuilderFactory.newInstance();
-            DocumentBuilder graditelj = tvornica.newDocumentBuilder();
-            trenutniDokument = graditelj.newDocument();
-            korijenskiElement = trenutniDokument.createElement("PovijestIgre");
-            trenutniDokument.appendChild(korijenskiElement);
-        } catch (ParserConfigurationException greska) {
-            System.out.println("Greska prilikom pokretanja nove povijesti: " + greska.getMessage());
+            DocumentBuilderFactory tvornicaDokumenata = DocumentBuilderFactory.newInstance();
+            DocumentBuilder graditeljiDokumenta = tvornicaDokumenata.newDocumentBuilder();
+            trenutniDokument = graditeljiDokumenta.newDocument();
+            Element korijen = trenutniDokument.createElement("PovijestIgre");
+            trenutniDokument.appendChild(korijen);
+            spremiDokument();
+        } catch (Exception greska) {
+            System.out.println("Greska pri pokretanju povijesti: " + greska.getMessage());
         }
     }
 
-    public void dodajPotezUPovijest(int brojRunde, String oznakaIgraca, String opisPoteza) {
-        if (trenutniDokument == null) {
-            pokreniNovuPovijest();
-        }
-        Element elementPoteza = trenutniDokument.createElement("Potez");
-
-        Element elementRunde = trenutniDokument.createElement("Runda");
-        elementRunde.setTextContent(String.valueOf(brojRunde));
-        elementPoteza.appendChild(elementRunde);
-
-        Element elementIgraca = trenutniDokument.createElement("Igrac");
-        elementIgraca.setTextContent(oznakaIgraca);
-        elementPoteza.appendChild(elementIgraca);
-
-        Element elementOpisa = trenutniDokument.createElement("Opis");
-        elementOpisa.setTextContent(opisPoteza);
-        elementPoteza.appendChild(elementOpisa);
-
-        korijenskiElement.appendChild(elementPoteza);
-        spremiTrenutniDokument();
-    }
-
-    private void spremiTrenutniDokument() {
+    public void dodajPotezUPovijest(int runda, String igrac, String opis) {
         try {
-            TransformerFactory tvornicaTransformera = TransformerFactory.newInstance();
-            Transformer transformer = tvornicaTransformera.newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            if (trenutniDokument == null) {
+                pokreniNovuPovijest();
+            }
+            Element korijen = trenutniDokument.getDocumentElement();
+            Element potez = trenutniDokument.createElement("Potez");
+            Element elementRunda = trenutniDokument.createElement("Runda");
+            elementRunda.setTextContent(String.valueOf(runda));
+            Element elementIgrac = trenutniDokument.createElement("Igrac");
+            elementIgrac.setTextContent(igrac);
+            Element elementOpis = trenutniDokument.createElement("Opis");
+            elementOpis.setTextContent(opis);
+
+            potez.appendChild(elementRunda);
+            potez.appendChild(elementIgrac);
+            potez.appendChild(elementOpis);
+            korijen.appendChild(potez);
+            spremiDokument();
+        } catch (Exception greska) {
+            System.out.println("Greska pri dodavanju poteza: " + greska.getMessage());
+        }
+    }
+
+    private void spremiDokument() {
+        try {
+            TransformerFactory tvornicaTransformatora = TransformerFactory.newInstance();
+            Transformer transformator = tvornicaTransformatora.newTransformer();
+            transformator.setOutputProperty(javax.xml.transform.OutputKeys.INDENT, "yes");
             DOMSource izvor = new DOMSource(trenutniDokument);
-            StreamResult odrediste = new StreamResult(new File(PUTANJA_DATOTEKE));
-            transformer.transform(izvor, odrediste);
-        } catch (TransformerException greska) {
-            System.out.println("Greska prilikom spremanja XML povijesti: " + greska.getMessage());
-        }
-    }
-
-    public boolean provjeriOsnovniFormat() {
-        try {
-            SAXParserFactory tvornicaSax = SAXParserFactory.newInstance();
-            SAXParser parser = tvornicaSax.newSAXParser();
-            ProvjeraSadrzajaHandler obradjivac = new ProvjeraSadrzajaHandler();
-            parser.parse(new File(PUTANJA_DATOTEKE), obradjivac);
-            return obradjivac.jeFormatIspravan();
-        } catch (ParserConfigurationException | SAXException | IOException greska) {
-            System.out.println("Greska prilikom SAX provjere formata: " + greska.getMessage());
-            return false;
+            StreamResult rezultat = new StreamResult(new File(PUTANJA_DATOTEKE));
+            transformator.transform(izvor, rezultat);
+        } catch (Exception greska) {
+            System.out.println("Greska pri spremanju XML-a: " + greska.getMessage());
         }
     }
 
     public List<String> ucitajPovijestZaReplay() {
-        List<String> lista = new ArrayList<>();
+        List<String> listaPoteza = new ArrayList<>();
         try {
             DocumentBuilderFactory tvornica = DocumentBuilderFactory.newInstance();
             DocumentBuilder graditelj = tvornica.newDocumentBuilder();
             File datoteka = new File(PUTANJA_DATOTEKE);
             if (!datoteka.exists()) {
-                System.out.println("Datoteka povijesti ne postoji, replay nije moguc.");
-                return lista;
+                return listaPoteza;
             }
             Document dokument = graditelj.parse(datoteka);
-            NodeList listaPoteza = dokument.getElementsByTagName("Potez");
-
+            NodeList listaCvorova = dokument.getElementsByTagName("Potez");
             int brojac = 0;
-            while (brojac < listaPoteza.getLength()) {
-                Node trenutniCvor = listaPoteza.item(brojac);
-                if (trenutniCvor.getNodeType() == Node.ELEMENT_NODE) {
-                    Element elementPoteza = (Element) trenutniCvor;
-                    String runda = dohvatiTekstPodElementa(elementPoteza, "Runda");
-                    String igrac = dohvatiTekstPodElementa(elementPoteza, "Igrac");
-                    String opis = dohvatiTekstPodElementa(elementPoteza, "Opis");
-                    String redak = "Runda " + runda + " | " + igrac + " | " + opis;
-                    lista.add(redak);
-                }
+            while (brojac < listaCvorova.getLength()) {
+                Element potez = (Element) listaCvorova.item(brojac);
+                String runda = potez.getElementsByTagName("Runda").item(0).getTextContent();
+                String igrac = potez.getElementsByTagName("Igrac").item(0).getTextContent();
+                String opis = potez.getElementsByTagName("Opis").item(0).getTextContent();
+                listaPoteza.add("Runda " + runda + " | " + igrac + " | " + opis);
                 brojac = brojac + 1;
             }
-        } catch (ParserConfigurationException | SAXException | IOException greska) {
-            System.out.println("Greska prilikom ucitavanja povijesti za replay: " + greska.getMessage());
+        } catch (Exception greska) {
+            System.out.println("Greska pri ucitavanju povijesti: " + greska.getMessage());
         }
-        return lista;
+        return listaPoteza;
     }
 
-    private String dohvatiTekstPodElementa(Element roditelj, String nazivOznake) {
-        NodeList podCvorovi = roditelj.getElementsByTagName(nazivOznake);
-        if (podCvorovi.getLength() > 0) {
-            return podCvorovi.item(0).getTextContent();
-        } else {
-            return "";
+    public boolean validirajProtivSheme() {
+        try {
+            InputStream tokSheme = getClass().getClassLoader().getResourceAsStream(PUTANJA_SHEME);
+            if (tokSheme == null) {
+                System.out.println("XSD shema nije pronadena: " + PUTANJA_SHEME);
+                return false;
+            }
+            SchemaFactory tvornicaSheme = SchemaFactory.newInstance(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            Schema shema = tvornicaSheme.newSchema(new StreamSource(tokSheme));
+            Validator validator = shema.newValidator();
+            validator.validate(new StreamSource(new File(PUTANJA_DATOTEKE)));
+            System.out.println("XML validacija uspjesna - povijest.xml je ispravna prema XSD shemi.");
+            return true;
+        } catch (SAXException greska) {
+            System.out.println("XML validacija neuspjesna: " + greska.getMessage());
+            return false;
+        } catch (IOException greska) {
+            System.out.println("Greska pri citanju datoteke za validaciju: " + greska.getMessage());
+            return false;
+        } catch (Exception greska) {
+            System.out.println("Neocekivana greska pri validaciji: " + greska.getMessage());
+            return false;
         }
     }
 
-    private static class ProvjeraSadrzajaHandler extends DefaultHandler {
-        private boolean pronadenKorijen = false;
-        private boolean formatIspravan = true;
+    public List<String> ekstrairajSaxom() {
+        List<String> ekstrahiraniPodaci = new ArrayList<>();
+        try {
+            File datoteka = new File(PUTANJA_DATOTEKE);
+            if (!datoteka.exists()) {
+                return ekstrahiraniPodaci;
+            }
+            SAXParserFactory tvornicaSax = SAXParserFactory.newInstance();
+            SAXParser saxParser = tvornicaSax.newSAXParser();
+            SaxEkstraktorHandler handler = new SaxEkstraktorHandler();
+            saxParser.parse(datoteka, handler);
+            ekstrahiraniPodaci = handler.dohvatiEkstrahiranePodatke();
+            System.out.println("SAX ekstrakcija uspjesna - pronadeno " + ekstrahiraniPodaci.size() + " poteza.");
+        } catch (Exception greska) {
+            System.out.println("Greska pri SAX ekstrakciji: " + greska.getMessage());
+        }
+        return ekstrahiraniPodaci;
+    }
+
+    private static class SaxEkstraktorHandler extends DefaultHandler {
+
+        private List<String> ekstrahiraniPodaci = new ArrayList<>();
+        private StringBuilder trenutniTekst = new StringBuilder();
+        private String trenutnaRunda = "";
+        private String trenutniIgrac = "";
+        private String trenutniOpis = "";
+        private String trenutniElement = "";
 
         @Override
-        public void startElement(String uri, String lokalnoIme, String kvalificiranoIme,
-                                 org.xml.sax.Attributes atributi) {
-            if (kvalificiranoIme.equals("PovijestIgre")) {
-                pronadenKorijen = true;
-            }
-            if (kvalificiranoIme.equals("Potez") && !pronadenKorijen) {
-                formatIspravan = false;
+        public void startElement(String uri, String localName, String qName, Attributes attributes) {
+            trenutniElement = qName;
+            trenutniTekst.setLength(0);
+        }
+
+        @Override
+        public void characters(char[] ch, int start, int length) {
+            trenutniTekst.append(ch, start, length);
+        }
+
+        @Override
+        public void endElement(String uri, String localName, String qName) {
+            String tekst = trenutniTekst.toString().trim();
+            if (qName.equals("Runda")) {
+                trenutnaRunda = tekst;
+            } else if (qName.equals("Igrac")) {
+                trenutniIgrac = tekst;
+            } else if (qName.equals("Opis")) {
+                trenutniOpis = tekst;
+            } else if (qName.equals("Potez")) {
+                if (!trenutnaRunda.isEmpty() && !trenutniIgrac.isEmpty()) {
+                    ekstrahiraniPodaci.add("R" + trenutnaRunda + " | " + trenutniIgrac + " | " + trenutniOpis);
+                }
+                trenutnaRunda = "";
+                trenutniIgrac = "";
+                trenutniOpis = "";
             }
         }
 
-        public boolean jeFormatIspravan() {
-            return pronadenKorijen && formatIspravan;
+        public List<String> dohvatiEkstrahiranePodatke() {
+            return ekstrahiraniPodaci;
         }
     }
 }

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:element name="PovijestIgre">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Potez" type="TipPoteza" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:attribute name="datumPocetka" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="TipPoteza">
+        <xs:sequence>
+            <xs:element name="Runda" type="xs:integer"/>
+            <xs:element name="Igrac" type="xs:string"/>
+            <xs:element name="Opis" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>
