@@ -44,20 +44,23 @@ public class KatalogZakona {
     public void oznaciIskoristenim(int indeks) { iskoristeni.set(indeks, true); }
 
     public void primijeniEfekt(int indeks, List<KlasaIgraca> listaIgraca, Vlada vlada) {
-        switch (indeks) {
-            case 0  -> vlada.promijeniStopuPoreza(vlada.getStopaPoreza() + 0.10);
-            case 1  -> vlada.promijeniStopuPoreza(vlada.getStopaPoreza() - 0.10);
-            case 2  -> vlada.promijeniMinimalnuPlacu(vlada.getMinimalnaPlaca() + 2.0);
-            case 3  -> vlada.promijeniMinimalnuPlacu(vlada.getMinimalnaPlaca() - 1.0);
-            case 4  -> primijeniSocijalneTransfere(listaIgraca, vlada);
-            case 5  -> vlada.promijeniStopuPoreza(vlada.getStopaPoreza() - 0.05);
-            case 6  -> {
+        String nazivZakona = dohvatiNaziv(indeks);
+
+        switch (nazivZakona) {
+            case "Povecanje poreza" -> vlada.promijeniStopuPoreza(vlada.getStopaPoreza() + 0.10);
+            case "Smanjenje poreza" -> vlada.promijeniStopuPoreza(vlada.getStopaPoreza() - 0.10);
+            case "Povecanje minimalne place" -> vlada.promijeniMinimalnuPlacu(vlada.getMinimalnaPlaca() + 2.0);
+            case "Smanjenje minimalne place" -> vlada.promijeniMinimalnuPlacu(vlada.getMinimalnaPlaca() - 1.0);
+            case "Socijalni transferi" -> primijeniSocijalneTransfere(listaIgraca, vlada);
+            case "Porezne olaksice za poduzetnike" -> vlada.promijeniStopuPoreza(vlada.getStopaPoreza() - 0.05);
+            case "Privatizacija javnih usluga" -> {
                 vlada.setDrzavniProracun(vlada.getDrzavniProracun() + 30.0);
                 vlada.smanjiLegitimnost(10);
             }
-            case 7  -> primijeniNacionalizaciju(listaIgraca, vlada);
-            case 8  -> primijeniInvesticijskePoticaje(listaIgraca, vlada);
-            default -> primijeniReformuRada(listaIgraca, vlada);
+            case "Nacionalizacija kljucnih industrija" -> primijeniNacionalizaciju(listaIgraca, vlada);
+            case "Investicijski poticaji" -> primijeniInvesticijskePoticaje(listaIgraca, vlada);
+            case "Reforma radnog zakonodavstva" -> primijeniReformuRada(listaIgraca, vlada);
+            default -> System.out.println("Nepoznat zakon: " + nazivZakona);
         }
     }
 
@@ -74,7 +77,8 @@ public class KatalogZakona {
         vlada.setDrzavniProracun(vlada.getDrzavniProracun() + 30.0);
         for (KlasaIgraca igrac : listaIgraca) {
             if (igrac instanceof KapitalistickaKlasa kapitalist) {
-                kapitalist.platiPorez(30.0);
+                // Smanjujemo kapital izravno (može ući u minus po vašem pravilu)
+                kapitalist.setUkupniKapital(kapitalist.getUkupniKapital() - 30.0);
             }
         }
     }

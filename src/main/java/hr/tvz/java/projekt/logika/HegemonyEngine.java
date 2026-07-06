@@ -1,8 +1,12 @@
 package hr.tvz.java.projekt.logika;
 
+import hr.tvz.java.projekt.model.KapitalistickaKlasa;
 import hr.tvz.java.projekt.model.KlasaIgraca;
+import hr.tvz.java.projekt.model.RadnickaKlasa;
+import hr.tvz.java.projekt.model.SrednjaKlasa;
 import hr.tvz.java.projekt.model.Vlada;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class HegemonyEngine {
@@ -65,6 +69,11 @@ public class HegemonyEngine {
                     obradiKrajRunde();
                 }
             }
+            // TOČAN PRIJELAZ: Nakon faze glasanja, igra ide na obradu kraja runde
+            case FAZA_GLASANJE    -> {
+                trenutnaFaza = FAZA_KRAJ_RUNDE;
+                obradiKrajRunde();
+            }
             default -> pokreniNovuRundu();
         }
     }
@@ -78,7 +87,46 @@ public class HegemonyEngine {
     public String obradiFazuProizvodnje() { return obradaProizvodnje.obradiFazuProizvodnje(listaIgraca); }
     public String obradiFazuPotrosnje() { return obradaProizvodnje.obradiFazuPotrosnje(listaIgraca); }
     public boolean iskoristiAkcijuTrenutnogIgraca(String nazivAkcije) { return redoslijedPoteza.dohvatiApSustavTrenutnogIgraca().iskoristiAkciju(nazivAkcije); }
-    public boolean jeAkcijaDostupnaTrenutnomIgracu(String nazivAkcije) { return redoslijedPoteza.dohvatiApSustavTrenutnogIgraca().jeAkcijaDostupna(nazivAkcije); }
+
+    public boolean jeAkcijaDostupnaTrenutnomIgracu(String nazivAkcije) {
+        // Prva provjera: ima li uopće preostalih AP-ova u AP sustavu
+        boolean imaAp = redoslijedPoteza.dohvatiApSustavTrenutnogIgraca().jeAkcijaDostupna(nazivAkcije);
+        if (!imaAp) {
+            return false;
+        }
+
+        // Druga provjera: ekonomska provjera resursa na temelju točnog nazivAkcije iz PoolKarata
+        KlasaIgraca trenutniIgrac = dohvatiIgracaNaPotezu();
+
+        if (trenutniIgrac instanceof SrednjaKlasa srednja) {
+            switch (nazivAkcije) {
+                case "ZatvoriPoduzece" -> { return srednja.getBrojMalihPoduzeca() > 0; }
+                case "IzvozRobe"       -> { return srednja.getBrojMalihPoduzeca() > 0; }
+                case "OtvoriPoduzece"  -> { return srednja.getUstedjeniKapital() >= 15.0; }
+            }
+        }
+
+        else if (trenutniIgrac instanceof KapitalistickaKlasa kapitalist) {
+            switch (nazivAkcije) {
+                case "ProdajTvornicu"   -> { return kapitalist.getBrojTvornica() > 0; }
+                case "FuzijaKompanija"  -> { return kapitalist.getBrojTvornica() >= 2; }
+                case "Lobiranje"        -> { return kapitalist.getUkupniKapital() >= 10.0; }
+            }
+        }
+
+        else if (trenutniIgrac instanceof RadnickaKlasa radnicka) {
+            switch (nazivAkcije) {
+                case "PotrosiHranu"     -> { return radnicka.getKolicinaHrane() > 0; }
+                // POPRAVAK: nazivAkcije iz PoolKarata za ovu kartu je "OtpustiRadnika" bez razmaka!
+                case "OtpustiRadnika"   -> { return radnicka.getZaposleniRadnici() > 0; }
+                // POPRAVAK: nazivAkcije iz PoolKarata za prosvjed je "Strajk"
+                case "Strajk"           -> { return !radnicka.isJeUStrajku() && radnicka.getZaposleniRadnici() > 0; }
+            }
+        }
+
+        return true;
+    }
+
     public void postaviLimitAkcijeTrenutnogIgraca(String nazivAkcije, int limit) { redoslijedPoteza.dohvatiApSustavTrenutnogIgraca().postaviLimitAkcije(nazivAkcije, limit); }
     public void prebaciPotez() { redoslijedPoteza.prebaciNaSljedecegIgraca(); }
     public boolean jeIgracNaPotezuOdigraoSveApove() { return redoslijedPoteza.jeIgracNaPotezuOdigraoSveApove(); }
