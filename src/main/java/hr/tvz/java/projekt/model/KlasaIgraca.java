@@ -28,7 +28,7 @@ public abstract class KlasaIgraca implements Serializable {
         if (kolicina > 0) {
             this.bodoviPobjede = this.bodoviPobjede + kolicina;
         } else {
-            System.out.println("Pokusaj dodavanja negativnih bodova ignoriran.");
+            System.err.println("Pokusaj dodavanja negativnih bodova ignoriran.");
         }
     }
 
