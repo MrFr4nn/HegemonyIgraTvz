@@ -1,11 +1,7 @@
 package hr.tvz.java.projekt.gui;
 
 import hr.tvz.java.projekt.logika.HegemonyEngine;
-import hr.tvz.java.projekt.model.KapitalistickaKlasa;
-import hr.tvz.java.projekt.model.KlasaIgraca;
-import hr.tvz.java.projekt.model.RadnickaKlasa;
-import hr.tvz.java.projekt.model.SrednjaKlasa;
-import hr.tvz.java.projekt.model.Vlada;
+import hr.tvz.java.projekt.model.*;
 import hr.tvz.java.projekt.util.XmlUpravitelj;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -38,6 +34,12 @@ public class KontrolePoteza {
             this.nazivAkcije = nazivAkcije;
             this.efekt = efekt;
         }
+
+        public String getNaziv() { return naziv; }
+        public String getOpis() { return opis; }
+        public String getSvgIkona() { return svgIkona; }
+        public String getNazivAkcije() { return nazivAkcije; }
+        public Runnable getEfekt() { return efekt; }
     }
 
     public KontrolePoteza(XmlUpravitelj xmlUpravitelj) {
@@ -65,7 +67,6 @@ public class KontrolePoteza {
         HBox redKarata = new HBox(10);
         redKarata.setAlignment(Pos.CENTER);
 
-        // Ovdje je primijenjen Pattern Matching za sve klase - rješava Sonar greške!
         if (igrac instanceof RadnickaKlasa radnicka) {
             definicijeKarata.dodajKarteRadnicke(redKarata, this, engineIgre, radnicka, akcijaPonovnogPrikaza);
         } else if (igrac instanceof SrednjaKlasa srednja) {
@@ -99,35 +100,33 @@ public class KontrolePoteza {
     }
 
     public void dodajKartu(HBox red, HegemonyEngine engineIgre, KlasaIgraca igrac, PodaciOKarti podaci) {
-        boolean dostupna = engineIgre.jeAkcijaDostupnaTrenutnomIgracu(podaci.nazivAkcije);
+        boolean dostupna = engineIgre.jeAkcijaDostupnaTrenutnomIgracu(podaci.getNazivAkcije());
         String bojaHex = StilGumba.dohvatiBojuKlase(igrac);
-        VBox karta = kreatorIgraceKarte.napraviKartu(podaci.naziv, podaci.opis, podaci.svgIkona, bojaHex, !dostupna);
+        VBox karta = kreatorIgraceKarte.napraviKartu(podaci.getNaziv(), podaci.getOpis(), podaci.getSvgIkona(), bojaHex, !dostupna);
 
         if (dostupna) {
             kreatorIgraceKarte.omoguciHover(karta, bojaHex);
             karta.setOnMouseClicked(dogadjaj -> {
-                if (engineIgre.iskoristiAkcijuTrenutnomIgracu(podaci.nazivAkcije)) {
-                    xmlUpravitelj.dodajPotezUPovijest(engineIgre.getBrojRunde(), igrac.getNaziv(), "Odigrana karta: " + podaci.naziv);
-                    podaci.efekt.run();
-                }
+                // 1. Obavještavamo engine igre da izvrši i limitira akciju (troši akcijski bod)
+                engineIgre.iskoristiAkcijuTrenutnogIgraca(podaci.getNazivAkcije());
+
+                // 2. Bilježimo odigrani potez u XML povijest igre
+                xmlUpravitelj.dodajPotezUPovijest(engineIgre.getBrojRunde(), igrac.getNaziv(), "Odigrana karta: " + podaci.getNaziv());
+
+                // 3. Pokrećemo logički efekt karte koji ujedno osvježava prikaz sučelja
+                podaci.getEfekt().run();
             });
         }
         red.getChildren().add(karta);
     }
 
     private String odrediNazivUloge(KlasaIgraca igrac) {
-        if (igrac instanceof RadnickaKlasa) {
-            return "Radnicka klasa";
-        } else if (igrac instanceof SrednjaKlasa) {
-            return "Srednja klasa";
-        } else if (igrac instanceof KapitalistickaKlasa) {
-            return "Kapitalisticka klasa";
-        } else {
-            return "Vlada";
-        }
+        if (igrac instanceof RadnickaKlasa) return "Radnicka klasa";
+        if (igrac instanceof SrednjaKlasa) return "Srednja klasa";
+        if (igrac instanceof KapitalistickaKlasa) return "Kapitalisticka klasa";
+        return "Vlada";
     }
 
-    // Ispravljen naziv metode iz "napkinsPanelGlasanja" u čitljiviji oblik
     public VBox napraviPanelGlasanja(String nazivZakona, String nazivGlasaca, String bojaHex,
                                      Runnable akcijaZa, Runnable akcijaProtiv) {
         VBox panelKontrola = new VBox(12);
