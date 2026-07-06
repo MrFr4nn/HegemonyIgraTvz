@@ -49,7 +49,6 @@ public class RadnickaKlasa extends KlasaIgraca {
 
     @Override
     public int izracunajUkupniRezultat() {
-        // Riješeno Sonar upozorenje - izraz se vraća odmah bez privremene varijable
         return standardZivota + (zaposleniRadnici * 2) + (razinaObrazovanja * 5);
     }
 
@@ -72,8 +71,13 @@ public class RadnickaKlasa extends KlasaIgraca {
         if (razinaObrazovanja > 0) {
             standardZivota = standardZivota + razinaObrazovanja * 2;
         }
+
+        // Osiguranje granica (0 - 100)
         if (standardZivota > 100) {
             standardZivota = 100;
+        }
+        if (standardZivota < 0) {
+            standardZivota = 0;
         }
     }
 
@@ -103,7 +107,14 @@ public class RadnickaKlasa extends KlasaIgraca {
     }
 
     public void kupiHranu(int kolicina, int trosak) {
-        kolicinaHrane = kolicinaHrane + kolicina;
+        if (kolicina > 0) {
+            kolicinaHrane = kolicinaHrane + kolicina;
+            // Socijalna pomoć / kupnja odmah podiže standard života srazmjerno hrani
+            standardZivota = standardZivota + (kolicina * 2);
+            if (standardZivota > 100) {
+                standardZivota = 100;
+            }
+        }
         if (trosak < 0) {
             LOG.log(Level.WARNING, "Trosak kupnje hrane je negativan: {0}", trosak);
         }
@@ -124,6 +135,9 @@ public class RadnickaKlasa extends KlasaIgraca {
             zaposleniRadnici = privremena;
         }
         standardZivota = standardZivota + 5;
+        if (standardZivota > 100) {
+            standardZivota = 100;
+        }
     }
 
     public void otpustiRadnika(int brojOtpustenih) {

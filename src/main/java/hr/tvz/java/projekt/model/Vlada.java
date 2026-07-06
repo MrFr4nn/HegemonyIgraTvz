@@ -84,16 +84,20 @@ public class Vlada extends KlasaIgraca {
     }
 
     public void povecajLegitimnost(int iznos) {
-        legitimnost = legitimnost + iznos;
-        if (legitimnost > 100) {
-            legitimnost = 100;
+        if (iznos > 0) {
+            legitimnost = legitimnost + iznos;
+            if (legitimnost > 100) {
+                legitimnost = 100;
+            }
         }
     }
 
     public void smanjiLegitimnost(int iznos) {
-        legitimnost = legitimnost - iznos;
-        if (legitimnost < 0) {
-            legitimnost = 0;
+        if (iznos > 0) {
+            legitimnost = legitimnost - iznos;
+            if (legitimnost < 0) {
+                legitimnost = 0;
+            }
         }
     }
 
@@ -115,6 +119,10 @@ public class Vlada extends KlasaIgraca {
     }
 
     public void promijeniStopuPoreza(double novaStopa) {
+        // Ako je pod kaznom MMF-a, zakoni ne mogu promijeniti poreznu stopu!
+        if (podMMFKaznom) {
+            return;
+        }
         if (novaStopa < 0.0) {
             stopaPoreza = 0.0;
         } else if (novaStopa > 0.9) {
@@ -125,6 +133,10 @@ public class Vlada extends KlasaIgraca {
     }
 
     public void promijeniMinimalnuPlacu(double novaPlaca) {
+        // Ako je pod kaznom MMF-a, zakoni ne mogu dizati minimalac!
+        if (podMMFKaznom) {
+            return;
+        }
         minimalnaPlaca = Math.max(1.0, novaPlaca);
     }
 

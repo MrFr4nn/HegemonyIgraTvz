@@ -6,7 +6,6 @@ import java.util.logging.Logger;
 public class SrednjaKlasa extends KlasaIgraca {
 
     private static final long serialVersionUID = 1L;
-    // Uveden službeni loger za rješavanje upozorenja bez mijenjanja potpisa metode
     private static final Logger LOG = Logger.getLogger(SrednjaKlasa.class.getName());
 
     private int brojMalihPoduzeca;
@@ -48,8 +47,13 @@ public class SrednjaKlasa extends KlasaIgraca {
         if (ustedjeniKapital > 20) {
             standardZivota = standardZivota + 2;
         }
+
+        // Fiksna provjera granica
         if (standardZivota > 100) {
             standardZivota = 100;
+        }
+        if (standardZivota < 0) {
+            standardZivota = 0;
         }
     }
 
@@ -62,14 +66,18 @@ public class SrednjaKlasa extends KlasaIgraca {
             brojMalihPoduzeca = brojMalihPoduzeca + 1;
             standardZivota = standardZivota + 2;
         }
+        if (standardZivota > 100) {
+            standardZivota = 100;
+        }
     }
 
     public void zatvoriPoduzece() {
         if (brojMalihPoduzeca > 0) {
             brojMalihPoduzeca = brojMalihPoduzeca - 1;
             standardZivota = standardZivota - 3;
+            // ISPRAVLJENO: Standard ne smije pasti ispod 0 niti ići dalje u minus
             if (standardZivota < 0) {
-                standardZivota = standardZivota - 1;
+                standardZivota = 0;
             }
         }
     }
@@ -87,7 +95,6 @@ public class SrednjaKlasa extends KlasaIgraca {
         if (standardZivota > 100) {
             standardZivota = 100;
         }
-        // Iskorištavanje parametra kroz loger uklanja Sonar/IDE upozorenje o neiskorištenom parametru
         if (trosak < 0) {
             LOG.log(Level.WARNING, "Trosak investicije u obrazovanje srednje klase je negativan: {0}", trosak);
         }
