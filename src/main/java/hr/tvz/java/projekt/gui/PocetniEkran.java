@@ -150,27 +150,21 @@ public class PocetniEkran {
     }
 
     private String dohvatiSvgZaUlogu(int indeks) {
-        if (indeks == 0) {
-            return kreatorKarticeUloge.dohvatiIkonuRadnicke();
-        } else if (indeks == 1) {
-            return kreatorKarticeUloge.dohvatiIkonuSrednje();
-        } else if (indeks == 2) {
-            return kreatorKarticeUloge.dohvatiIkonuKapitalisticke();
-        } else {
-            return kreatorKarticeUloge.dohvatiIkonuVlade();
-        }
+        return switch (indeks) {
+            case 0 -> kreatorKarticeUloge.dohvatiIkonuRadnicke();
+            case 1 -> kreatorKarticeUloge.dohvatiIkonuSrednje();
+            case 2 -> kreatorKarticeUloge.dohvatiIkonuKapitalisticke();
+            default -> kreatorKarticeUloge.dohvatiIkonuVlade();
+        };
     }
 
     private String dohvatiOpisZaUlogu(int indeks) {
-        if (indeks == 0) {
-            return kreatorKarticeUloge.dohvatiOpisRadnicke();
-        } else if (indeks == 1) {
-            return kreatorKarticeUloge.dohvatiOpisSrednje();
-        } else if (indeks == 2) {
-            return kreatorKarticeUloge.dohvatiOpisKapitalisticke();
-        } else {
-            return kreatorKarticeUloge.dohvatiOpisVlade();
-        }
+        return switch (indeks) {
+            case 0 -> kreatorKarticeUloge.dohvatiOpisRadnicke();
+            case 1 -> kreatorKarticeUloge.dohvatiOpisSrednje();
+            case 2 -> kreatorKarticeUloge.dohvatiOpisKapitalisticke();
+            default -> kreatorKarticeUloge.dohvatiOpisVlade();
+        };
     }
 
     private void obradiZapocniIgru() {

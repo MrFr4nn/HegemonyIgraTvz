@@ -22,7 +22,6 @@ public class GlavniProzor {
     private HegemonyEngine engineIgre;
     private PrikazPloce prikazPloce;
     private KontrolePoteza kontrolePoteza;
-    private UpraviteljAnimacija upraviteljAnimacija;
     private Serijalizator serijalizator;
     private UpraviteljTehnickeAnalize upraviteljTehnickeAnalize;
     private XmlUpravitelj xmlUpravitelj;
@@ -41,7 +40,6 @@ public class GlavniProzor {
         this.glavnaScena = glavnaScena;
         this.engineIgre = new HegemonyEngine(listaIgraca);
         this.prikazPloce = new PrikazPloce();
-        this.upraviteljAnimacija = new UpraviteljAnimacija();
         this.serijalizator = new Serijalizator();
         this.upraviteljTehnickeAnalize = new UpraviteljTehnickeAnalize(serijalizator);
         this.xmlUpravitelj = new XmlUpravitelj();

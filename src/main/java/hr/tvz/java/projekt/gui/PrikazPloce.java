@@ -3,7 +3,6 @@ package hr.tvz.java.projekt.gui;
 import hr.tvz.java.projekt.model.KapitalistickaKlasa;
 import hr.tvz.java.projekt.model.KlasaIgraca;
 import hr.tvz.java.projekt.model.RadnickaKlasa;
-import hr.tvz.java.projekt.model.SrednjaKlasa;
 import hr.tvz.java.projekt.model.Vlada;
 import javafx.geometry.Insets;
 import javafx.scene.layout.Background;
@@ -12,8 +11,6 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.control.Label;
 
 import java.util.ArrayList;
@@ -23,15 +20,9 @@ public class PrikazPloce {
 
     private static final String BOJA_PODLOGE = StilGumba.POZADINA_TAMNA;
 
-    private KreatorKartice kreatorKartice;
-    private List<List<Label>> listaOznakaPoIgracu;
-    private List<VBox> listaKarticaIgraca;
-
-    public PrikazPloce() {
-        this.kreatorKartice = new KreatorKartice();
-        this.listaOznakaPoIgracu = new ArrayList<>();
-        this.listaKarticaIgraca = new ArrayList<>();
-    }
+    private final KreatorKartice kreatorKartice = new KreatorKartice();
+    private final List<List<Label>> listaOznakaPoIgracu = new ArrayList<>();
+    private final List<VBox> listaKarticaIgraca = new ArrayList<>();
 
     public HBox napraviDrzavnuPlocu(List<KlasaIgraca> listaIgraca) {
         HBox plocaIgre = new HBox(20);
@@ -41,14 +32,11 @@ public class PrikazPloce {
         listaOznakaPoIgracu.clear();
         listaKarticaIgraca.clear();
 
-        int brojac = 0;
-        while (brojac < listaIgraca.size()) {
-            VBox karticaIgraca = napraviKarticuIgraca(listaIgraca.get(brojac));
+        for (KlasaIgraca igrac : listaIgraca) {
+            VBox karticaIgraca = napraviKarticuIgraca(igrac);
             listaKarticaIgraca.add(karticaIgraca);
             plocaIgre.getChildren().add(karticaIgraca);
-            brojac = brojac + 1;
         }
-
         return plocaIgre;
     }
 
@@ -56,62 +44,51 @@ public class PrikazPloce {
         VBox kartica = new VBox(10);
         kreatorKartice.postaviOkvirIVanjskiStil(kartica, igrac.isNaPotezu());
 
-        VBox zaglavljeKartice = kreatorKartice.napraviZaglavljeKartice(igrac);
-
         List<Label> oznakePodataka = napraviOznakePodataka(igrac);
         VBox sadrzajKartice = new VBox(8);
         sadrzajKartice.setPadding(new Insets(15, 18, 0, 18));
         sadrzajKartice.getChildren().addAll(oznakePodataka);
-
-        VBox miniGraf = napraviMiniGrafZaIgraca(igrac);
-        sadrzajKartice.getChildren().add(miniGraf);
+        sadrzajKartice.getChildren().add(napraviMiniGrafZaIgraca(igrac));
 
         Label oznakaBodova = kreatorKartice.napraviOznakuBodova(igrac);
         oznakePodataka.add(oznakaBodova);
         sadrzajKartice.getChildren().add(oznakaBodova);
 
-        kartica.getChildren().addAll(zaglavljeKartice, sadrzajKartice);
+        kartica.getChildren().addAll(kreatorKartice.napraviZaglavljeKartice(igrac), sadrzajKartice);
         listaOznakaPoIgracu.add(oznakePodataka);
         return kartica;
     }
 
     private VBox napraviMiniGrafZaIgraca(KlasaIgraca igrac) {
-        if (igrac instanceof RadnickaKlasa) {
-            RadnickaKlasa radnickaKlasa = (RadnickaKlasa) igrac;
-            return kreatorKartice.napraviMiniGraf(igrac, radnickaKlasa.getStandardZivota(), 100, "Standard zivota");
-        } else if (igrac instanceof SrednjaKlasa) {
-            SrednjaKlasa srednjaKlasa = (SrednjaKlasa) igrac;
-            return kreatorKartice.napraviMiniGraf(igrac, srednjaKlasa.getStandardZivota(), 100, "Standard zivota");
-        } else if (igrac instanceof KapitalistickaKlasa) {
-            KapitalistickaKlasa kapitalist = (KapitalistickaKlasa) igrac;
+        if (igrac instanceof RadnickaKlasa radnicka) {
+            return kreatorKartice.napraviMiniGraf(igrac, radnicka.getStandardZivota(), 100, "Standard zivota");
+        } else if (igrac instanceof hr.tvz.java.projekt.model.SrednjaKlasa srednja) {
+            return kreatorKartice.napraviMiniGraf(igrac, srednja.getStandardZivota(), 100, "Standard zivota");
+        } else if (igrac instanceof KapitalistickaKlasa kapitalist) {
             return kreatorKartice.napraviMiniGraf(igrac, kapitalist.getUkupniKapital(), 400, "Ukupni kapital");
-        } else {
-            Vlada vlada = (Vlada) igrac;
+        } else if (igrac instanceof Vlada vlada) {
             return kreatorKartice.napraviMiniGraf(igrac, vlada.getLegitimnost(), 100, "Legitimnost");
         }
+        return new VBox();
     }
 
     private List<Label> napraviOznakePodataka(KlasaIgraca igrac) {
         List<Label> oznake = new ArrayList<>();
 
-        if (igrac instanceof RadnickaKlasa) {
-            RadnickaKlasa radnickaKlasa = (RadnickaKlasa) igrac;
-            oznake.add(kreatorKartice.napraviOznaku("Standard zivota: " + radnickaKlasa.getStandardZivota()));
-            oznake.add(kreatorKartice.napraviOznaku("Kolicina hrane: " + radnickaKlasa.getKolicinaHrane()));
-            oznake.add(kreatorKartice.napraviOznaku("Zaposleni: " + radnickaKlasa.getZaposleniRadnici() + " / " + radnickaKlasa.getBrojRadnika()));
-            oznake.add(kreatorKartice.napraviOznaku("U strajku: " + (radnickaKlasa.isJeUStrajku() ? "DA" : "Ne")));
-        } else if (igrac instanceof SrednjaKlasa) {
-            SrednjaKlasa srednjaKlasa = (SrednjaKlasa) igrac;
-            oznake.add(kreatorKartice.napraviOznaku("Standard zivota: " + srednjaKlasa.getStandardZivota()));
-            oznake.add(kreatorKartice.napraviOznaku("Poduzeca: " + srednjaKlasa.getBrojMalihPoduzeca()));
-            oznake.add(kreatorKartice.napraviOznaku("Kapital: " + String.format("%.2f", srednjaKlasa.getUstedjeniKapital())));
-        } else if (igrac instanceof KapitalistickaKlasa) {
-            KapitalistickaKlasa kapitalistickaKlasa = (KapitalistickaKlasa) igrac;
-            oznake.add(kreatorKartice.napraviOznaku("Kapital: " + String.format("%.2f", kapitalistickaKlasa.getUkupniKapital())));
-            oznake.add(kreatorKartice.napraviOznaku("Tvornice: " + kapitalistickaKlasa.getBrojTvornica()));
-            oznake.add(kreatorKartice.napraviOznaku("Dionice: " + String.format("%.2f", kapitalistickaKlasa.getVrijednostDionica())));
-        } else {
-            Vlada vlada = (Vlada) igrac;
+        if (igrac instanceof RadnickaKlasa radnicka) {
+            oznake.add(kreatorKartice.napraviOznaku("Standard zivota: " + radnicka.getStandardZivota()));
+            oznake.add(kreatorKartice.napraviOznaku("Kolicina hrane: " + radnicka.getKolicinaHrane()));
+            oznake.add(kreatorKartice.napraviOznaku("Zaposleni: " + radnicka.getZaposleniRadnici() + " / " + radnicka.getBrojRadnika()));
+            oznake.add(kreatorKartice.napraviOznaku("U strajku: " + (radnicka.isJeUStrajku() ? "DA" : "Ne")));
+        } else if (igrac instanceof hr.tvz.java.projekt.model.SrednjaKlasa srednja) {
+            oznake.add(kreatorKartice.napraviOznaku("Standard zivota: " + srednja.getStandardZivota()));
+            oznake.add(kreatorKartice.napraviOznaku("Poduzeca: " + srednja.getBrojMalihPoduzeca()));
+            oznake.add(kreatorKartice.napraviOznaku("Kapital: " + String.format("%.2f", srednja.getUstedjeniKapital())));
+        } else if (igrac instanceof KapitalistickaKlasa kapitalist) {
+            oznake.add(kreatorKartice.napraviOznaku("Kapital: " + String.format("%.2f", kapitalist.getUkupniKapital())));
+            oznake.add(kreatorKartice.napraviOznaku("Tvornice: " + kapitalist.getBrojTvornica()));
+            oznake.add(kreatorKartice.napraviOznaku("Dionice: " + String.format("%.2f", kapitalist.getVrijednostDionica())));
+        } else if (igrac instanceof Vlada vlada) {
             oznake.add(kreatorKartice.napraviOznaku("Proracun: " + String.format("%.2f", vlada.getDrzavniProracun())));
             oznake.add(kreatorKartice.napraviOznaku("Stopa poreza: " + String.format("%.2f", vlada.getStopaPoreza())));
             oznake.add(kreatorKartice.napraviOznaku("Min. placa: " + String.format("%.2f", vlada.getMinimalnaPlaca())));
@@ -121,20 +98,16 @@ public class PrikazPloce {
     }
 
     public void azurirajPrikaz(List<KlasaIgraca> listaIgraca) {
-        int brojac = 0;
-        while (brojac < listaIgraca.size()) {
-            KlasaIgraca igrac = listaIgraca.get(brojac);
-            List<Label> oznakePodataka = listaOznakaPoIgracu.get(brojac);
-            List<Label> novePodatkovneOznake = napraviOznakePodataka(igrac);
+        for (int i = 0; i < listaIgraca.size(); i++) {
+            KlasaIgraca igrac = listaIgraca.get(i);
+            List<Label> oznakePodataka = listaOznakaPoIgracu.get(i);
+            List<Label> noveOznake = napraviOznakePodataka(igrac);
 
-            int drugiBrojac = 0;
-            while (drugiBrojac < oznakePodataka.size() - 1 && drugiBrojac < novePodatkovneOznake.size()) {
-                oznakePodataka.get(drugiBrojac).setText(novePodatkovneOznake.get(drugiBrojac).getText());
-                drugiBrojac = drugiBrojac + 1;
+            for (int j = 0; j < oznakePodataka.size() - 1 && j < noveOznake.size(); j++) {
+                oznakePodataka.get(j).setText(noveOznake.get(j).getText());
             }
             oznakePodataka.get(oznakePodataka.size() - 1).setText("BODOVI: " + igrac.getBodoviPobjede());
-            kreatorKartice.postaviOkvirIVanjskiStil(listaKarticaIgraca.get(brojac), igrac.isNaPotezu());
-            brojac = brojac + 1;
+            kreatorKartice.postaviOkvirIVanjskiStil(listaKarticaIgraca.get(i), igrac.isNaPotezu());
         }
     }
 }

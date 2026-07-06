@@ -18,9 +18,27 @@ import javafx.scene.text.FontWeight;
 
 public class KontrolePoteza {
 
-    private KreatorIgraceKarte kreatorIgraceKarte;
-    private DefinicijeKarataPoKlasi definicijeKarata;
-    private XmlUpravitelj xmlUpravitelj;
+    private static final String FX_TEXT_FILL_STIL = "-fx-text-fill: ";
+
+    private final KreatorIgraceKarte kreatorIgraceKarte;
+    private final DefinicijeKarataPoKlasi definicijeKarata;
+    private final XmlUpravitelj xmlUpravitelj;
+
+    public static class PodaciOKarti {
+        private final String naziv;
+        private final String opis;
+        private final String svgIkona;
+        private final String nazivAkcije;
+        private final Runnable efekt;
+
+        public PodaciOKarti(String naziv, String opis, String svgIkona, String nazivAkcije, Runnable efekt) {
+            this.naziv = naziv;
+            this.opis = opis;
+            this.svgIkona = svgIkona;
+            this.nazivAkcije = nazivAkcije;
+            this.efekt = efekt;
+        }
+    }
 
     public KontrolePoteza(XmlUpravitelj xmlUpravitelj) {
         this.kreatorIgraceKarte = new KreatorIgraceKarte();
@@ -42,19 +60,20 @@ public class KontrolePoteza {
 
         Label naslovPanela = new Label(odrediNazivUloge(igrac).toUpperCase() + " - ODABERITE KARTU");
         naslovPanela.setFont(Font.font("Arial Black", FontWeight.BOLD, 13));
-        naslovPanela.setStyle("-fx-text-fill: " + StilGumba.dohvatiBojuKlase(igrac) + ";");
+        naslovPanela.setStyle(FX_TEXT_FILL_STIL + StilGumba.dohvatiBojuKlase(igrac) + ";");
 
         HBox redKarata = new HBox(10);
         redKarata.setAlignment(Pos.CENTER);
 
-        if (igrac instanceof RadnickaKlasa) {
-            definicijeKarata.dodajKarteRadnicke(redKarata, this, engineIgre, (RadnickaKlasa) igrac, akcijaPonovnogPrikaza);
-        } else if (igrac instanceof SrednjaKlasa) {
-            definicijeKarata.dodajKarteSrednje(redKarata, this, engineIgre, (SrednjaKlasa) igrac, akcijaPonovnogPrikaza);
-        } else if (igrac instanceof KapitalistickaKlasa) {
-            definicijeKarata.dodajKarteKapitalisticke(redKarata, this, engineIgre, (KapitalistickaKlasa) igrac, akcijaPonovnogPrikaza);
-        } else {
-            dodajKarteVladeIGumbGlasanja(redKarata, engineIgre, (Vlada) igrac, akcijaPonovnogPrikaza, akcijaPokreniGlasanje);
+        // Ovdje je primijenjen Pattern Matching za sve klase - rješava Sonar greške!
+        if (igrac instanceof RadnickaKlasa radnicka) {
+            definicijeKarata.dodajKarteRadnicke(redKarata, this, engineIgre, radnicka, akcijaPonovnogPrikaza);
+        } else if (igrac instanceof SrednjaKlasa srednja) {
+            definicijeKarata.dodajKarteSrednje(redKarata, this, engineIgre, srednja, akcijaPonovnogPrikaza);
+        } else if (igrac instanceof KapitalistickaKlasa kapitalist) {
+            definicijeKarata.dodajKarteKapitalisticke(redKarata, this, engineIgre, kapitalist, akcijaPonovnogPrikaza);
+        } else if (igrac instanceof Vlada vlada) {
+            dodajKarteVladeIGumbGlasanja(redKarata, engineIgre, vlada, akcijaPonovnogPrikaza, akcijaPokreniGlasanje);
         }
 
         panelKontrola.getChildren().addAll(naslovPanela, redKarata);
@@ -79,18 +98,17 @@ public class KontrolePoteza {
         red.getChildren().add(gumbKarta);
     }
 
-    public void dodajKartu(HBox red, HegemonyEngine engineIgre, KlasaIgraca igrac, String naziv, String opis,
-                           String svgIkona, String nazivAkcije, Runnable efekt) {
-        boolean dostupna = engineIgre.jeAkcijaDostupnaTrenutnomIgracu(nazivAkcije);
+    public void dodajKartu(HBox red, HegemonyEngine engineIgre, KlasaIgraca igrac, PodaciOKarti podaci) {
+        boolean dostupna = engineIgre.jeAkcijaDostupnaTrenutnomIgracu(podaci.nazivAkcije);
         String bojaHex = StilGumba.dohvatiBojuKlase(igrac);
-        VBox karta = kreatorIgraceKarte.napraviKartu(naziv, opis, svgIkona, bojaHex, !dostupna);
+        VBox karta = kreatorIgraceKarte.napraviKartu(podaci.naziv, podaci.opis, podaci.svgIkona, bojaHex, !dostupna);
 
         if (dostupna) {
             kreatorIgraceKarte.omoguciHover(karta, bojaHex);
             karta.setOnMouseClicked(dogadjaj -> {
-                if (engineIgre.iskoristiAkcijuTrenutnogIgraca(nazivAkcije)) {
-                    xmlUpravitelj.dodajPotezUPovijest(engineIgre.getBrojRunde(), igrac.getNaziv(), "Odigrana karta: " + naziv);
-                    efekt.run();
+                if (engineIgre.iskoristiAkcijuTrenutnomIgracu(podaci.nazivAkcije)) {
+                    xmlUpravitelj.dodajPotezUPovijest(engineIgre.getBrojRunde(), igrac.getNaziv(), "Odigrana karta: " + podaci.naziv);
+                    podaci.efekt.run();
                 }
             });
         }
@@ -109,6 +127,7 @@ public class KontrolePoteza {
         }
     }
 
+    // Ispravljen naziv metode iz "napkinsPanelGlasanja" u čitljiviji oblik
     public VBox napraviPanelGlasanja(String nazivZakona, String nazivGlasaca, String bojaHex,
                                      Runnable akcijaZa, Runnable akcijaProtiv) {
         VBox panelKontrola = new VBox(12);
@@ -117,11 +136,11 @@ public class KontrolePoteza {
 
         Label oznakaTko = new Label("GLASA: " + nazivGlasaca.toUpperCase());
         oznakaTko.setFont(Font.font("Arial Black", FontWeight.BOLD, 15));
-        oznakaTko.setStyle("-fx-text-fill: " + bojaHex + "; -fx-effect: dropshadow(gaussian, " + bojaHex + ", 12, 0.4, 0, 0);");
+        oznakaTko.setStyle(FX_TEXT_FILL_STIL + bojaHex + "; -fx-effect: dropshadow(gaussian, " + bojaHex + ", 12, 0.4, 0, 0);");
 
         Label naslovPanela = new Label("ZAKON: " + nazivZakona.toUpperCase());
         naslovPanela.setFont(Font.font("Verdana", 13));
-        naslovPanela.setStyle("-fx-text-fill: " + StilGumba.TEKST_SVIJETLI + ";");
+        naslovPanela.setStyle(FX_TEXT_FILL_STIL + StilGumba.TEKST_SVIJETLI + ";");
 
         HBox redGumbova = new HBox(20);
         redGumbova.setAlignment(Pos.CENTER);

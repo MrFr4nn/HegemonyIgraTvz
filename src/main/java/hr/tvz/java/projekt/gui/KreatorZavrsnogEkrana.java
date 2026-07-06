@@ -26,6 +26,10 @@ import java.util.List;
 
 public class KreatorZavrsnogEkrana {
 
+    // Konstante definirane kako bi se izbjeglo dupliranje string literala
+    private static final String FONT_ARIAL_BLACK = "Arial Black";
+    private static final String FX_TEXT_FILL_STIL = "-fx-text-fill: ";
+
     public void prikaziEkranPobjede(String nazivPobjednika, List<KlasaIgraca> listaIgraca, Runnable akcijaNovaIgra) {
         Stage prozorPobjede = new Stage();
         prozorPobjede.setTitle("Kraj igre");
@@ -36,11 +40,11 @@ public class KreatorZavrsnogEkrana {
         korijenskiLayout.setBackground(new Background(new BackgroundFill(Color.web(StilGumba.POZADINA_TAMNA), CornerRadii.EMPTY, Insets.EMPTY)));
 
         Label naslovIgraJeZavrsena = new Label("IGRA JE ZAVRSENA");
-        naslovIgraJeZavrsena.setFont(Font.font("Arial Black", FontWeight.BOLD, 22));
-        naslovIgraJeZavrsena.setStyle("-fx-text-fill: " + StilGumba.TEKST_SIVI + ";");
+        naslovIgraJeZavrsena.setFont(Font.font(FONT_ARIAL_BLACK, FontWeight.BOLD, 22));
+        naslovIgraJeZavrsena.setStyle(FX_TEXT_FILL_STIL + StilGumba.TEKST_SIVI + ";");
 
         Label naslovPobjednika = new Label("POBJEDNIK: " + nazivPobjednika.toUpperCase());
-        naslovPobjednika.setFont(Font.font("Arial Black", FontWeight.BOLD, 26));
+        naslovPobjednika.setFont(Font.font(FONT_ARIAL_BLACK, FontWeight.BOLD, 26));
         naslovPobjednika.setWrapText(true);
         naslovPobjednika.setAlignment(Pos.CENTER);
         naslovPobjednika.setStyle("-fx-text-fill: #00D4FF; -fx-text-alignment: center; "
@@ -106,18 +110,18 @@ public class KreatorZavrsnogEkrana {
         }
 
         Label oznakaRanga = new Label("#" + rang);
-        oznakaRanga.setFont(Font.font("Arial Black", FontWeight.BOLD, 18));
-        oznakaRanga.setStyle("-fx-text-fill: " + bojaHex + ";");
+        oznakaRanga.setFont(Font.font(FONT_ARIAL_BLACK, FontWeight.BOLD, 18));
+        oznakaRanga.setStyle(FX_TEXT_FILL_STIL + bojaHex + ";");
         oznakaRanga.setMinWidth(40);
 
         Label oznakaNaziva = new Label(igrac.getNaziv());
         oznakaNaziva.setFont(Font.font("Verdana", FontWeight.BOLD, 13));
-        oznakaNaziva.setStyle("-fx-text-fill: " + StilGumba.TEKST_SVIJETLI + ";");
+        oznakaNaziva.setStyle(FX_TEXT_FILL_STIL + StilGumba.TEKST_SVIJETLI + ";");
         oznakaNaziva.setMinWidth(260);
 
         Label oznakaBodova = new Label(igrac.getBodoviPobjede() + " BODOVA");
-        oznakaBodova.setFont(Font.font("Arial Black", FontWeight.BOLD, 14));
-        oznakaBodova.setStyle("-fx-text-fill: " + bojaHex + ";");
+        oznakaBodova.setFont(Font.font(FONT_ARIAL_BLACK, FontWeight.BOLD, 14));
+        oznakaBodova.setStyle(FX_TEXT_FILL_STIL + bojaHex + ";");
 
         redak.getChildren().addAll(oznakaRanga, oznakaNaziva, oznakaBodova);
         return redak;

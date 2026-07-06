@@ -12,8 +12,11 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 public class UpraviteljReplay {
+
+    private static final Logger LOG = Logger.getLogger(UpraviteljReplay.class.getName());
 
     private XmlUpravitelj xmlUpravitelj;
     private List<String> listaPoteza;
@@ -27,11 +30,6 @@ public class UpraviteljReplay {
     }
 
     public void otvoriProzorReplaya() {
-        boolean formatIspravan = xmlUpravitelj.provjeriOsnovniFormat();
-        if (!formatIspravan) {
-            System.err.println("Upozorenje: XML format povijesti nije potpuno ispravan, ali pokusavamo prikazati replay.");
-        }
-
         listaPoteza = xmlUpravitelj.ucitajPovijestZaReplay();
         trenutnaPozicija = 0;
 
@@ -56,7 +54,6 @@ public class UpraviteljReplay {
         gumbAutomatski.setOnAction(dogadjaj -> pokreniAutomatskiReplay());
 
         HBox redGumbova = new HBox(10, gumbSljedeci, gumbAutomatski);
-
         korijenskiLayout.getChildren().addAll(naslov, oznakaTrenutnogPoteza, prikazPovijesti, redGumbova);
 
         Scene scenaReplaya = new Scene(korijenskiLayout, 500, 450);
@@ -80,23 +77,25 @@ public class UpraviteljReplay {
     }
 
     private void pokreniAutomatskiReplay() {
-        Thread nitAutomatskogReplaya = new Thread(() -> {
+        if (listaPoteza == null || listaPoteza.isEmpty()) {
+            return;
+        }
+
+        // Pokretanje zadatka unutar lagane virtualne niti (Java 21+)
+        Thread.ofVirtual().start(() -> {
             while (trenutnaPozicija < listaPoteza.size()) {
-                int pozicijaPrijeAzuriranja = trenutnaPozicija;
                 Platform.runLater(this::prikaziSljedeciKorak);
+
                 try {
+                    // Blokirajuća operacija - virtualna nit se ovdje privremeno miče iz izvršavanja
+                    // i ne troši resurse stvarnog procesora / OS niti
                     Thread.sleep(800);
                 } catch (InterruptedException greska) {
-                    System.err.println("Automatski replay je prekinut: " + greska.getMessage());
+                    LOG.warning("Automatski replay je prekinut: " + greska.getMessage());
                     Thread.currentThread().interrupt();
-                    break;
-                }
-                if (pozicijaPrijeAzuriranja == trenutnaPozicija) {
                     break;
                 }
             }
         });
-        nitAutomatskogReplaya.setDaemon(true);
-        nitAutomatskogReplaya.start();
     }
 }

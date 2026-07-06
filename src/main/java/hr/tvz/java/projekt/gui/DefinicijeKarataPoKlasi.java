@@ -26,7 +26,7 @@ public class DefinicijeKarataPoKlasi {
         List<PoolKarata.PodaciKarte> aktivne = dohvatiAktivneKarte(igrac);
         int brojac = 0;
         while (brojac < aktivne.size()) {
-            engineIgre.postaviLimitAkcijeTrenutnogIgraca(aktivne.get(brojac).nazivAkcije, 1);
+            engineIgre.postaviLimitAkcijeTrenutnogIgraca(aktivne.get(brojac).getNazivAkcije(), 1);
             brojac = brojac + 1;
         }
         if (igrac instanceof Vlada) {
@@ -52,9 +52,10 @@ public class DefinicijeKarataPoKlasi {
         int brojac = 0;
         while (brojac < aktivne.size()) {
             PoolKarata.PodaciKarte karta = aktivne.get(brojac);
-            Runnable efekt = napraviEfektRadnicke(karta.nazivAkcije, radnickaKlasa, akcija);
+            Runnable efekt = napraviEfektRadnicke(karta.getNazivAkcije(), radnickaKlasa, akcija);
             if (efekt != null) {
-                kontrolePoteza.dodajKartu(red, engineIgre, radnickaKlasa, karta.naziv, karta.opis, karta.svgIkona, karta.nazivAkcije, efekt);
+                kontrolePoteza.dodajKartu(red, engineIgre, radnickaKlasa,
+                        karta.getNaziv(), karta.getOpis(), karta.getSvgIkona(), karta.getNazivAkcije(), efekt);
             }
             brojac = brojac + 1;
         }
@@ -64,7 +65,7 @@ public class DefinicijeKarataPoKlasi {
         if (nazivAkcije.equals("Zaposljavanje")) {
             return () -> { radnickaKlasa.zaposliRadnika(1); akcija.run(); };
         } else if (nazivAkcije.equals("Obrazovanje")) {
-            return () -> { radnickaKlasa.investirajUObrazovanje(10); akcija.run(); };
+            return () -> { radnickaKlasa.investirajUObrazovanje(30); akcija.run(); };
         } else if (nazivAkcije.equals("Strajk")) {
             return () -> { radnickaKlasa.pokreniStrajk(); akcija.run(); };
         } else if (nazivAkcije.equals("OtpustiRadnika")) {
@@ -72,9 +73,9 @@ public class DefinicijeKarataPoKlasi {
         } else if (nazivAkcije.equals("KolektivniUgovor")) {
             return () -> { radnickaKlasa.setStandardZivota(radnickaKlasa.getStandardZivota() + 8); akcija.run(); };
         } else if (nazivAkcije.equals("ZdravstvenaZastita")) {
-            return () -> { radnickaKlasa.setStandardZivota(radnickaKlasa.getStandardZivota() + 6); radnickaKlasa.kupiHranu(3, 0); akcija.run(); };
+            return () -> { radnickaKlasa.setStandardZivota(radnickaKlasa.getStandardZivota() + 6); radnickaKlasa.kupiHranu(3,5); akcija.run(); };
         } else if (nazivAkcije.equals("PrekovremeniRad")) {
-            return () -> { radnickaKlasa.kupiHranu(5, 0); radnickaKlasa.setStandardZivota(radnickaKlasa.getStandardZivota() - 2); akcija.run(); };
+            return () -> { radnickaKlasa.kupiHranu(2,5); radnickaKlasa.setStandardZivota(radnickaKlasa.getStandardZivota() - 2); akcija.run(); };
         } else if (nazivAkcije.equals("RegionalniRazvoj")) {
             return () -> { radnickaKlasa.zaposliRadnika(2); radnickaKlasa.setStandardZivota(radnickaKlasa.getStandardZivota() + 4); akcija.run(); };
         }
@@ -87,9 +88,10 @@ public class DefinicijeKarataPoKlasi {
         int brojac = 0;
         while (brojac < aktivne.size()) {
             PoolKarata.PodaciKarte karta = aktivne.get(brojac);
-            Runnable efekt = napraviEfektSrednje(karta.nazivAkcije, srednjaKlasa, akcija);
+            Runnable efekt = napraviEfektSrednje(karta.getNazivAkcije(), srednjaKlasa, akcija);
             if (efekt != null) {
-                kontrolePoteza.dodajKartu(red, engineIgre, srednjaKlasa, karta.naziv, karta.opis, karta.svgIkona, karta.nazivAkcije, efekt);
+                kontrolePoteza.dodajKartu(red, engineIgre, srednjaKlasa,
+                        karta.getNaziv(), karta.getOpis(), karta.getSvgIkona(), karta.getNazivAkcije(), efekt);
             }
             brojac = brojac + 1;
         }
@@ -122,14 +124,16 @@ public class DefinicijeKarataPoKlasi {
         int brojac = 0;
         while (brojac < aktivne.size()) {
             PoolKarata.PodaciKarte karta = aktivne.get(brojac);
-            Runnable efekt = napraviEfektKapitalisticke(karta.nazivAkcije, kapitalist, akcija);
+            Runnable efekt = napraviEfektKapitalisticke(karta.getNazivAkcije(), kapitalist, akcija);
             if (efekt != null) {
-                kontrolePoteza.dodajKartu(red, engineIgre, kapitalist, karta.naziv, karta.opis, karta.svgIkona, karta.nazivAkcije, efekt);
+                kontrolePoteza.dodajKartu(red, engineIgre, kapitalist,
+                        karta.getNaziv(), karta.getOpis(), karta.getSvgIkona(), karta.getNazivAkcije(), efekt);
             }
             brojac = brojac + 1;
         }
     }
 
+    @SuppressWarnings("java:S2245")
     private Runnable napraviEfektKapitalisticke(String nazivAkcije, KapitalistickaKlasa kapitalist, Runnable akcija) {
         if (nazivAkcije.equals("IzgradiTvornicu")) {
             return () -> { kapitalist.izgradiTvornicu(50.0); akcija.run(); };
@@ -142,8 +146,7 @@ public class DefinicijeKarataPoKlasi {
         } else if (nazivAkcije.equals("FuzijaKompanija")) {
             return () -> { kapitalist.setUkupniKapital(kapitalist.getUkupniKapital() + 40.0); akcija.run(); };
         } else if (nazivAkcije.equals("BurzovnaSpeculacija")) {
-            double random = Math.random();
-            if (random > 0.5) {
+            if (Math.random() > 0.5) {
                 return () -> { kapitalist.setUkupniKapital(kapitalist.getUkupniKapital() + 35.0); akcija.run(); };
             } else {
                 return () -> { kapitalist.platiPorez(20.0); akcija.run(); };
@@ -162,9 +165,10 @@ public class DefinicijeKarataPoKlasi {
         int brojac = 0;
         while (brojac < aktivne.size()) {
             PoolKarata.PodaciKarte karta = aktivne.get(brojac);
-            Runnable efekt = napraviEfektVlade(karta.nazivAkcije, vlada, akcija);
+            Runnable efekt = napraviEfektVlade(karta.getNazivAkcije(), vlada, akcija);
             if (efekt != null) {
-                kontrolePoteza.dodajKartu(red, engineIgre, vlada, karta.naziv, karta.opis, karta.svgIkona, karta.nazivAkcije, efekt);
+                kontrolePoteza.dodajKartu(red, engineIgre, vlada,
+                        karta.getNaziv(), karta.getOpis(), karta.getSvgIkona(), karta.getNazivAkcije(), efekt);
             }
             brojac = brojac + 1;
         }

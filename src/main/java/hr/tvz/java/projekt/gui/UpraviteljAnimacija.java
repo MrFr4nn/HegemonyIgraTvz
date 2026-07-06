@@ -14,12 +14,10 @@ public class UpraviteljAnimacija {
 
     public void pokreniAnimacijuDonosenjaZakona(Label oznakaPoruke, String tekstZakona) {
         Thread nitAnimacije = new Thread(() -> {
-            int brojac = 0;
-            while (brojac < 3) {
+            for (int brojac = 0; brojac < 3; brojac++) {
                 String konacniTekst = "Donosenje zakona u tijeku..." + napraviTockice(brojac);
                 Platform.runLater(() -> oznakaPoruke.setText(konacniTekst));
                 pauzirajNit(300);
-                brojac = brojac + 1;
             }
             Platform.runLater(() -> oznakaPoruke.setText("Zakon donesen: " + tekstZakona));
         });
@@ -29,10 +27,8 @@ public class UpraviteljAnimacija {
 
     private String napraviTockice(int brojac) {
         StringBuilder rezultat = new StringBuilder();
-        int privremena = 0;
-        while (privremena <= brojac) {
+        for (int privremena = 0; privremena <= brojac; privremena++) {
             rezultat.append(".");
-            privremena = privremena + 1;
         }
         return rezultat.toString();
     }
@@ -49,17 +45,19 @@ public class UpraviteljAnimacija {
     public void animirajPromjenuStupca(Rectangle stupac, double novaVisina) {
         double staraVisina = stupac.getHeight();
         Timeline animacijaRasta = new Timeline();
-        int brojKoraka = 10;
+        // Definiranjem koraka kao double, rješavamo se potrebe za castanjem pri dijeljenju
+        double brojKoraka = 10.0;
         double razlika = novaVisina - staraVisina;
 
-        int brojac = 0;
-        while (brojac <= brojKoraka) {
-            double udio = (double) brojac / (double) brojKoraka;
-            double trenutnaVisina = staraVisina + (razlika * udio);
-            KeyFrame okvirAnimacije = new KeyFrame(Duration.millis(brojac * 30L),
+        for (int brojac = 0; brojac <= brojKoraka; brojac++) {
+            double udio = brojac / brojKoraka;
+            final double trenutnaVisina = staraVisina + (razlika * udio);
+
+            // Micanjem (double) casta rješavamo trenutnu Sonar grešku, long automatski prelazi u double
+            long trajanje = brojac * 30L;
+            KeyFrame okvirAnimacije = new KeyFrame(Duration.millis(trajanje),
                     dogadjaj -> stupac.setHeight(trenutnaVisina));
             animacijaRasta.getKeyFrames().add(okvirAnimacije);
-            brojac = brojac + 1;
         }
         animacijaRasta.play();
     }

@@ -15,15 +15,17 @@ import java.util.List;
 
 public class KreatorSazetkaOdabira {
 
+    private static final String FX_FONT_VERDANA = "-fx-font-family: 'Verdana'; -fx-font-size: 12px; ";
+
     public Label napraviOznakuBrojaca() {
         Label oznaka = new Label();
-        oznaka.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #00D4FF;");
+        oznaka.setStyle(FX_FONT_VERDANA + "-fx-font-weight: bold; -fx-text-fill: #00D4FF;");
         return oznaka;
     }
 
     public Label napraviOznakuSazetka() {
         Label oznaka = new Label();
-        oznaka.setStyle("-fx-font-family: 'Verdana'; -fx-font-size: 12px; -fx-text-fill: " + StilGumba.TEKST_SVIJETLI + ";");
+        oznaka.setStyle(FX_FONT_VERDANA + "-fx-text-fill: " + StilGumba.TEKST_SVIJETLI + ";");
         oznaka.setWrapText(true);
         return oznaka;
     }
@@ -32,17 +34,18 @@ public class KreatorSazetkaOdabira {
         oznakaBrojaca.setText("POSTAVKE ODABRANE ZA " + odabraniBrojIgraca + " / " + odabraniBrojIgraca + " IGRACA");
     }
 
+    // Riješeno Sonar upozorenje korištenjem StringBuilder-a i elegantnije for petlje
     public void azurirajSazetak(Label oznakaSazetka, List<String> odabraneUlogePoPoziciji) {
-        String sazetak = "";
-        int brojac = 0;
-        while (brojac < odabraneUlogePoPoziciji.size()) {
-            sazetak = sazetak + "Igrac " + (brojac + 1) + ": " + odabraneUlogePoPoziciji.get(brojac);
-            if (brojac < odabraneUlogePoPoziciji.size() - 1) {
-                sazetak = sazetak + "   |   ";
+        StringBuilder sazetakBuilder = new StringBuilder();
+
+        for (int i = 0; i < odabraneUlogePoPoziciji.size(); i++) {
+            sazetakBuilder.append("Igrac ").append(i + 1).append(": ").append(odabraneUlogePoPoziciji.get(i));
+            if (i < odabraneUlogePoPoziciji.size() - 1) {
+                sazetakBuilder.append("   |   ");
             }
-            brojac = brojac + 1;
         }
-        oznakaSazetka.setText(sazetak);
+
+        oznakaSazetka.setText(sazetakBuilder.toString());
     }
 
     public Background napraviGradijentnuPodlogu() {
@@ -75,7 +78,7 @@ public class KreatorSazetkaOdabira {
     }
 
     private ListCell<Integer> napraviCelijuBrojaIgraca() {
-        return new ListCell<Integer>() {
+        return new ListCell<>() {
             @Override
             protected void updateItem(Integer broj, boolean prazno) {
                 super.updateItem(broj, prazno);

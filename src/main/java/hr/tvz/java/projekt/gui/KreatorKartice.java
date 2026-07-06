@@ -24,6 +24,9 @@ import javafx.scene.control.ProgressBar;
 
 public class KreatorKartice {
 
+    // Konstanta definirana kako bi se izbjeglo dupliranje string literala "Verdana"
+    private static final String FONT_VERDANA = "Verdana";
+
     public VBox napraviZaglavljeKartice(KlasaIgraca igrac) {
         String bojaTraka = StilGumba.dohvatiBojuKlase(igrac);
 
@@ -50,7 +53,7 @@ public class KreatorKartice {
         redIkoneINaziva.getChildren().addAll(ikona, oznakaUloge);
 
         Label oznakaIgraca = new Label(igrac.getNaziv());
-        oznakaIgraca.setFont(Font.font("Verdana", 11));
+        oznakaIgraca.setFont(Font.font(FONT_VERDANA, 11));
         oznakaIgraca.setTextFill(Color.web(StilGumba.TEKST_SIVI));
 
         zaglavlje.getChildren().addAll(redIkoneINaziva, oznakaIgraca);
@@ -76,7 +79,7 @@ public class KreatorKartice {
     public Label napraviOznaku(String tekst) {
         Label oznaka = new Label(tekst);
         oznaka.setTextFill(Color.web(StilGumba.TEKST_SVIJETLI));
-        oznaka.setFont(Font.font("Verdana", 13));
+        oznaka.setFont(Font.font(FONT_VERDANA, 13));
         return oznaka;
     }
 
@@ -90,7 +93,7 @@ public class KreatorKartice {
     public VBox napraviMiniGraf(KlasaIgraca igrac, double trenutnaVrijednost, double maksimum, String oznakaGrafa) {
         VBox blok = new VBox(4);
         Label naslovGrafa = new Label(oznakaGrafa.toUpperCase());
-        naslovGrafa.setFont(Font.font("Verdana", FontWeight.BOLD, 9));
+        naslovGrafa.setFont(Font.font(FONT_VERDANA, FontWeight.BOLD, 9));
         naslovGrafa.setTextFill(Color.web(StilGumba.TEKST_SIVI));
 
         ProgressBar trakaNapretka = new ProgressBar();
