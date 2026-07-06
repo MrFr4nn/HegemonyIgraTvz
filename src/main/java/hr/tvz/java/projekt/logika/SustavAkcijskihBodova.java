@@ -32,7 +32,7 @@ public class SustavAkcijskihBodova {
 
     public boolean iskoristiAkciju(String nazivAkcije) {
         if (!jeAkcijaDostupna(nazivAkcije)) {
-            System.out.println("Akcija " + nazivAkcije + " nije dostupna - limit ili AP potrosen.");
+            System.err.println("Akcija " + nazivAkcije + " nije dostupna - limit ili AP potrosen.");
             return false;
         }
         int trenutnoKoristenja = dohvatiBrojKoristenja(nazivAkcije);

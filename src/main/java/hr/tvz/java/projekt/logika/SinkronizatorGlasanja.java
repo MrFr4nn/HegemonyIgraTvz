@@ -30,14 +30,14 @@ public class SinkronizatorGlasanja {
 
     private void cekajNaPrepreci(String oznakaIgraca) {
         try {
-            System.out.println(oznakaIgraca + " ceka na ostale igrace da zavrse glasanje.");
+            System.err.println(oznakaIgraca + " ceka na ostale igrace da zavrse glasanje.");
             prepreka.await();
-            System.out.println(oznakaIgraca + " je prosao prepreku, glasanje sinkronizirano.");
+            System.err.println(oznakaIgraca + " je prosao prepreku, glasanje sinkronizirano.");
         } catch (InterruptedException greska) {
-            System.out.println("Nit je prekinuta tijekom cekanja: " + greska.getMessage());
+            System.err.println("Nit je prekinuta tijekom cekanja: " + greska.getMessage());
             Thread.currentThread().interrupt();
         } catch (BrokenBarrierException greska) {
-            System.out.println("Prepreka je slomljena tijekom glasanja: " + greska.getMessage());
+            System.err.println("Prepreka je slomljena tijekom glasanja: " + greska.getMessage());
         }
     }
 }
