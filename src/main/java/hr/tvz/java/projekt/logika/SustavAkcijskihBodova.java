@@ -2,6 +2,7 @@ package hr.tvz.java.projekt.logika;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SustavAkcijskihBodova {
@@ -34,7 +35,8 @@ public class SustavAkcijskihBodova {
 
     public boolean iskoristiAkciju(String nazivAkcije) {
         if (!jeAkcijaDostupna(nazivAkcije)) {
-            LOG.info("Akcija " + nazivAkcije + " nije dostupna.");
+            // Ispravljeno: Korištenje ugrađenog formatiranja (rješava java:S2629)
+            LOG.log(Level.INFO, "Akcija {0} nije dostupna.", nazivAkcije);
             return false;
         }
         int trenutnoKoristenja = dohvatiBrojKoristenja(nazivAkcije);

@@ -5,8 +5,13 @@ import hr.tvz.java.projekt.model.KlasaIgraca;
 import java.util.List;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SinkronizatorGlasanja {
+
+    // Uveden službeni loger umjesto System.err (rješava java:S106)
+    private static final Logger LOG = Logger.getLogger(SinkronizatorGlasanja.class.getName());
 
     private CyclicBarrier prepreka;
 
@@ -30,14 +35,16 @@ public class SinkronizatorGlasanja {
 
     private void cekajNaPrepreci(String oznakaIgraca) {
         try {
-            System.err.println(oznakaIgraca + " ceka na ostale igrace da zavrse glasanje.");
+            // Zamijenjeno s LOG.info i placeholderom
+            LOG.log(Level.INFO, "{0} ceka na ostale igrace da zavrse glasanje.", oznakaIgraca);
             prepreka.await();
-            System.err.println(oznakaIgraca + " je prosao prepreku, glasanje sinkronizirano.");
+            LOG.log(Level.INFO, "{0} je prosao prepreku, glasanje sinkronizirano.", oznakaIgraca);
         } catch (InterruptedException greska) {
-            System.err.println("Nit je prekinuta tijekom cekanja: " + greska.getMessage());
+            // Zamijenjeno s LOG.log(Level.SEVERE...)
+            LOG.log(Level.SEVERE, "Nit je prekinuta tijekom cekanja: {0}", greska.getMessage());
             Thread.currentThread().interrupt();
         } catch (BrokenBarrierException greska) {
-            System.err.println("Prepreka je slomljena tijekom glasanja: " + greska.getMessage());
+            LOG.log(Level.SEVERE, "Prepreka je slomljena tijekom glasanja: {0}", greska.getMessage());
         }
     }
 }

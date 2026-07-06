@@ -25,10 +25,9 @@ public class Glasanje {
         return glasovi.containsKey(nazivIgraca);
     }
 
-    public void zatvoriGlasanje(int ukupanBrojGlasaca) {
+    public void zatvoriGlasanje() {
         int brojGlasovaZa = 0;
         int brojGlasovaProtiv = 0;
-
         for (Map.Entry<String, Boolean> jedanGlas : glasovi.entrySet()) {
             if (Boolean.TRUE.equals(jedanGlas.getValue())) {
                 brojGlasovaZa = brojGlasovaZa + 1;
@@ -36,7 +35,6 @@ public class Glasanje {
                 brojGlasovaProtiv = brojGlasovaProtiv + 1;
             }
         }
-
         zakonPrihvacen = brojGlasovaZa > brojGlasovaProtiv;
         glasanjeZavrseno = true;
     }
@@ -44,12 +42,10 @@ public class Glasanje {
     public String ispisiRezultatGlasanja() {
         StringBuilder tekst = new StringBuilder();
         tekst.append("Zakon: ").append(nazivZakona).append("\n");
-
         for (Map.Entry<String, Boolean> jedanGlas : glasovi.entrySet()) {
             String odluka = Boolean.TRUE.equals(jedanGlas.getValue()) ? "ZA" : "PROTIV";
             tekst.append(jedanGlas.getKey()).append(": ").append(odluka).append("\n");
         }
-
         if (zakonPrihvacen) {
             tekst.append("Ishod: Zakon je PRIHVACEN.");
         } else {

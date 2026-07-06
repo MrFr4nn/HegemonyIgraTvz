@@ -3,7 +3,6 @@ package hr.tvz.java.projekt.logika;
 import hr.tvz.java.projekt.model.KapitalistickaKlasa;
 import hr.tvz.java.projekt.model.KlasaIgraca;
 import hr.tvz.java.projekt.model.RadnickaKlasa;
-import hr.tvz.java.projekt.model.SrednjaKlasa;
 import hr.tvz.java.projekt.model.Vlada;
 
 import java.util.ArrayList;
@@ -11,14 +10,11 @@ import java.util.List;
 
 public class KatalogZakona {
 
-    private List<String> nazivi;
-    private List<String> opisi;
-    private List<Boolean> iskoristeni;
+    private final List<String> nazivi = new ArrayList<>();
+    private final List<String> opisi = new ArrayList<>();
+    private final List<Boolean> iskoristeni = new ArrayList<>();
 
     public KatalogZakona() {
-        nazivi = new ArrayList<>();
-        opisi = new ArrayList<>();
-        iskoristeni = new ArrayList<>();
         napuniKatalog();
     }
 
@@ -41,96 +37,63 @@ public class KatalogZakona {
         iskoristeni.add(false);
     }
 
-    public int dohvatiBrojZakona() {
-        return nazivi.size();
-    }
-
-    public String dohvatiNaziv(int indeks) {
-        return nazivi.get(indeks);
-    }
-
-    public String dohvatiOpis(int indeks) {
-        return opisi.get(indeks);
-    }
-
-    public boolean jeIskoristen(int indeks) {
-        return iskoristeni.get(indeks);
-    }
-
-    public void oznaciIskoristenim(int indeks) {
-        iskoristeni.set(indeks, true);
-    }
+    public int dohvatiBrojZakona() { return nazivi.size(); }
+    public String dohvatiNaziv(int indeks) { return nazivi.get(indeks); }
+    public String dohvatiOpis(int indeks) { return opisi.get(indeks); }
+    public boolean jeIskoristen(int indeks) { return iskoristeni.get(indeks); }
+    public void oznaciIskoristenim(int indeks) { iskoristeni.set(indeks, true); }
 
     public void primijeniEfekt(int indeks, List<KlasaIgraca> listaIgraca, Vlada vlada) {
-        if (indeks == 0) {
-            vlada.promijeniStopuPoreza(vlada.getStopaPoreza() + 0.10);
-        } else if (indeks == 1) {
-            vlada.promijeniStopuPoreza(vlada.getStopaPoreza() - 0.10);
-        } else if (indeks == 2) {
-            vlada.promijeniMinimalnuPlacu(vlada.getMinimalnaPlaca() + 2.0);
-        } else if (indeks == 3) {
-            vlada.promijeniMinimalnuPlacu(vlada.getMinimalnaPlaca() - 1.0);
-        } else if (indeks == 4) {
-            primijeniSocijalneTransfere(listaIgraca, vlada);
-        } else if (indeks == 5) {
-            vlada.promijeniStopuPoreza(vlada.getStopaPoreza() - 0.05);
-        } else if (indeks == 6) {
-            vlada.setDrzavniProracun(vlada.getDrzavniProracun() + 30.0);
-            vlada.smanjiLegitimnost(10);
-        } else if (indeks == 7) {
-            primijeniNacionalizaciju(listaIgraca, vlada);
-        } else if (indeks == 8) {
-            primijeniInvesticijskePoticaje(listaIgraca, vlada);
-        } else {
-            primijeniReformuRada(listaIgraca, vlada);
+        switch (indeks) {
+            case 0  -> vlada.promijeniStopuPoreza(vlada.getStopaPoreza() + 0.10);
+            case 1  -> vlada.promijeniStopuPoreza(vlada.getStopaPoreza() - 0.10);
+            case 2  -> vlada.promijeniMinimalnuPlacu(vlada.getMinimalnaPlaca() + 2.0);
+            case 3  -> vlada.promijeniMinimalnuPlacu(vlada.getMinimalnaPlaca() - 1.0);
+            case 4  -> primijeniSocijalneTransfere(listaIgraca, vlada);
+            case 5  -> vlada.promijeniStopuPoreza(vlada.getStopaPoreza() - 0.05);
+            case 6  -> {
+                vlada.setDrzavniProracun(vlada.getDrzavniProracun() + 30.0);
+                vlada.smanjiLegitimnost(10);
+            }
+            case 7  -> primijeniNacionalizaciju(listaIgraca, vlada);
+            case 8  -> primijeniInvesticijskePoticaje(listaIgraca, vlada);
+            default -> primijeniReformuRada(listaIgraca, vlada);
         }
     }
 
     private void primijeniSocijalneTransfere(List<KlasaIgraca> listaIgraca, Vlada vlada) {
         vlada.setDrzavniProracun(vlada.getDrzavniProracun() - 20.0);
-        int brojac = 0;
-        while (brojac < listaIgraca.size()) {
-            KlasaIgraca igrac = listaIgraca.get(brojac);
-            if (igrac instanceof RadnickaKlasa) {
-                ((RadnickaKlasa) igrac).kupiHranu(5, 0);
+        for (KlasaIgraca igrac : listaIgraca) {
+            if (igrac instanceof RadnickaKlasa radnicka) {
+                radnicka.kupiHranu(5, 0);
             }
-            brojac = brojac + 1;
         }
     }
 
     private void primijeniNacionalizaciju(List<KlasaIgraca> listaIgraca, Vlada vlada) {
         vlada.setDrzavniProracun(vlada.getDrzavniProracun() + 30.0);
-        int brojac = 0;
-        while (brojac < listaIgraca.size()) {
-            KlasaIgraca igrac = listaIgraca.get(brojac);
-            if (igrac instanceof KapitalistickaKlasa) {
-                ((KapitalistickaKlasa) igrac).platiPorez(30.0);
+        for (KlasaIgraca igrac : listaIgraca) {
+            if (igrac instanceof KapitalistickaKlasa kapitalist) {
+                kapitalist.platiPorez(30.0);
             }
-            brojac = brojac + 1;
         }
     }
 
     private void primijeniInvesticijskePoticaje(List<KlasaIgraca> listaIgraca, Vlada vlada) {
         vlada.setDrzavniProracun(vlada.getDrzavniProracun() - 25.0);
-        int brojac = 0;
-        while (brojac < listaIgraca.size()) {
-            KlasaIgraca igrac = listaIgraca.get(brojac);
-            if (igrac instanceof KapitalistickaKlasa) {
-                ((KapitalistickaKlasa) igrac).setUkupniKapital(((KapitalistickaKlasa) igrac).getUkupniKapital() + 25.0);
+        for (KlasaIgraca igrac : listaIgraca) {
+            if (igrac instanceof KapitalistickaKlasa kapitalist) {
+                kapitalist.setUkupniKapital(kapitalist.getUkupniKapital() + 25.0);
             }
-            brojac = brojac + 1;
         }
     }
 
     private void primijeniReformuRada(List<KlasaIgraca> listaIgraca, Vlada vlada) {
         vlada.smanjiLegitimnost(5);
-        int brojac = 0;
-        while (brojac < listaIgraca.size()) {
-            KlasaIgraca igrac = listaIgraca.get(brojac);
-            if (igrac instanceof RadnickaKlasa) {
-                ((RadnickaKlasa) igrac).setStandardZivota(((RadnickaKlasa) igrac).getStandardZivota() + 10);
+        for (KlasaIgraca igrac : listaIgraca) {
+            if (igrac instanceof RadnickaKlasa radnicka) {
+                radnicka.setStandardZivota(radnicka.getStandardZivota() + 10);
             }
-            brojac = brojac + 1;
         }
     }
 }

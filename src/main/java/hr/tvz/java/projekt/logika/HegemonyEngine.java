@@ -13,18 +13,18 @@ public class HegemonyEngine {
     public static final String FAZA_POTROSNJA = "POTROSNJA";
     public static final String FAZA_GLASANJE = "GLASANJE";
     public static final String FAZA_KRAJ_RUNDE = "KRAJ_RUNDE";
+    private static final int MAKSIMALNI_BROJ_RUNDI = 5;
 
-    private List<KlasaIgraca> listaIgraca;
+    private final List<KlasaIgraca> listaIgraca;
     private Vlada vlada;
     private String trenutnaFaza;
     private int brojRunde;
-    private RedoslijedPoteza redoslijedPoteza;
-    private SinkronizatorGlasanja sinkronizatorGlasanja;
-    private ObradaProizvodnje obradaProizvodnje;
-    private KatalogZakona katalogZakona;
+    private final RedoslijedPoteza redoslijedPoteza;
+    private final SinkronizatorGlasanja sinkronizatorGlasanja;
+    private final ObradaProizvodnje obradaProizvodnje;
+    private final KatalogZakona katalogZakona;
     private boolean igraZavrsena;
     private Glasanje trenutnoGlasanje;
-    private static final int MAKSIMALNI_BROJ_RUNDI = 5;
 
     public HegemonyEngine(List<KlasaIgraca> listaIgraca) {
         this.listaIgraca = listaIgraca;
@@ -35,19 +35,16 @@ public class HegemonyEngine {
         this.sinkronizatorGlasanja = new SinkronizatorGlasanja(listaIgraca.size());
         this.obradaProizvodnje = new ObradaProizvodnje();
         this.katalogZakona = new KatalogZakona();
-        Vlada pronadjenaVlada = null;
-        int brojac = 0;
-        while (brojac < listaIgraca.size()) {
-            if (listaIgraca.get(brojac) instanceof Vlada) {
-                pronadjenaVlada = (Vlada) listaIgraca.get(brojac);
+
+        for (KlasaIgraca igrac : listaIgraca) {
+            if (igrac instanceof Vlada pronadjenaVlada) {
+                this.vlada = pronadjenaVlada;
             }
-            brojac = brojac + 1;
         }
-        this.vlada = pronadjenaVlada;
     }
 
     public void pokreniNovuRundu() {
-        brojRunde = brojRunde + 1;
+        brojRunde++;
         trenutnaFaza = FAZA_PRIPREMA;
         redoslijedPoteza.resetirajNaPocetak();
         if (brojRunde > MAKSIMALNI_BROJ_RUNDI) {
@@ -56,22 +53,19 @@ public class HegemonyEngine {
     }
 
     public void prebaciNaSljedecuFazu() {
-        if (trenutnaFaza.equals(FAZA_PRIPREMA)) {
-            trenutnaFaza = FAZA_AKCIJA;
-        } else if (trenutnaFaza.equals(FAZA_AKCIJA)) {
-            trenutnaFaza = FAZA_PROIZVODNJA;
-        } else if (trenutnaFaza.equals(FAZA_PROIZVODNJA)) {
-            trenutnaFaza = FAZA_POTROSNJA;
-        } else if (trenutnaFaza.equals(FAZA_POTROSNJA) && trenutnoGlasanje != null) {
-            trenutnaFaza = FAZA_GLASANJE;
-        } else if (trenutnaFaza.equals(FAZA_POTROSNJA)) {
-            trenutnaFaza = FAZA_KRAJ_RUNDE;
-            obradiKrajRunde();
-        } else if (trenutnaFaza.equals(FAZA_GLASANJE)) {
-            trenutnaFaza = FAZA_KRAJ_RUNDE;
-            obradiKrajRunde();
-        } else {
-            pokreniNovuRundu();
+        switch (trenutnaFaza) {
+            case FAZA_PRIPREMA    -> trenutnaFaza = FAZA_AKCIJA;
+            case FAZA_AKCIJA      -> trenutnaFaza = FAZA_PROIZVODNJA;
+            case FAZA_PROIZVODNJA -> trenutnaFaza = FAZA_POTROSNJA;
+            case FAZA_POTROSNJA   -> {
+                if (trenutnoGlasanje != null) {
+                    trenutnaFaza = FAZA_GLASANJE;
+                } else {
+                    trenutnaFaza = FAZA_KRAJ_RUNDE;
+                    obradiKrajRunde();
+                }
+            }
+            default -> pokreniNovuRundu();
         }
     }
 
@@ -81,45 +75,16 @@ public class HegemonyEngine {
         }
     }
 
-    public String obradiFazuProizvodnje() {
-        return obradaProizvodnje.obradiFazuProizvodnje(listaIgraca);
-    }
-
-    public String obradiFazuPotrosnje() {
-        return obradaProizvodnje.obradiFazuPotrosnje(listaIgraca);
-    }
-
-    public boolean iskoristiAkcijuTrenutnogIgraca(String nazivAkcije) {
-        return redoslijedPoteza.dohvatiApSustavTrenutnogIgraca().iskoristiAkciju(nazivAkcije);
-    }
-
-    public boolean jeAkcijaDostupnaTrenutnomIgracu(String nazivAkcije) {
-        return redoslijedPoteza.dohvatiApSustavTrenutnogIgraca().jeAkcijaDostupna(nazivAkcije);
-    }
-
-    public void postaviLimitAkcijeTrenutnogIgraca(String nazivAkcije, int limit) {
-        redoslijedPoteza.dohvatiApSustavTrenutnogIgraca().postaviLimitAkcije(nazivAkcije, limit);
-    }
-
-    public void prebaciPotez() {
-        redoslijedPoteza.prebaciNaSljedecegIgraca();
-    }
-
-    public boolean jeIgracNaPotezuOdigraoSveApove() {
-        return redoslijedPoteza.jeIgracNaPotezuOdigraoSveApove();
-    }
-
-    public boolean jesuLiSviIgraciOdigrali() {
-        return redoslijedPoteza.jesuLiSviIgraciOdigraliSveApove();
-    }
-
-    public int dohvatiPreostaleApTrenutnogIgraca() {
-        return redoslijedPoteza.dohvatiApSustavTrenutnogIgraca().getPreostaliAp();
-    }
-
-    public KatalogZakona getKatalogZakona() {
-        return katalogZakona;
-    }
+    public String obradiFazuProizvodnje() { return obradaProizvodnje.obradiFazuProizvodnje(listaIgraca); }
+    public String obradiFazuPotrosnje() { return obradaProizvodnje.obradiFazuPotrosnje(listaIgraca); }
+    public boolean iskoristiAkcijuTrenutnogIgraca(String nazivAkcije) { return redoslijedPoteza.dohvatiApSustavTrenutnogIgraca().iskoristiAkciju(nazivAkcije); }
+    public boolean jeAkcijaDostupnaTrenutnomIgracu(String nazivAkcije) { return redoslijedPoteza.dohvatiApSustavTrenutnogIgraca().jeAkcijaDostupna(nazivAkcije); }
+    public void postaviLimitAkcijeTrenutnogIgraca(String nazivAkcije, int limit) { redoslijedPoteza.dohvatiApSustavTrenutnogIgraca().postaviLimitAkcije(nazivAkcije, limit); }
+    public void prebaciPotez() { redoslijedPoteza.prebaciNaSljedecegIgraca(); }
+    public boolean jeIgracNaPotezuOdigraoSveApove() { return redoslijedPoteza.jeIgracNaPotezuOdigraoSveApove(); }
+    public boolean jesuLiSviIgraciOdigrali() { return redoslijedPoteza.jesuLiSviIgraciOdigraliSveApove(); }
+    public int dohvatiPreostaleApTrenutnogIgraca() { return redoslijedPoteza.dohvatiApSustavTrenutnogIgraca().getPreostaliAp(); }
+    public KatalogZakona getKatalogZakona() { return katalogZakona; }
 
     public void pokreniGlasanjeOZakonu(int indeksZakona) {
         pokreniNovoGlasanje(katalogZakona.dohvatiNaziv(indeksZakona));
@@ -132,59 +97,24 @@ public class HegemonyEngine {
         trenutnoGlasanje = null;
     }
 
-    public void simulirajGlasanjeUNiti(List<Runnable> akcijeIgraca) {
-        sinkronizatorGlasanja.simulirajGlasanjeUNiti(akcijeIgraca, listaIgraca);
-    }
-
-    public void pokreniNovoGlasanje(String nazivZakona) {
-        trenutnoGlasanje = new Glasanje(nazivZakona);
-    }
+    public void simulirajGlasanjeUNiti(List<Runnable> akcijeIgraca) { sinkronizatorGlasanja.simulirajGlasanjeUNiti(akcijeIgraca, listaIgraca); }
+    public void pokreniNovoGlasanje(String nazivZakona) { trenutnoGlasanje = new Glasanje(nazivZakona); }
 
     public void zabrojiGlasIgraca(String nazivIgraca, boolean glasZa) {
-        if (trenutnoGlasanje != null) {
-            trenutnoGlasanje.zabrojiGlas(nazivIgraca, glasZa);
-        }
+        if (trenutnoGlasanje != null) trenutnoGlasanje.zabrojiGlas(nazivIgraca, glasZa);
     }
 
     public void zatvoriTrenutnoGlasanje() {
-        if (trenutnoGlasanje != null) {
-            trenutnoGlasanje.zatvoriGlasanje(listaIgraca.size() - 1);
-        }
+        if (trenutnoGlasanje != null) trenutnoGlasanje.zatvoriGlasanje();
     }
 
-    public Glasanje getTrenutnoGlasanje() {
-        return trenutnoGlasanje;
-    }
-
-    public boolean provjeriPobjedu() {
-        return igraZavrsena;
-    }
-
-    public String dohvatiPobjednika() {
-        return redoslijedPoteza.dohvatiPobjednika();
-    }
-
-    public KlasaIgraca dohvatiIgracaNaPotezu() {
-        return redoslijedPoteza.dohvatiIgracaNaPotezu();
-    }
-
-    public List<KlasaIgraca> getListaIgraca() {
-        return listaIgraca;
-    }
-
-    public Vlada getVlada() {
-        return vlada;
-    }
-
-    public String getTrenutnaFaza() {
-        return trenutnaFaza;
-    }
-
-    public int getBrojRunde() {
-        return brojRunde;
-    }
-
-    public boolean isIgraZavrsena() {
-        return igraZavrsena;
-    }
+    public Glasanje getTrenutnoGlasanje() { return trenutnoGlasanje; }
+    public boolean provjeriPobjedu() { return igraZavrsena; }
+    public String dohvatiPobjednika() { return redoslijedPoteza.dohvatiPobjednika(); }
+    public KlasaIgraca dohvatiIgracaNaPotezu() { return redoslijedPoteza.dohvatiIgracaNaPotezu(); }
+    public List<KlasaIgraca> getListaIgraca() { return listaIgraca; }
+    public Vlada getVlada() { return vlada; }
+    public String getTrenutnaFaza() { return trenutnaFaza; }
+    public int getBrojRunde() { return brojRunde; }
+    public boolean isIgraZavrsena() { return igraZavrsena; }
 }
