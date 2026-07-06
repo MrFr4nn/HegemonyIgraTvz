@@ -29,7 +29,7 @@ public class UpraviteljReplay {
     public void otvoriProzorReplaya() {
         boolean formatIspravan = xmlUpravitelj.provjeriOsnovniFormat();
         if (!formatIspravan) {
-            System.out.println("Upozorenje: XML format povijesti nije potpuno ispravan, ali pokusavamo prikazati replay.");
+            System.err.println("Upozorenje: XML format povijesti nije potpuno ispravan, ali pokusavamo prikazati replay.");
         }
 
         listaPoteza = xmlUpravitelj.ucitajPovijestZaReplay();
@@ -87,7 +87,7 @@ public class UpraviteljReplay {
                 try {
                     Thread.sleep(800);
                 } catch (InterruptedException greska) {
-                    System.out.println("Automatski replay je prekinut: " + greska.getMessage());
+                    System.err.println("Automatski replay je prekinut: " + greska.getMessage());
                     Thread.currentThread().interrupt();
                     break;
                 }

@@ -38,7 +38,7 @@ public class UpraviteljAnimacija {
         try {
             Thread.sleep(milisekunde);
         } catch (InterruptedException greska) {
-            System.out.println("Animacijska nit je prekinuta: " + greska.getMessage());
+            System.err.println("Animacijska nit je prekinuta: " + greska.getMessage());
             Thread.currentThread().interrupt();
         }
     }
@@ -63,7 +63,7 @@ public class UpraviteljAnimacija {
 
     public void pokreniAsinkronoAzuriranjeEkonomije(Runnable logikaAzuriranja, Runnable akcijaNakonAzuriranja) {
         Thread nitEkonomije = new Thread(() -> {
-            System.out.println("Pokrenuto azuriranje u zasebnoj niti");
+            System.err.println("Pokrenuto azuriranje u zasebnoj niti");
             logikaAzuriranja.run();
             pauzirajNit(500);
             Platform.runLater(akcijaNakonAzuriranja);
