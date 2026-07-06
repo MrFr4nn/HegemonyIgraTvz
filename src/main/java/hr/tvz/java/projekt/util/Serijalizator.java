@@ -11,24 +11,26 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class Serijalizator {
 
+    private static final Logger LOG = Logger.getLogger(Serijalizator.class.getName());
     private static final String PUTANJA_DATOTEKE = "stanje.bin";
+    private static final String SEPARATOR = "--------------------------";
 
     public boolean spremiStanje(List<KlasaIgraca> listaIgraca) {
         try (FileOutputStream tokDatoteke = new FileOutputStream(PUTANJA_DATOTEKE);
              ObjectOutputStream tokObjekta = new ObjectOutputStream(tokDatoteke)) {
-            tokObjekta.writeObject((Serializable) listaIgraca);
-            System.out.println("Stanje igre je uspjesno spremljeno u datoteku.");
+            tokObjekta.writeObject(listaIgraca);
+            LOG.info("Stanje igre je uspjesno spremljeno u datoteku.");
             return true;
         } catch (IOException greska) {
-            System.out.println("Doslo je do greske prilikom spremanja stanja: " + greska.getMessage());
+            LOG.severe("Doslo je do greske prilikom spremanja stanja: " + greska.getMessage());
             return false;
         }
     }
@@ -38,55 +40,56 @@ public class Serijalizator {
         try (FileInputStream tokDatoteke = new FileInputStream(PUTANJA_DATOTEKE);
              ObjectInputStream tokObjekta = new ObjectInputStream(tokDatoteke)) {
             Object procitaniObjekt = tokObjekta.readObject();
-            System.out.println("Stanje igre je uspjesno ucitano iz datoteke.");
+            LOG.info("Stanje igre je uspjesno ucitano iz datoteke.");
             return (List<KlasaIgraca>) procitaniObjekt;
         } catch (IOException greska) {
-            System.out.println("Doslo je do greske prilikom ucitavanja stanja: " + greska.getMessage());
+            LOG.severe("Doslo je do greske prilikom ucitavanja stanja: " + greska.getMessage());
         } catch (ClassNotFoundException greska) {
-            System.out.println("Klasa nije pronadena prilikom ucitavanja: " + greska.getMessage());
+            LOG.severe("Klasa nije pronadena prilikom ucitavanja: " + greska.getMessage());
         }
         return new ArrayList<>();
     }
 
     public String napraviTehnickuUsporedbu() {
-        String tekst = "";
-        tekst = tekst + analizirajKlasuPomocuReflectiona(RadnickaKlasa.class);
-        tekst = tekst + "\n--------------------------\n";
-        tekst = tekst + analizirajKlasuPomocuReflectiona(SrednjaKlasa.class);
-        tekst = tekst + "\n--------------------------\n";
-        tekst = tekst + analizirajKlasuPomocuReflectiona(KapitalistickaKlasa.class);
-        tekst = tekst + "\n--------------------------\n";
-        tekst = tekst + analizirajKlasuPomocuReflectiona(Vlada.class);
-        return tekst;
+        StringBuilder tekst = new StringBuilder();
+        tekst.append(analizirajKlasuPomocuReflectiona(RadnickaKlasa.class));
+        tekst.append("\n").append(SEPARATOR).append("\n");
+        tekst.append(analizirajKlasuPomocuReflectiona(SrednjaKlasa.class));
+        tekst.append("\n").append(SEPARATOR).append("\n");
+        tekst.append(analizirajKlasuPomocuReflectiona(KapitalistickaKlasa.class));
+        tekst.append("\n").append(SEPARATOR).append("\n");
+        tekst.append(analizirajKlasuPomocuReflectiona(Vlada.class));
+        return tekst.toString();
     }
 
     private String analizirajKlasuPomocuReflectiona(Class<?> klasa) {
-        String tekst = "";
-        tekst = tekst + "Analiza klase: " + klasa.getSimpleName() + "\n";
+        StringBuilder tekst = new StringBuilder();
+        tekst.append("Analiza klase: ").append(klasa.getSimpleName()).append("\n");
 
         Field[] poljaKlase = klasa.getDeclaredFields();
-        tekst = tekst + "Broj atributa: " + poljaKlase.length + "\n";
+        tekst.append("Broj atributa: ").append(poljaKlase.length).append("\n");
         int brojac = 0;
         while (brojac < poljaKlase.length) {
             Field trenutnoPolje = poljaKlase[brojac];
-            tekst = tekst + "  - Atribut: " + trenutnoPolje.getName() + " (" + trenutnoPolje.getType().getSimpleName() + ")\n";
+            tekst.append("  - Atribut: ").append(trenutnoPolje.getName())
+                    .append(" (").append(trenutnoPolje.getType().getSimpleName()).append(")\n");
             brojac = brojac + 1;
         }
 
         Method[] metodeKlase = klasa.getDeclaredMethods();
-        tekst = tekst + "Broj metoda: " + metodeKlase.length + "\n";
+        tekst.append("Broj metoda: ").append(metodeKlase.length).append("\n");
         int drugiBrojac = 0;
         while (drugiBrojac < metodeKlase.length) {
             Method trenutnaMetoda = metodeKlase[drugiBrojac];
-            tekst = tekst + "  - Metoda: " + trenutnaMetoda.getName() + "()\n";
+            tekst.append("  - Metoda: ").append(trenutnaMetoda.getName()).append("()\n");
             drugiBrojac = drugiBrojac + 1;
         }
 
         Class<?> nadklasa = klasa.getSuperclass();
         if (nadklasa != null) {
-            tekst = tekst + "Nasljeduje od: " + nadklasa.getSimpleName() + "\n";
+            tekst.append("Nasljeduje od: ").append(nadklasa.getSimpleName()).append("\n");
         }
 
-        return tekst;
+        return tekst.toString();
     }
 }

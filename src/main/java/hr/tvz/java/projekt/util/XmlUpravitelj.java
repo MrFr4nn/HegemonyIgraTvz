@@ -3,9 +3,8 @@ package hr.tvz.java.projekt.util;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.SAXParser;
@@ -23,23 +22,33 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class XmlUpravitelj {
 
+    private static final Logger LOG = Logger.getLogger(XmlUpravitelj.class.getName());
     private static final String PUTANJA_DATOTEKE = "povijest.xml";
     private static final String PUTANJA_SHEME = "povijest.xsd";
+    private static final String TAG_POTEZ = "Potez";
+    private static final String TAG_RUNDA = "Runda";
+    private static final String TAG_IGRAC = "Igrac";
+    private static final String TAG_OPIS = "Opis";
+    private static final String FEATURE_DOCTYPE = "http://apache.org/xml/features/disallow-doctype-decl";
+    private static final String FEATURE_EXT_GENERAL = "http://xml.org/sax/features/external-general-entities";
+    private static final String FEATURE_EXT_PARAM = "http://xml.org/sax/features/external-parameter-entities";
+
     private Document trenutniDokument;
 
     public void pokreniNovuPovijest() {
         try {
-            DocumentBuilderFactory tvornicaDokumenata = DocumentBuilderFactory.newInstance();
-            DocumentBuilder graditeljiDokumenta = tvornicaDokumenata.newDocumentBuilder();
-            trenutniDokument = graditeljiDokumenta.newDocument();
+            DocumentBuilderFactory tvornica = napraviSiguranDocumentBuilderFactory();
+            DocumentBuilder graditelj = tvornica.newDocumentBuilder();
+            trenutniDokument = graditelj.newDocument();
             Element korijen = trenutniDokument.createElement("PovijestIgre");
             trenutniDokument.appendChild(korijen);
             spremiDokument();
         } catch (Exception greska) {
-            System.out.println("Greska pri pokretanju povijesti: " + greska.getMessage());
+            LOG.severe("Greska pri pokretanju povijesti: " + greska.getMessage());
         }
     }
 
@@ -49,59 +58,57 @@ public class XmlUpravitelj {
                 pokreniNovuPovijest();
             }
             Element korijen = trenutniDokument.getDocumentElement();
-            Element potez = trenutniDokument.createElement("Potez");
-            Element elementRunda = trenutniDokument.createElement("Runda");
+            Element potez = trenutniDokument.createElement(TAG_POTEZ);
+            Element elementRunda = trenutniDokument.createElement(TAG_RUNDA);
             elementRunda.setTextContent(String.valueOf(runda));
-            Element elementIgrac = trenutniDokument.createElement("Igrac");
+            Element elementIgrac = trenutniDokument.createElement(TAG_IGRAC);
             elementIgrac.setTextContent(igrac);
-            Element elementOpis = trenutniDokument.createElement("Opis");
+            Element elementOpis = trenutniDokument.createElement(TAG_OPIS);
             elementOpis.setTextContent(opis);
-
             potez.appendChild(elementRunda);
             potez.appendChild(elementIgrac);
             potez.appendChild(elementOpis);
             korijen.appendChild(potez);
             spremiDokument();
         } catch (Exception greska) {
-            System.out.println("Greska pri dodavanju poteza: " + greska.getMessage());
+            LOG.severe("Greska pri dodavanju poteza: " + greska.getMessage());
         }
     }
 
     private void spremiDokument() {
         try {
-            TransformerFactory tvornicaTransformatora = TransformerFactory.newInstance();
-            Transformer transformator = tvornicaTransformatora.newTransformer();
+            TransformerFactory tvornicaT = TransformerFactory.newInstance();
+            tvornicaT.setAttribute(javax.xml.XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            tvornicaT.setAttribute(javax.xml.XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+            Transformer transformator = tvornicaT.newTransformer();
             transformator.setOutputProperty(javax.xml.transform.OutputKeys.INDENT, "yes");
-            DOMSource izvor = new DOMSource(trenutniDokument);
-            StreamResult rezultat = new StreamResult(new File(PUTANJA_DATOTEKE));
-            transformator.transform(izvor, rezultat);
+            transformator.transform(new DOMSource(trenutniDokument), new StreamResult(new File(PUTANJA_DATOTEKE)));
         } catch (Exception greska) {
-            System.out.println("Greska pri spremanju XML-a: " + greska.getMessage());
+            LOG.severe("Greska pri spremanju XML-a: " + greska.getMessage());
         }
     }
 
     public List<String> ucitajPovijestZaReplay() {
         List<String> listaPoteza = new ArrayList<>();
         try {
-            DocumentBuilderFactory tvornica = DocumentBuilderFactory.newInstance();
-            DocumentBuilder graditelj = tvornica.newDocumentBuilder();
             File datoteka = new File(PUTANJA_DATOTEKE);
             if (!datoteka.exists()) {
                 return listaPoteza;
             }
+            DocumentBuilder graditelj = napraviSiguranDocumentBuilderFactory().newDocumentBuilder();
             Document dokument = graditelj.parse(datoteka);
-            NodeList listaCvorova = dokument.getElementsByTagName("Potez");
+            NodeList listaCvorova = dokument.getElementsByTagName(TAG_POTEZ);
             int brojac = 0;
             while (brojac < listaCvorova.getLength()) {
                 Element potez = (Element) listaCvorova.item(brojac);
-                String runda = potez.getElementsByTagName("Runda").item(0).getTextContent();
-                String igrac = potez.getElementsByTagName("Igrac").item(0).getTextContent();
-                String opis = potez.getElementsByTagName("Opis").item(0).getTextContent();
+                String runda = potez.getElementsByTagName(TAG_RUNDA).item(0).getTextContent();
+                String igrac = potez.getElementsByTagName(TAG_IGRAC).item(0).getTextContent();
+                String opis = potez.getElementsByTagName(TAG_OPIS).item(0).getTextContent();
                 listaPoteza.add("Runda " + runda + " | " + igrac + " | " + opis);
                 brojac = brojac + 1;
             }
         } catch (Exception greska) {
-            System.out.println("Greska pri ucitavanju povijesti: " + greska.getMessage());
+            LOG.severe("Greska pri ucitavanju povijesti: " + greska.getMessage());
         }
         return listaPoteza;
     }
@@ -110,23 +117,24 @@ public class XmlUpravitelj {
         try {
             InputStream tokSheme = getClass().getClassLoader().getResourceAsStream(PUTANJA_SHEME);
             if (tokSheme == null) {
-                System.out.println("XSD shema nije pronadena: " + PUTANJA_SHEME);
+                LOG.warning("XSD shema nije pronadena.");
                 return false;
             }
             SchemaFactory tvornicaSheme = SchemaFactory.newInstance(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            tvornicaSheme.setProperty(javax.xml.XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            tvornicaSheme.setProperty(javax.xml.XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
             Schema shema = tvornicaSheme.newSchema(new StreamSource(tokSheme));
             Validator validator = shema.newValidator();
+            validator.setProperty(javax.xml.XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            validator.setProperty(javax.xml.XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
             validator.validate(new StreamSource(new File(PUTANJA_DATOTEKE)));
-            System.out.println("XML validacija uspjesna - povijest.xml je ispravna prema XSD shemi.");
+            LOG.info("XML validacija uspjesna.");
             return true;
-        } catch (SAXException greska) {
-            System.out.println("XML validacija neuspjesna: " + greska.getMessage());
-            return false;
-        } catch (IOException greska) {
-            System.out.println("Greska pri citanju datoteke za validaciju: " + greska.getMessage());
+        } catch (SAXException | IOException greska) {
+            LOG.severe("Greska pri validaciji: " + greska.getMessage());
             return false;
         } catch (Exception greska) {
-            System.out.println("Neocekivana greska pri validaciji: " + greska.getMessage());
+            LOG.severe("Neocekivana greska: " + greska.getMessage());
             return false;
         }
     }
@@ -139,58 +147,25 @@ public class XmlUpravitelj {
                 return ekstrahiraniPodaci;
             }
             SAXParserFactory tvornicaSax = SAXParserFactory.newInstance();
+            tvornicaSax.setFeature(FEATURE_DOCTYPE, true);
+            tvornicaSax.setFeature(FEATURE_EXT_GENERAL, false);
+            tvornicaSax.setFeature(FEATURE_EXT_PARAM, false);
             SAXParser saxParser = tvornicaSax.newSAXParser();
             SaxEkstraktorHandler handler = new SaxEkstraktorHandler();
             saxParser.parse(datoteka, handler);
             ekstrahiraniPodaci = handler.dohvatiEkstrahiranePodatke();
-            System.out.println("SAX ekstrakcija uspjesna - pronadeno " + ekstrahiraniPodaci.size() + " poteza.");
+            LOG.info("SAX ekstrakcija uspjesna - " + ekstrahiraniPodaci.size() + " poteza.");
         } catch (Exception greska) {
-            System.out.println("Greska pri SAX ekstrakciji: " + greska.getMessage());
+            LOG.severe("Greska pri SAX ekstrakciji: " + greska.getMessage());
         }
         return ekstrahiraniPodaci;
     }
 
-    private static class SaxEkstraktorHandler extends DefaultHandler {
-
-        private List<String> ekstrahiraniPodaci = new ArrayList<>();
-        private StringBuilder trenutniTekst = new StringBuilder();
-        private String trenutnaRunda = "";
-        private String trenutniIgrac = "";
-        private String trenutniOpis = "";
-        private String trenutniElement = "";
-
-        @Override
-        public void startElement(String uri, String localName, String qName, Attributes attributes) {
-            trenutniElement = qName;
-            trenutniTekst.setLength(0);
-        }
-
-        @Override
-        public void characters(char[] ch, int start, int length) {
-            trenutniTekst.append(ch, start, length);
-        }
-
-        @Override
-        public void endElement(String uri, String localName, String qName) {
-            String tekst = trenutniTekst.toString().trim();
-            if (qName.equals("Runda")) {
-                trenutnaRunda = tekst;
-            } else if (qName.equals("Igrac")) {
-                trenutniIgrac = tekst;
-            } else if (qName.equals("Opis")) {
-                trenutniOpis = tekst;
-            } else if (qName.equals("Potez")) {
-                if (!trenutnaRunda.isEmpty() && !trenutniIgrac.isEmpty()) {
-                    ekstrahiraniPodaci.add("R" + trenutnaRunda + " | " + trenutniIgrac + " | " + trenutniOpis);
-                }
-                trenutnaRunda = "";
-                trenutniIgrac = "";
-                trenutniOpis = "";
-            }
-        }
-
-        public List<String> dohvatiEkstrahiranePodatke() {
-            return ekstrahiraniPodaci;
-        }
+    private DocumentBuilderFactory napraviSiguranDocumentBuilderFactory() throws Exception {
+        DocumentBuilderFactory tvornica = DocumentBuilderFactory.newInstance();
+        tvornica.setFeature(FEATURE_DOCTYPE, true);
+        tvornica.setFeature(FEATURE_EXT_GENERAL, false);
+        tvornica.setFeature(FEATURE_EXT_PARAM, false);
+        return tvornica;
     }
 }
