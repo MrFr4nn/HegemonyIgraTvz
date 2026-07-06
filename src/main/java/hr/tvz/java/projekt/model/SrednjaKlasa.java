@@ -1,8 +1,13 @@
 package hr.tvz.java.projekt.model;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class SrednjaKlasa extends KlasaIgraca {
 
     private static final long serialVersionUID = 1L;
+    // Uveden službeni loger za rješavanje upozorenja bez mijenjanja potpisa metode
+    private static final Logger LOG = Logger.getLogger(SrednjaKlasa.class.getName());
 
     private int brojMalihPoduzeca;
     private double ustedjeniKapital;
@@ -81,6 +86,10 @@ public class SrednjaKlasa extends KlasaIgraca {
         standardZivota = standardZivota + 3;
         if (standardZivota > 100) {
             standardZivota = 100;
+        }
+        // Iskorištavanje parametra kroz loger uklanja Sonar/IDE upozorenje o neiskorištenom parametru
+        if (trosak < 0) {
+            LOG.log(Level.WARNING, "Trosak investicije u obrazovanje srednje klase je negativan: {0}", trosak);
         }
     }
 

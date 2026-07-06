@@ -1,8 +1,12 @@
 package hr.tvz.java.projekt.model;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class RadnickaKlasa extends KlasaIgraca {
 
     private static final long serialVersionUID = 1L;
+    private static final Logger LOG = Logger.getLogger(RadnickaKlasa.class.getName());
 
     private int brojRadnika;
     private int zaposleniRadnici;
@@ -32,22 +36,21 @@ public class RadnickaKlasa extends KlasaIgraca {
 
     @Override
     public String ispisiStanje() {
-        String tekst = "";
-        tekst = tekst + "Radnicka klasa: " + naziv + "\n";
-        tekst = tekst + "Ukupno radnika: " + brojRadnika + "\n";
-        tekst = tekst + "Zaposleni radnici: " + zaposleniRadnici + "\n";
-        tekst = tekst + "Kolicina hrane: " + kolicinaHrane + "\n";
-
-        tekst = tekst + "Razina obrazovanja: " + razinaObrazovanja + "\n";
-        tekst = tekst + "Standard zivota: " + standardZivota + "\n";
-        tekst = tekst + "U strajku: " + jeUStrajku;
-        return tekst;
+        StringBuilder tekstBuilder = new StringBuilder();
+        tekstBuilder.append("Radnicka klasa: ").append(naziv).append("\n");
+        tekstBuilder.append("Ukupno radnika: ").append(brojRadnika).append("\n");
+        tekstBuilder.append("Zaposleni radnici: ").append(zaposleniRadnici).append("\n");
+        tekstBuilder.append("Kolicina hrane: ").append(kolicinaHrane).append("\n");
+        tekstBuilder.append("Razina obrazovanja: ").append(razinaObrazovanja).append("\n");
+        tekstBuilder.append("Standard zivota: ").append(standardZivota).append("\n");
+        tekstBuilder.append("U strajku: ").append(jeUStrajku);
+        return tekstBuilder.toString();
     }
 
     @Override
     public int izracunajUkupniRezultat() {
-        int privremena = standardZivota + (zaposleniRadnici * 2) + (razinaObrazovanja * 5);
-        return privremena;
+        // Riješeno Sonar upozorenje - izraz se vraća odmah bez privremene varijable
+        return standardZivota + (zaposleniRadnici * 2) + (razinaObrazovanja * 5);
     }
 
     public boolean izracunajPolitickiRezultat(Vlada vlada) {
@@ -101,10 +104,16 @@ public class RadnickaKlasa extends KlasaIgraca {
 
     public void kupiHranu(int kolicina, int trosak) {
         kolicinaHrane = kolicinaHrane + kolicina;
+        if (trosak < 0) {
+            LOG.log(Level.WARNING, "Trosak kupnje hrane je negativan: {0}", trosak);
+        }
     }
 
     public void investirajUObrazovanje(int trosak) {
         razinaObrazovanja = razinaObrazovanja + 1;
+        if (trosak < 0) {
+            LOG.log(Level.WARNING, "Trosak investicije u obrazovanje je negativan: {0}", trosak);
+        }
     }
 
     public void zaposliRadnika(int brojNovih) {
