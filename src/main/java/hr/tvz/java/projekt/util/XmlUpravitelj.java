@@ -7,9 +7,11 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -22,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class XmlUpravitelj {
@@ -47,32 +50,35 @@ public class XmlUpravitelj {
             Element korijen = trenutniDokument.createElement("PovijestIgre");
             trenutniDokument.appendChild(korijen);
             spremiDokument();
-        } catch (Exception greska) {
-            LOG.severe("Greska pri pokretanju povijesti: " + greska.getMessage());
+        } catch (ParserConfigurationException greska) {
+            LOG.log(Level.SEVERE, "Greska u konfiguraciji XML parsera pri pokretanju povijesti: {0}", greska.getMessage());
         }
     }
 
     public void dodajPotezUPovijest(int runda, String igrac, String opis) {
-        try {
-            if (trenutniDokument == null) {
-                pokreniNovuPovijest();
-            }
-            Element korijen = trenutniDokument.getDocumentElement();
-            Element potez = trenutniDokument.createElement(TAG_POTEZ);
-            Element elementRunda = trenutniDokument.createElement(TAG_RUNDA);
-            elementRunda.setTextContent(String.valueOf(runda));
-            Element elementIgrac = trenutniDokument.createElement(TAG_IGRAC);
-            elementIgrac.setTextContent(igrac);
-            Element elementOpis = trenutniDokument.createElement(TAG_OPIS);
-            elementOpis.setTextContent(opis);
-            potez.appendChild(elementRunda);
-            potez.appendChild(elementIgrac);
-            potez.appendChild(elementOpis);
-            korijen.appendChild(potez);
-            spremiDokument();
-        } catch (Exception greska) {
-            LOG.severe("Greska pri dodavanju poteza: " + greska.getMessage());
+        if (trenutniDokument == null) {
+            pokreniNovuPovijest();
         }
+
+        if (trenutniDokument == null) {
+            LOG.warning("Nije moguce dodati potez jer XML dokument nije inicijaliziran.");
+            return;
+        }
+
+        Element korijen = trenutniDokument.getDocumentElement();
+        Element potez = trenutniDokument.createElement(TAG_POTEZ);
+        Element elementRunda = trenutniDokument.createElement(TAG_RUNDA);
+        elementRunda.setTextContent(String.valueOf(runda));
+        Element elementIgrac = trenutniDokument.createElement(TAG_IGRAC);
+        elementIgrac.setTextContent(igrac);
+        Element elementOpis = trenutniDokument.createElement(TAG_OPIS);
+        elementOpis.setTextContent(opis);
+
+        potez.appendChild(elementRunda);
+        potez.appendChild(elementIgrac);
+        potez.appendChild(elementOpis);
+        korijen.appendChild(potez);
+        spremiDokument();
     }
 
     private void spremiDokument() {
@@ -83,8 +89,8 @@ public class XmlUpravitelj {
             Transformer transformator = tvornicaT.newTransformer();
             transformator.setOutputProperty(javax.xml.transform.OutputKeys.INDENT, "yes");
             transformator.transform(new DOMSource(trenutniDokument), new StreamResult(new File(PUTANJA_DATOTEKE)));
-        } catch (Exception greska) {
-            LOG.severe("Greska pri spremanju XML-a: " + greska.getMessage());
+        } catch (TransformerException greska) {
+            LOG.log(Level.SEVERE, "Greska pri transformaciji/spremanju XML-a: {0}", greska.getMessage());
         }
     }
 
@@ -107,8 +113,8 @@ public class XmlUpravitelj {
                 listaPoteza.add("Runda " + runda + " | " + igrac + " | " + opis);
                 brojac = brojac + 1;
             }
-        } catch (Exception greska) {
-            LOG.severe("Greska pri ucitavanju povijesti: " + greska.getMessage());
+        } catch (ParserConfigurationException | SAXException | IOException greska) {
+            LOG.log(Level.SEVERE, "Greska pri parsiranju i ucitavanju povijesti: {0}", greska.getMessage());
         }
         return listaPoteza;
     }
@@ -131,10 +137,7 @@ public class XmlUpravitelj {
             LOG.info("XML validacija uspjesna.");
             return true;
         } catch (SAXException | IOException greska) {
-            LOG.severe("Greska pri validaciji: " + greska.getMessage());
-            return false;
-        } catch (Exception greska) {
-            LOG.severe("Neocekivana greska: " + greska.getMessage());
+            LOG.log(Level.SEVERE, "Greska pri strukturalnoj validaciji XML-a protiv XSD-a: {0}", greska.getMessage());
             return false;
         }
     }
@@ -154,18 +157,25 @@ public class XmlUpravitelj {
             SaxEkstraktorHandler handler = new SaxEkstraktorHandler();
             saxParser.parse(datoteka, handler);
             ekstrahiraniPodaci = handler.dohvatiEkstrahiranePodatke();
-            LOG.info("SAX ekstrakcija uspjesna - " + ekstrahiraniPodaci.size() + " poteza.");
-        } catch (Exception greska) {
-            LOG.severe("Greska pri SAX ekstrakciji: " + greska.getMessage());
+
+            // Ispravljeno spajanje stringova unutar logera prema pravilu S2629
+            LOG.log(Level.INFO, "SAX ekstrakcija uspjesna - {0} poteza.", ekstrahiraniPodaci.size());
+        } catch (ParserConfigurationException | SAXException | IOException greska) {
+            LOG.log(Level.SEVERE, "Greska pri obradi SAX parserom: {0}", greska.getMessage());
         }
         return ekstrahiraniPodaci;
     }
 
-    private DocumentBuilderFactory napraviSiguranDocumentBuilderFactory() throws Exception {
+    // Popravljeno pravilo S112: maknut 'throws' i ubačen unutarnji try-catch za siguran rad s tvornicom
+    private DocumentBuilderFactory napraviSiguranDocumentBuilderFactory() {
         DocumentBuilderFactory tvornica = DocumentBuilderFactory.newInstance();
-        tvornica.setFeature(FEATURE_DOCTYPE, true);
-        tvornica.setFeature(FEATURE_EXT_GENERAL, false);
-        tvornica.setFeature(FEATURE_EXT_PARAM, false);
+        try {
+            tvornica.setFeature(FEATURE_DOCTYPE, true);
+            tvornica.setFeature(FEATURE_EXT_GENERAL, false);
+            tvornica.setFeature(FEATURE_EXT_PARAM, false);
+        } catch (ParserConfigurationException greska) {
+            LOG.log(Level.WARNING, "XML sigurnosne znacajke nisu podrzane: {0}", greska.getMessage());
+        }
         return tvornica;
     }
 }
