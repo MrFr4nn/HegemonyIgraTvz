@@ -20,7 +20,7 @@ public class PokretacAplikacije extends Application {
     }
 
     public static void main(String[] argumenti) {
-        System.out.println("Pokretanje...");
+        System.err.println("Pokretanje...");
         launch(argumenti);
     }
 }
