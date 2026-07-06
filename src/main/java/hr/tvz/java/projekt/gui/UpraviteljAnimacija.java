@@ -6,8 +6,11 @@ import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
+import java.util.logging.Logger;
 
 public class UpraviteljAnimacija {
+
+    private static final Logger LOG = Logger.getLogger(UpraviteljAnimacija.class.getName());
 
     public void pokreniAnimacijuDonosenjaZakona(Label oznakaPoruke, String tekstZakona) {
         Thread nitAnimacije = new Thread(() -> {
@@ -25,20 +28,20 @@ public class UpraviteljAnimacija {
     }
 
     private String napraviTockice(int brojac) {
-        String rezultat = "";
+        StringBuilder rezultat = new StringBuilder();
         int privremena = 0;
         while (privremena <= brojac) {
-            rezultat = rezultat + ".";
+            rezultat.append(".");
             privremena = privremena + 1;
         }
-        return rezultat;
+        return rezultat.toString();
     }
 
     private void pauzirajNit(long milisekunde) {
         try {
             Thread.sleep(milisekunde);
         } catch (InterruptedException greska) {
-            System.err.println("Animacijska nit je prekinuta: " + greska.getMessage());
+            LOG.warning("Animacijska nit je prekinuta: " + greska.getMessage());
             Thread.currentThread().interrupt();
         }
     }
@@ -53,8 +56,8 @@ public class UpraviteljAnimacija {
         while (brojac <= brojKoraka) {
             double udio = (double) brojac / (double) brojKoraka;
             double trenutnaVisina = staraVisina + (razlika * udio);
-            double konacnaVisina = trenutnaVisina;
-            KeyFrame okvirAnimacije = new KeyFrame(Duration.millis(brojac * 30L), dogadjaj -> stupac.setHeight(konacnaVisina));
+            KeyFrame okvirAnimacije = new KeyFrame(Duration.millis(brojac * 30L),
+                    dogadjaj -> stupac.setHeight(trenutnaVisina));
             animacijaRasta.getKeyFrames().add(okvirAnimacije);
             brojac = brojac + 1;
         }
@@ -63,7 +66,7 @@ public class UpraviteljAnimacija {
 
     public void pokreniAsinkronoAzuriranjeEkonomije(Runnable logikaAzuriranja, Runnable akcijaNakonAzuriranja) {
         Thread nitEkonomije = new Thread(() -> {
-            System.err.println("Pokrenuto azuriranje u zasebnoj niti");
+            LOG.info("Pokrenuto azuriranje u zasebnoj niti");
             logikaAzuriranja.run();
             pauzirajNit(500);
             Platform.runLater(akcijaNakonAzuriranja);

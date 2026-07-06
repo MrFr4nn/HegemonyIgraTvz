@@ -2,9 +2,11 @@ package hr.tvz.java.projekt.logika;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class SustavAkcijskihBodova {
 
+    private static final Logger LOG = Logger.getLogger(SustavAkcijskihBodova.class.getName());
     private static final int MAKSIMALNI_AP_PO_RUNDI = 1;
 
     private int potrosenAp;
@@ -32,7 +34,7 @@ public class SustavAkcijskihBodova {
 
     public boolean iskoristiAkciju(String nazivAkcije) {
         if (!jeAkcijaDostupna(nazivAkcije)) {
-            System.err.println("Akcija " + nazivAkcije + " nije dostupna - limit ili AP potrosen.");
+            LOG.info("Akcija " + nazivAkcije + " nije dostupna.");
             return false;
         }
         int trenutnoKoristenja = dohvatiBrojKoristenja(nazivAkcije);
@@ -44,17 +46,15 @@ public class SustavAkcijskihBodova {
     private int dohvatiBrojKoristenja(String nazivAkcije) {
         if (brojKoristenjaPoAkciji.containsKey(nazivAkcije)) {
             return brojKoristenjaPoAkciji.get(nazivAkcije);
-        } else {
-            return 0;
         }
+        return 0;
     }
 
     private int dohvatiLimit(String nazivAkcije) {
         if (limitPoAkciji.containsKey(nazivAkcije)) {
             return limitPoAkciji.get(nazivAkcije);
-        } else {
-            return MAKSIMALNI_AP_PO_RUNDI;
         }
+        return MAKSIMALNI_AP_PO_RUNDI;
     }
 
     public void resetirajZaNovuRundu() {
@@ -66,9 +66,7 @@ public class SustavAkcijskihBodova {
         return potrosenAp >= MAKSIMALNI_AP_PO_RUNDI;
     }
 
-    public int getPotrosenAp() {
-        return potrosenAp;
-    }
+    public int getPotrosenAp() { return potrosenAp; }
 
     public int getPreostaliAp() {
         return MAKSIMALNI_AP_PO_RUNDI - potrosenAp;
@@ -77,10 +75,6 @@ public class SustavAkcijskihBodova {
     public int dohvatiPreostaliBrojKoristenja(String nazivAkcije) {
         int limit = dohvatiLimit(nazivAkcije);
         int koristeno = dohvatiBrojKoristenja(nazivAkcije);
-        int preostalo = limit - koristeno;
-        if (preostalo < 0) {
-            return 0;
-        }
-        return preostalo;
+        return limit - koristeno;
     }
 }

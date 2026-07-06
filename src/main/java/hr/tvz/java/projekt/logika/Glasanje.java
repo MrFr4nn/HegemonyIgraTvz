@@ -30,58 +30,36 @@ public class Glasanje {
         int brojGlasovaProtiv = 0;
 
         for (Map.Entry<String, Boolean> jedanGlas : glasovi.entrySet()) {
-            if (jedanGlas.getValue()) {
+            if (Boolean.TRUE.equals(jedanGlas.getValue())) {
                 brojGlasovaZa = brojGlasovaZa + 1;
             } else {
                 brojGlasovaProtiv = brojGlasovaProtiv + 1;
             }
         }
 
-        if (brojGlasovaZa > brojGlasovaProtiv) {
-            zakonPrihvacen = true;
-        } else {
-            zakonPrihvacen = false;
-        }
+        zakonPrihvacen = brojGlasovaZa > brojGlasovaProtiv;
         glasanjeZavrseno = true;
     }
 
     public String ispisiRezultatGlasanja() {
-        String tekst = "";
-        tekst = tekst + "Zakon: " + nazivZakona + "\n";
+        StringBuilder tekst = new StringBuilder();
+        tekst.append("Zakon: ").append(nazivZakona).append("\n");
 
-        int brojac = 0;
         for (Map.Entry<String, Boolean> jedanGlas : glasovi.entrySet()) {
-            String odluka;
-            if (jedanGlas.getValue()) {
-                odluka = "ZA";
-            } else {
-                odluka = "PROTIV";
-            }
-            tekst = tekst + jedanGlas.getKey() + ": " + odluka + "\n";
-            brojac = brojac + 1;
+            String odluka = Boolean.TRUE.equals(jedanGlas.getValue()) ? "ZA" : "PROTIV";
+            tekst.append(jedanGlas.getKey()).append(": ").append(odluka).append("\n");
         }
 
         if (zakonPrihvacen) {
-            tekst = tekst + "Ishod: Zakon je PRIHVACEN.";
+            tekst.append("Ishod: Zakon je PRIHVACEN.");
         } else {
-            tekst = tekst + "Ishod: Zakon je ODBIJEN.";
+            tekst.append("Ishod: Zakon je ODBIJEN.");
         }
-        return tekst;
+        return tekst.toString();
     }
 
-    public String getNazivZakona() {
-        return nazivZakona;
-    }
-
-    public boolean isGlasanjeZavrseno() {
-        return glasanjeZavrseno;
-    }
-
-    public boolean isZakonPrihvacen() {
-        return zakonPrihvacen;
-    }
-
-    public int dohvatiBrojGlasova() {
-        return glasovi.size();
-    }
+    public String getNazivZakona() { return nazivZakona; }
+    public boolean isGlasanjeZavrseno() { return glasanjeZavrseno; }
+    public boolean isZakonPrihvacen() { return zakonPrihvacen; }
+    public int dohvatiBrojGlasova() { return glasovi.size(); }
 }
