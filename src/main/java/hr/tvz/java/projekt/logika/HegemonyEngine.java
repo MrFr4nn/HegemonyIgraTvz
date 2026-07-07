@@ -5,7 +5,6 @@ import hr.tvz.java.projekt.model.KlasaIgraca;
 import hr.tvz.java.projekt.model.RadnickaKlasa;
 import hr.tvz.java.projekt.model.SrednjaKlasa;
 import hr.tvz.java.projekt.model.Vlada;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,7 +68,6 @@ public class HegemonyEngine {
                     obradiKrajRunde();
                 }
             }
-            // TOČAN PRIJELAZ: Nakon faze glasanja, igra ide na obradu kraja runde
             case FAZA_GLASANJE    -> {
                 trenutnaFaza = FAZA_KRAJ_RUNDE;
                 obradiKrajRunde();
@@ -89,13 +87,11 @@ public class HegemonyEngine {
     public boolean iskoristiAkcijuTrenutnogIgraca(String nazivAkcije) { return redoslijedPoteza.dohvatiApSustavTrenutnogIgraca().iskoristiAkciju(nazivAkcije); }
 
     public boolean jeAkcijaDostupnaTrenutnomIgracu(String nazivAkcije) {
-        // Prva provjera: ima li uopće preostalih AP-ova u AP sustavu
         boolean imaAp = redoslijedPoteza.dohvatiApSustavTrenutnogIgraca().jeAkcijaDostupna(nazivAkcije);
         if (!imaAp) {
             return false;
         }
 
-        // Druga provjera: ekonomska provjera resursa na temelju točnog nazivAkcije iz PoolKarata
         KlasaIgraca trenutniIgrac = dohvatiIgracaNaPotezu();
 
         if (trenutniIgrac instanceof SrednjaKlasa srednja) {
@@ -103,24 +99,32 @@ public class HegemonyEngine {
                 case "ZatvoriPoduzece" -> { return srednja.getBrojMalihPoduzeca() > 0; }
                 case "IzvozRobe"       -> { return srednja.getBrojMalihPoduzeca() > 0; }
                 case "OtvoriPoduzece"  -> { return srednja.getUstedjeniKapital() >= 15.0; }
+                case "Marketing"       -> { return srednja.getUstedjeniKapital() >= 8.0; }
             }
         }
 
         else if (trenutniIgrac instanceof KapitalistickaKlasa kapitalist) {
             switch (nazivAkcije) {
-                case "ProdajTvornicu"   -> { return kapitalist.getBrojTvornica() > 0; }
-                case "FuzijaKompanija"  -> { return kapitalist.getBrojTvornica() >= 2; }
-                case "Lobiranje"        -> { return kapitalist.getUkupniKapital() >= 10.0; }
+                case "ProdajTvornicu"    -> { return kapitalist.getBrojTvornica() > 0; }
+                case "FuzijaKompanija"   -> { return kapitalist.getBrojTvornica() >= 2; }
+                case "Lobiranje"         -> { return kapitalist.getUkupniKapital() >= 10.0; }
+                case "IzgradiTvornicu"   -> { return kapitalist.getUkupniKapital() >= 50.0; }
+                case "Diverzifikacija"   -> { return kapitalist.getUkupniKapital() >= 20.0; }
             }
         }
 
         else if (trenutniIgrac instanceof RadnickaKlasa radnicka) {
             switch (nazivAkcije) {
-                case "PotrosiHranu"     -> { return radnicka.getKolicinaHrane() > 0; }
-                // POPRAVAK: nazivAkcije iz PoolKarata za ovu kartu je "OtpustiRadnika" bez razmaka!
-                case "OtpustiRadnika"   -> { return radnicka.getZaposleniRadnici() > 0; }
-                // POPRAVAK: nazivAkcije iz PoolKarata za prosvjed je "Strajk"
-                case "Strajk"           -> { return !radnicka.isJeUStrajku() && radnicka.getZaposleniRadnici() > 0; }
+                case "OtpustiRadnika" -> { return radnicka.getZaposleniRadnici() > 0; }
+                case "Strajk"         -> { return !radnicka.isJeUStrajku() && radnicka.getZaposleniRadnici() > 0; }
+                case "Zaposljavanje"  -> { return radnicka.getZaposleniRadnici() < radnicka.getBrojRadnika(); }
+            }
+        }
+
+        else if (trenutniIgrac instanceof Vlada vlada) {
+            switch (nazivAkcije) {
+                case "SocijalniPaket"  -> { return vlada.getDrzavniProracun() >= 15.0; }
+                case "Infrastruktura"  -> { return vlada.getDrzavniProracun() >= 20.0; }
             }
         }
 
