@@ -15,7 +15,8 @@ public class PokretacAplikacije extends Application {
     @Override
     public void start(Stage glavnaScena) {
         glavnaScena.setResizable(true);
-        PocetniEkran pocetniEkran = new PocetniEkran(glavnaScena, listaIgraca -> {
+        PocetniEkran pocetniEkran = new PocetniEkran();
+        pocetniEkran.prikaziEkran(glavnaScena, listaIgraca -> {
             PauseTransition odgoda = new PauseTransition(Duration.millis(50));
             odgoda.setOnFinished(dogadjaj -> {
                 GlavniProzor glavniProzor = new GlavniProzor(glavnaScena, listaIgraca);
@@ -25,7 +26,6 @@ public class PokretacAplikacije extends Application {
             });
             odgoda.play();
         });
-        pocetniEkran.prikaziEkran();
     }
 
     public static void main(String[] argumenti) {
