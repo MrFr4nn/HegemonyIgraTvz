@@ -58,10 +58,6 @@ public class Vlada extends KlasaIgraca {
         return privremena;
     }
 
-    public boolean izracunajPolitickiRezultat() {
-        return drzavniProracun >= 0;
-    }
-
     public void provjeriStanjeProracuna() {
         proracunUManjku = drzavniProracun < 0;
     }
@@ -69,6 +65,8 @@ public class Vlada extends KlasaIgraca {
     public void provjeriUvjeteBankrota() {
         if (drzavniProracun < 0 && !podMMFKaznom) {
             aktivirajMMFKaznu();
+        } else if (drzavniProracun >= 0 && podMMFKaznom) {
+            ukloniMMFKaznu();
         }
     }
 
@@ -107,9 +105,23 @@ public class Vlada extends KlasaIgraca {
         return bodovi;
     }
 
-    public void naplatiPorez(double oporeziviPrihod) {
-        double iznos = oporeziviPrihod * stopaPoreza;
-        drzavniProracun = drzavniProracun + iznos;
+    public double naplatiPorezOdIgraca(List<KlasaIgraca> listaIgraca) {
+        double ukupnoNaplaceno = 0.0;
+
+        for (KlasaIgraca igrac : listaIgraca) {
+            if (igrac instanceof SrednjaKlasa srednja) {
+                double iznos = srednja.getUstedjeniKapital() * stopaPoreza;
+                srednja.setUstedjeniKapital(srednja.getUstedjeniKapital() - iznos);
+                ukupnoNaplaceno = ukupnoNaplaceno + iznos;
+            } else if (igrac instanceof KapitalistickaKlasa kapitalist) {
+                double iznos = kapitalist.getUkupniKapital() * stopaPoreza;
+                kapitalist.setUkupniKapital(kapitalist.getUkupniKapital() - iznos);
+                ukupnoNaplaceno = ukupnoNaplaceno + iznos;
+            }
+        }
+
+        drzavniProracun = drzavniProracun + ukupnoNaplaceno;
+        return ukupnoNaplaceno;
     }
 
     public void isplatiSubvenciju(double iznos) {
@@ -119,7 +131,6 @@ public class Vlada extends KlasaIgraca {
     }
 
     public void promijeniStopuPoreza(double novaStopa) {
-        // Ako je pod kaznom MMF-a, zakoni ne mogu promijeniti poreznu stopu!
         if (podMMFKaznom) {
             return;
         }
@@ -133,7 +144,6 @@ public class Vlada extends KlasaIgraca {
     }
 
     public void promijeniMinimalnuPlacu(double novaPlaca) {
-        // Ako je pod kaznom MMF-a, zakoni ne mogu dizati minimalac!
         if (podMMFKaznom) {
             return;
         }

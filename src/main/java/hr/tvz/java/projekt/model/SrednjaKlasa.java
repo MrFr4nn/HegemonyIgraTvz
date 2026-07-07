@@ -1,12 +1,8 @@
 package hr.tvz.java.projekt.model;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public class SrednjaKlasa extends KlasaIgraca {
 
     private static final long serialVersionUID = 1L;
-    private static final Logger LOG = Logger.getLogger(SrednjaKlasa.class.getName());
 
     private int brojMalihPoduzeca;
     private double ustedjeniKapital;
@@ -22,7 +18,6 @@ public class SrednjaKlasa extends KlasaIgraca {
     @Override
     public void odigrajPotez() {
         zabrojOdigranihPoteza();
-        azurirajStandard();
     }
 
     @Override
@@ -38,23 +33,6 @@ public class SrednjaKlasa extends KlasaIgraca {
     @Override
     public int izracunajUkupniRezultat() {
         return standardZivota + (int) (ustedjeniKapital / 10) + (brojMalihPoduzeca * 5);
-    }
-
-    private void azurirajStandard() {
-        if (brojMalihPoduzeca > 0) {
-            standardZivota = standardZivota + brojMalihPoduzeca * 3;
-        }
-        if (ustedjeniKapital > 20) {
-            standardZivota = standardZivota + 2;
-        }
-
-        // Fiksna provjera granica
-        if (standardZivota > 100) {
-            standardZivota = 100;
-        }
-        if (standardZivota < 0) {
-            standardZivota = 0;
-        }
     }
 
     public void otvoriNovoPoduzece(double trosak) {
@@ -75,7 +53,6 @@ public class SrednjaKlasa extends KlasaIgraca {
         if (brojMalihPoduzeca > 0) {
             brojMalihPoduzeca = brojMalihPoduzeca - 1;
             standardZivota = standardZivota - 3;
-            // ISPRAVLJENO: Standard ne smije pasti ispod 0 niti ići dalje u minus
             if (standardZivota < 0) {
                 standardZivota = 0;
             }
@@ -94,9 +71,6 @@ public class SrednjaKlasa extends KlasaIgraca {
         standardZivota = standardZivota + 3;
         if (standardZivota > 100) {
             standardZivota = 100;
-        }
-        if (trosak < 0) {
-            LOG.log(Level.WARNING, "Trosak investicije u obrazovanje srednje klase je negativan: {0}", trosak);
         }
     }
 

@@ -40,16 +40,14 @@ public class KapitalistickaKlasa extends KlasaIgraca {
 
     public void izgradiTvornicu(double trosak) {
         brojTvornica = brojTvornica + 1;
-        ukupniKapital = ukupniKapital - trosak; // Kapital slobodno ide u minus
+        ukupniKapital = ukupniKapital - trosak;
     }
 
     public void prodajTvornicu(double prihod) {
-        // CIJELA logika se mora izvršiti samo ako imamo što prodati!
         if (brojTvornica > 0) {
             brojTvornica = brojTvornica - 1;
             ukupniKapital = ukupniKapital + prihod;
         } else {
-            // Ako nema tvornica, ispisujemo obavijest u konzolu i prekidamo akciju bez zarade novca
             System.out.println("Nemate tvornica za prodaju! Akcija je propala.");
         }
     }
@@ -58,21 +56,19 @@ public class KapitalistickaKlasa extends KlasaIgraca {
         ukupniKapital = ukupniKapital + iznos;
         vrijednostDionica = vrijednostDionica + (iznos * 0.5);
 
-        // Osiguranje da dionice ne odu ispod 0 (za slučaj negativnih investicija/kriza)
         if (vrijednostDionica < 0.0) {
             vrijednostDionica = 0.0;
         }
     }
 
     public void platiPorez(double iznos) {
-        ukupniKapital = ukupniKapital - iznos; // Može ići u minus
+        ukupniKapital = ukupniKapital - iznos;
     }
 
     public double getUkupniKapital() { return ukupniKapital; }
     public void setUkupniKapital(double ukupniKapital) { this.ukupniKapital = ukupniKapital; }
     public int getBrojTvornica() { return brojTvornica; }
 
-    // Dodana setters metoda za tvornice s provjerom protiv minusa
     public void setBrojTvornica(int brojTvornica) {
         if (brojTvornica >= 0) {
             this.brojTvornica = brojTvornica;
