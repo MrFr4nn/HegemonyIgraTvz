@@ -77,7 +77,6 @@ public class KatalogZakona {
         vlada.setDrzavniProracun(vlada.getDrzavniProracun() + 30.0);
         for (KlasaIgraca igrac : listaIgraca) {
             if (igrac instanceof KapitalistickaKlasa kapitalist) {
-                // Smanjujemo kapital izravno (može ući u minus po vašem pravilu)
                 kapitalist.setUkupniKapital(kapitalist.getUkupniKapital() - 30.0);
             }
         }

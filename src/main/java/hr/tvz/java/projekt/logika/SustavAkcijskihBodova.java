@@ -35,7 +35,6 @@ public class SustavAkcijskihBodova {
 
     public boolean iskoristiAkciju(String nazivAkcije) {
         if (!jeAkcijaDostupna(nazivAkcije)) {
-            // Ispravljeno: Korištenje ugrađenog formatiranja (rješava java:S2629)
             LOG.log(Level.INFO, "Akcija {0} nije dostupna.", nazivAkcije);
             return false;
         }

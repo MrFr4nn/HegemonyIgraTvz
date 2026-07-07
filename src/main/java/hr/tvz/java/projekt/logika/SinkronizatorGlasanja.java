@@ -10,7 +10,6 @@ import java.util.logging.Logger;
 
 public class SinkronizatorGlasanja {
 
-    // Uveden službeni loger umjesto System.err (rješava java:S106)
     private static final Logger LOG = Logger.getLogger(SinkronizatorGlasanja.class.getName());
 
     private CyclicBarrier prepreka;
@@ -35,12 +34,10 @@ public class SinkronizatorGlasanja {
 
     private void cekajNaPrepreci(String oznakaIgraca) {
         try {
-            // Zamijenjeno s LOG.info i placeholderom
             LOG.log(Level.INFO, "{0} ceka na ostale igrace da zavrse glasanje.", oznakaIgraca);
             prepreka.await();
             LOG.log(Level.INFO, "{0} je prosao prepreku, glasanje sinkronizirano.", oznakaIgraca);
         } catch (InterruptedException greska) {
-            // Zamijenjeno s LOG.log(Level.SEVERE...)
             LOG.log(Level.SEVERE, "Nit je prekinuta tijekom cekanja: {0}", greska.getMessage());
             Thread.currentThread().interrupt();
         } catch (BrokenBarrierException greska) {
