@@ -7,11 +7,11 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;"
+<ScrollPane fitToWidth="true" style="-fx-background: #0D0D12; -fx-background-color: #0D0D12;"
             xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="hr.tvz.java.projekt.gui.PocetniEkran">
     <content>
-        <VBox fx:id="korijenskiLayout" spacing="18" alignment="TOP_CENTER">
+        <VBox fx:id="korijenskiLayout" spacing="18" alignment="TOP_CENTER" style="-fx-background-color: #0D0D12;">
             <padding>
                 <Insets top="30" right="30" bottom="30" left="30"/>
             </padding>
