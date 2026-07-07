@@ -87,8 +87,6 @@ public class UpraviteljReplay {
                 Platform.runLater(this::prikaziSljedeciKorak);
 
                 try {
-                    // Blokirajuća operacija - virtualna nit se ovdje privremeno miče iz izvršavanja
-                    // i ne troši resurse stvarnog procesora / OS niti
                     Thread.sleep(800);
                 } catch (InterruptedException greska) {
                     LOG.warning("Automatski replay je prekinut: " + greska.getMessage());
