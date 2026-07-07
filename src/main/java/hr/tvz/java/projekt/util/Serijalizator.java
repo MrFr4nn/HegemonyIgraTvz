@@ -5,7 +5,6 @@ import hr.tvz.java.projekt.model.KlasaIgraca;
 import hr.tvz.java.projekt.model.RadnickaKlasa;
 import hr.tvz.java.projekt.model.SrednjaKlasa;
 import hr.tvz.java.projekt.model.Vlada;
-
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -89,7 +88,6 @@ public class Serijalizator {
         if (nadklasa != null) {
             tekst.append("Nasljeduje od: ").append(nadklasa.getSimpleName()).append("\n");
         }
-
         return tekst.toString();
     }
 }

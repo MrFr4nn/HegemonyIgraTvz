@@ -4,7 +4,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -158,7 +157,6 @@ public class XmlUpravitelj {
             saxParser.parse(datoteka, handler);
             ekstrahiraniPodaci = handler.dohvatiEkstrahiranePodatke();
 
-            // Ispravljeno spajanje stringova unutar logera prema pravilu S2629
             LOG.log(Level.INFO, "SAX ekstrakcija uspjesna - {0} poteza.", ekstrahiraniPodaci.size());
         } catch (ParserConfigurationException | SAXException | IOException greska) {
             LOG.log(Level.SEVERE, "Greska pri obradi SAX parserom: {0}", greska.getMessage());
@@ -166,7 +164,6 @@ public class XmlUpravitelj {
         return ekstrahiraniPodaci;
     }
 
-    // Popravljeno pravilo S112: maknut 'throws' i ubačen unutarnji try-catch za siguran rad s tvornicom
     private DocumentBuilderFactory napraviSiguranDocumentBuilderFactory() {
         DocumentBuilderFactory tvornica = DocumentBuilderFactory.newInstance();
         try {
