@@ -5,7 +5,7 @@ import hr.tvz.java.projekt.model.KlasaIgraca;
 import hr.tvz.java.projekt.model.RadnickaKlasa;
 import hr.tvz.java.projekt.model.SrednjaKlasa;
 import hr.tvz.java.projekt.model.Vlada;
-import java.util.ArrayList;
+
 import java.util.List;
 
 public class HegemonyEngine {
@@ -100,6 +100,7 @@ public class HegemonyEngine {
                 case "IzvozRobe"       -> { return srednja.getBrojMalihPoduzeca() > 0; }
                 case "OtvoriPoduzece"  -> { return srednja.getUstedjeniKapital() >= 15.0; }
                 case "Marketing"       -> { return srednja.getUstedjeniKapital() >= 8.0; }
+                default -> { }
             }
         }
 
@@ -110,6 +111,7 @@ public class HegemonyEngine {
                 case "Lobiranje"         -> { return kapitalist.getUkupniKapital() >= 10.0; }
                 case "IzgradiTvornicu"   -> { return kapitalist.getUkupniKapital() >= 50.0; }
                 case "Diverzifikacija"   -> { return kapitalist.getUkupniKapital() >= 20.0; }
+                default -> { }
             }
         }
 
@@ -118,13 +120,15 @@ public class HegemonyEngine {
                 case "OtpustiRadnika" -> { return radnicka.getZaposleniRadnici() > 0; }
                 case "Strajk"         -> { return !radnicka.isJeUStrajku() && radnicka.getZaposleniRadnici() > 0; }
                 case "Zaposljavanje"  -> { return radnicka.getZaposleniRadnici() < radnicka.getBrojRadnika(); }
+                default -> { }
             }
         }
 
-        else if (trenutniIgrac instanceof Vlada vlada) {
+        else if (trenutniIgrac instanceof Vlada vladaIgrac) {
             switch (nazivAkcije) {
-                case "SocijalniPaket"  -> { return vlada.getDrzavniProracun() >= 15.0; }
-                case "Infrastruktura"  -> { return vlada.getDrzavniProracun() >= 20.0; }
+                case "SocijalniPaket"  -> { return vladaIgrac.getDrzavniProracun() >= 15.0; }
+                case "Infrastruktura"  -> { return vladaIgrac.getDrzavniProracun() >= 20.0; }
+                default -> { }
             }
         }
 
