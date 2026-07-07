@@ -98,56 +98,56 @@ public class DefinicijeKarataPoKlasi {
                 karta -> napraviEfektVlade(karta.getNazivAkcije(), vlada, listaIgraca, akcija));
     }
 
-    private Runnable napraviEfektRadnicke(String akcija, RadnickaKlasa r, Runnable osvezi) {
+    private Runnable napraviEfektRadnicke(String akcija, RadnickaKlasa r, Runnable osvjezi) {
         switch (akcija) {
-            case "Zaposljavanje": return () -> { r.zaposliRadnika(1); osvezi.run(); };
-            case "Obrazovanje": return () -> { r.investirajUObrazovanje(30); r.setStandardZivota(r.getStandardZivota() + 3); osvezi.run(); };
-            case "Strajk": return () -> { r.pokreniStrajk(); osvezi.run(); };
-            case "OtpustiRadnika": return () -> { r.otpustiRadnika(1); osvezi.run(); };
-            case "KolektivniUgovor": return () -> { r.setStandardZivota(r.getStandardZivota() + 8); osvezi.run(); };
-            case "RegionalniRazvoj": return () -> { r.zaposliRadnika(2); r.setStandardZivota(r.getStandardZivota() + 4); osvezi.run(); };
+            case "Zaposljavanje": return () -> { r.zaposliRadnika(1); osvjezi.run(); };
+            case "Obrazovanje": return () -> { r.investirajUObrazovanje(30); r.setStandardZivota(r.getStandardZivota() + 3); osvjezi.run(); };
+            case "Strajk": return () -> { r.pokreniStrajk(); osvjezi.run(); };
+            case "OtpustiRadnika": return () -> { r.otpustiRadnika(1); osvjezi.run(); };
+            case "KolektivniUgovor": return () -> { r.setStandardZivota(r.getStandardZivota() + 8); osvjezi.run(); };
+            case "RegionalniRazvoj": return () -> { r.zaposliRadnika(2); r.setStandardZivota(r.getStandardZivota() + 4); osvjezi.run(); };
             default: return null;
         }
     }
 
-    private Runnable napraviEfektSrednje(String akcija, SrednjaKlasa s, Runnable osvezi) {
+    private Runnable napraviEfektSrednje(String akcija, SrednjaKlasa s, Runnable osvjezi) {
         switch (akcija) {
-            case "OtvoriPoduzece": return () -> { s.otvoriNovoPoduzece(15.0); osvezi.run(); };
-            case "ObrazovanjeSrednja": return () -> { s.investirajUObrazovanje(10); osvezi.run(); };
-            case "Marketing": return () -> { s.setUstedjeniKapital(s.getUstedjeniKapital() - 8.0); s.ostvariPrihod(18.0); osvezi.run(); };
-            case "ZatvoriPoduzece": return () -> { s.zatvoriPoduzece(); osvezi.run(); };
-            case "IzvozRobe": return () -> { s.ostvariPrihod(30.0); osvezi.run(); };
-            case "Stednja": return () -> { s.setUstedjeniKapital(s.getUstedjeniKapital() + 15.0); osvezi.run(); };
+            case "OtvoriPoduzece": return () -> { s.otvoriNovoPoduzece(15.0); osvjezi.run(); };
+            case "ObrazovanjeSrednja": return () -> { s.investirajUObrazovanje(10); osvjezi.run(); };
+            case "Marketing": return () -> { s.setUstedjeniKapital(s.getUstedjeniKapital() - 8.0); s.ostvariPrihod(18.0); osvjezi.run(); };
+            case "ZatvoriPoduzece": return () -> { s.zatvoriPoduzece(); osvjezi.run(); };
+            case "IzvozRobe": return () -> { s.ostvariPrihod(30.0); osvjezi.run(); };
+            case "Stednja": return () -> { s.setUstedjeniKapital(s.getUstedjeniKapital() + 15.0); osvjezi.run(); };
             default: return null;
         }
     }
 
-    private Runnable napraviEfektKapitalisticke(String akcija, KapitalistickaKlasa k, Runnable osvezi) {
+    private Runnable napraviEfektKapitalisticke(String akcija, KapitalistickaKlasa k, Runnable osvjezi) {
         switch (akcija) {
-            case "TraziInvestitora": return () -> { k.ulozUInvesticiju(15.0); osvezi.run(); };
-            case "IzgradiTvornicu": return () -> { k.izgradiTvornicu(50.0); osvezi.run(); };
-            case "Lobiranje": return () -> { k.ulozUInvesticiju(30.0); osvezi.run(); };
-            case "ProdajTvornicu": return () -> { k.prodajTvornicu(25.0); osvezi.run(); };
-            case "Diverzifikacija": return () -> { k.setUkupniKapital(k.getUkupniKapital() - 20.0); k.ulozUInvesticiju(15.0); osvezi.run(); };
-            case "FuzijaKompanija": return () -> { k.setUkupniKapital(k.getUkupniKapital() + 40.0); osvezi.run(); };
+            case "TraziInvestitora": return () -> { k.ulozUInvesticiju(15.0); osvjezi.run(); };
+            case "IzgradiTvornicu": return () -> { k.izgradiTvornicu(50.0); osvjezi.run(); };
+            case "Lobiranje": return () -> { k.ulozUInvesticiju(30.0); osvjezi.run(); };
+            case "ProdajTvornicu": return () -> { k.prodajTvornicu(25.0); osvjezi.run(); };
+            case "Diverzifikacija": return () -> { k.setUkupniKapital(k.getUkupniKapital() - 20.0); k.ulozUInvesticiju(15.0); osvjezi.run(); };
+            case "FuzijaKompanija": return () -> { k.setUkupniKapital(k.getUkupniKapital() + 40.0); osvjezi.run(); };
             case "BurzovnaSpeculacija":
                 return () -> {
                     if (Math.random() > 0.5) k.setUkupniKapital(k.getUkupniKapital() + 35.0);
                     else k.platiPorez(20.0);
-                    osvezi.run();
+                    osvjezi.run();
                 };
             default: return null;
         }
     }
 
-    private Runnable napraviEfektVlade(String akcija, Vlada v, List<KlasaIgraca> listaIgraca, Runnable osvezi) {
+    private Runnable napraviEfektVlade(String akcija, Vlada v, List<KlasaIgraca> listaIgraca, Runnable osvjezi) {
         switch (akcija) {
-            case "JavneInvesticije": return () -> { v.povecajLegitimnost(5); osvezi.run(); };
-            case "SocijalniPaket": return () -> { v.isplatiSubvenciju(15.0); osvezi.run(); };
-            case "NaplatiPorez": return () -> { v.naplatiPorezOdIgraca(listaIgraca); osvezi.run(); };
-            case "Dekret": return () -> { v.povecajLegitimnost(10); osvezi.run(); };
-            case "Infrastruktura": return () -> { v.povecajLegitimnost(8); v.setDrzavniProracun(v.getDrzavniProracun() - 20.0); osvezi.run(); };
-            case "VanjskaPolitika": return () -> { v.setDrzavniProracun(v.getDrzavniProracun() + 30.0); v.povecajLegitimnost(4); osvezi.run(); };
+            case "JavneInvesticije": return () -> { v.povecajLegitimnost(5); osvjezi.run(); };
+            case "SocijalniPaket": return () -> { v.isplatiSubvenciju(15.0); osvjezi.run(); };
+            case "NaplatiPorez": return () -> { v.naplatiPorezOdIgraca(listaIgraca); osvjezi.run(); };
+            case "Dekret": return () -> { v.povecajLegitimnost(10); osvjezi.run(); };
+            case "Infrastruktura": return () -> { v.povecajLegitimnost(8); v.setDrzavniProracun(v.getDrzavniProracun() - 20.0); osvjezi.run(); };
+            case "VanjskaPolitika": return () -> { v.setDrzavniProracun(v.getDrzavniProracun() + 30.0); v.povecajLegitimnost(4); osvjezi.run(); };
             default: return null;
         }
     }

@@ -5,6 +5,8 @@ import java.util.List;
 
 public class PoolKarata {
 
+    private static final String NAZIV_OBRAZOVANJE = "Obrazovanje";
+
     public static class PodaciKarte {
         private final String naziv;
         private final String opis;
@@ -36,7 +38,7 @@ public class PoolKarata {
     private void napuniPooloveKarata() {
         poolRadnicke = new ArrayList<>();
         poolRadnicke.add(new PodaciKarte("Zaposljavanje", "Posalji radnika u firmu", "👷", "Zaposljavanje"));
-        poolRadnicke.add(new PodaciKarte("Obrazovanje", "Podigni kvalifikaciju", "🎓", "Obrazovanje"));
+        poolRadnicke.add(new PodaciKarte(NAZIV_OBRAZOVANJE, "Podigni kvalifikaciju", "🎓", NAZIV_OBRAZOVANJE));
         poolRadnicke.add(new PodaciKarte("Sindikalni prosvjed", "Pokreni strajk", "✊", "Strajk"));
         poolRadnicke.add(new PodaciKarte("Otpusti radnika", "Smanji broj zaposlenih", "📉", "OtpustiRadnika"));
         poolRadnicke.add(new PodaciKarte("Kolektivni ugovor", "Pregovaraj o boljim uvjetima", "🤝", "KolektivniUgovor"));
@@ -44,7 +46,7 @@ public class PoolKarata {
 
         poolSrednje = new ArrayList<>();
         poolSrednje.add(new PodaciKarte("Otvori poduzece", "Pokreni novi posao (trosak 15)", "🏪", "OtvoriPoduzece"));
-        poolSrednje.add(new PodaciKarte("Obrazovanje", "Podigni kvalifikaciju", "🎓", "ObrazovanjeSrednja"));
+        poolSrednje.add(new PodaciKarte(NAZIV_OBRAZOVANJE, "Podigni kvalifikaciju", "🎓", "ObrazovanjeSrednja"));
         poolSrednje.add(new PodaciKarte("Marketing", "Ulozi u promidzbu obrta", "📣", "Marketing"));
         poolSrednje.add(new PodaciKarte("Zatvori poduzece", "Smanji broj poduzeca", "📉", "ZatvoriPoduzece"));
         poolSrednje.add(new PodaciKarte("Izvoz robe", "Prodaj na strano trziste", "🚢", "IzvozRobe"));
