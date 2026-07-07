@@ -131,7 +131,7 @@ public class KontrolePoteza {
 
         Label oznakaTko = new Label("GLASA: " + nazivGlasaca.toUpperCase());
         oznakaTko.setFont(Font.font("Arial Black", FontWeight.BOLD, 15));
-        oznakaTko.setStyle(FX_TEXT_FILL_STIL + bojaHex + "; -fx-effect: dropshadow(gaussian, " + bojaHex + ", 12, 0.4, 0, 0);");
+        oznakaTko.setStyle(FX_TEXT_FILL_STIL + bojaHex + ";");
 
         Label naslovPanela = new Label("ZAKON: " + nazivZakona.toUpperCase());
         naslovPanela.setFont(Font.font("Verdana", 13));

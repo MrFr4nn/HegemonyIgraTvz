@@ -129,6 +129,10 @@ public class PrikazPloce {
     }
 
     public void azurirajPrikaz(List<KlasaIgraca> listaIgraca) {
+        azurirajPrikaz(listaIgraca, false);
+    }
+
+    public void azurirajPrikaz(List<KlasaIgraca> listaIgraca, boolean fazaGlasanjaAktivna) {
         for (int i = 0; i < listaIgraca.size(); i++) {
             KlasaIgraca igrac = listaIgraca.get(i);
             List<Label> oznakePodataka = listaOznakaPoIgracu.get(i);
@@ -138,7 +142,9 @@ public class PrikazPloce {
                 oznakePodataka.get(j).setText(noveOznake.get(j).getText());
             }
             oznakePodataka.get(oznakePodataka.size() - 1).setText("BODOVI: " + igrac.getBodoviPobjede());
-            kreatorKartice.postaviOkvirIVanjskiStil(listaKarticaIgraca.get(i), igrac.isNaPotezu());
+
+            boolean prikaziKaoNaPotezu = igrac.isNaPotezu() && !fazaGlasanjaAktivna;
+            kreatorKartice.postaviOkvirIVanjskiStil(listaKarticaIgraca.get(i), prikaziKaoNaPotezu);
 
             double trenutnaVrijednost = dohvatiVrijednostGrafa(igrac);
             double maksimum = dohvatiMaksimumGrafa(igrac);

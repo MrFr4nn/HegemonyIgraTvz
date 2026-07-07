@@ -129,6 +129,7 @@ public class GlavniProzor {
         } else if (faza.equals(HegemonyEngine.FAZA_POTROSNJA)) {
             prikaziVizualniIzvjestaj("Faza Potrosnje", engineIgre.obradiFazuPotrosnje());
         } else if (faza.equals(HegemonyEngine.FAZA_GLASANJE)) {
+            prikazPloce.azurirajPrikaz(engineIgre.getListaIgraca(), true);
             upraviteljGlasanja.prikaziPanelGlasanja(panelKontrolaTrenutniIgrac, this::azurirajPanelPotezaPremaFazi);
         } else if (faza.equals(HegemonyEngine.FAZA_KRAJ_RUNDE) || faza.equals(HegemonyEngine.FAZA_PRIPREMA)) {
             Label oznaka = new Label("FAZA " + faza.replace("_", " ") + " — KLIKNITE 'SLJEDECA FAZA' ZA NASTAVAK");
