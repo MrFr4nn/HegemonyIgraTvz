@@ -181,7 +181,7 @@ public class GlavniProzor {
         if (engineIgre.getTrenutnaFaza().equals(HegemonyEngine.FAZA_PRIPREMA)) {
             oznakaAnimacije.setText("Nova runda zapoceta.");
             upraviteljGlasanja.resetirajPoziciju();
-            kontrolePoteza.osvjeziPoolZaNovuRundu();
+            kontrolePoteza.prekiniSveStrajkoveNaPocetku(engineIgre.getListaIgraca());
         }
 
         prikazPloce.azurirajPrikaz(engineIgre.getListaIgraca());
@@ -189,8 +189,8 @@ public class GlavniProzor {
 
         if (engineIgre.provjeriPobjedu()) {
             kreatorZavrsnogEkrana.prikaziEkranPobjede(engineIgre.dohvatiPobjednika(), engineIgre.getListaIgraca(),
-                    () -> new PocetniEkran(glavnaScena, novaListaIgraca ->
-                            new GlavniProzor(glavnaScena, novaListaIgraca).prikaziProzor()).prikaziEkran());
+                    () -> new PocetniEkran().prikaziEkran(glavnaScena, novaListaIgraca ->
+                            new GlavniProzor(glavnaScena, novaListaIgraca).prikaziProzor()));
         }
     }
 }

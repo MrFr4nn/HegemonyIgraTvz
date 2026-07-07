@@ -12,13 +12,12 @@ import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 public class KreatorIgraceKarte {
 
-    public VBox napraviKartu(String nazivKarte, String opisEfekta, String svgIkona, String bojaHex, boolean iskoristena) {
+    public VBox napraviKartu(String nazivKarte, String opisEfekta, String emojiIkona, String bojaHex, boolean iskoristena) {
         VBox karta = new VBox(8);
         karta.setAlignment(Pos.TOP_CENTER);
         karta.setPadding(new Insets(14, 10, 14, 10));
@@ -31,12 +30,10 @@ public class KreatorIgraceKarte {
             karta.setCursor(javafx.scene.Cursor.HAND);
         }
 
-        SVGPath ikona = new SVGPath();
-        ikona.setContent(svgIkona);
-        Color bojaIkone = iskoristena ? Color.web(StilGumba.TEKST_SIVI) : Color.web(bojaHex);
-        ikona.setFill(bojaIkone);
-        ikona.setScaleX(1.3);
-        ikona.setScaleY(1.3);
+        Label ikona = new Label(emojiIkona);
+        ikona.setFont(Font.font(28));
+        ikona.setStyle("-fx-text-fill: white;");
+        ikona.setOpacity(iskoristena ? 0.4 : 1.0);
 
         Label naslovKarte = new Label(nazivKarte.toUpperCase());
         naslovKarte.setFont(Font.font("Arial Black", FontWeight.BOLD, 12));

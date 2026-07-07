@@ -24,7 +24,6 @@ import javafx.scene.control.ProgressBar;
 
 public class KreatorKartice {
 
-    // Konstanta definirana kako bi se izbjeglo dupliranje string literala "Verdana"
     private static final String FONT_VERDANA = "Verdana";
 
     public VBox napraviZaglavljeKartice(KlasaIgraca igrac) {
@@ -41,8 +40,9 @@ public class KreatorKartice {
         HBox redIkoneINaziva = new HBox(10);
         redIkoneINaziva.setAlignment(Pos.CENTER_LEFT);
 
-        SVGPath ikona = napraviIkonuKlase(igrac);
-        ikona.setFill(Color.web(bojaTraka));
+        Label ikona = new Label(odrediEmojiUloge(igrac));
+        ikona.setFont(Font.font(22));
+        ikona.setStyle("-fx-text-fill: white;");
 
         Label oznakaUloge = new Label(odrediNazivUloge(igrac).toUpperCase());
         oznakaUloge.setFont(Font.font("Arial Black", FontWeight.BOLD, 14));
@@ -90,13 +90,17 @@ public class KreatorKartice {
         return oznakaBodova;
     }
 
-    public VBox napraviMiniGraf(KlasaIgraca igrac, double trenutnaVrijednost, double maksimum, String oznakaGrafa) {
-        VBox blok = new VBox(4);
-        Label naslovGrafa = new Label(oznakaGrafa.toUpperCase());
-        naslovGrafa.setFont(Font.font(FONT_VERDANA, FontWeight.BOLD, 9));
-        naslovGrafa.setTextFill(Color.web(StilGumba.TEKST_SIVI));
-
+    public ProgressBar napraviTrakuNapretka(KlasaIgraca igrac, double trenutnaVrijednost, double maksimum) {
         ProgressBar trakaNapretka = new ProgressBar();
+        azurirajTrakuNapretka(trakaNapretka, trenutnaVrijednost, maksimum);
+        trakaNapretka.setPrefWidth(220);
+        String bojaTrake = StilGumba.dohvatiBojuKlase(igrac);
+        trakaNapretka.setStyle("-fx-accent: " + bojaTrake + "; -fx-control-inner-background: #1A1A22; "
+                + "-fx-border-color: " + bojaTrake + "; -fx-border-width: 1; -fx-border-radius: 3; -fx-background-radius: 3;");
+        return trakaNapretka;
+    }
+
+    public void azurirajTrakuNapretka(ProgressBar trakaNapretka, double trenutnaVrijednost, double maksimum) {
         double udio = trenutnaVrijednost / maksimum;
         if (udio > 1.0) {
             udio = 1.0;
@@ -105,10 +109,13 @@ public class KreatorKartice {
             udio = 0.0;
         }
         trakaNapretka.setProgress(udio);
-        trakaNapretka.setPrefWidth(220);
-        String bojaTrake = StilGumba.dohvatiBojuKlase(igrac);
-        trakaNapretka.setStyle("-fx-accent: " + bojaTrake + "; -fx-control-inner-background: #0D0D12;");
+    }
 
+    public VBox spakirajTrakuUBlok(String oznakaGrafa, ProgressBar trakaNapretka) {
+        VBox blok = new VBox(4);
+        Label naslovGrafa = new Label(oznakaGrafa.toUpperCase());
+        naslovGrafa.setFont(Font.font(FONT_VERDANA, FontWeight.BOLD, 9));
+        naslovGrafa.setTextFill(Color.web(StilGumba.TEKST_SIVI));
         blok.getChildren().addAll(naslovGrafa, trakaNapretka);
         return blok;
     }
@@ -125,21 +132,15 @@ public class KreatorKartice {
         }
     }
 
-    private SVGPath napraviIkonuKlase(KlasaIgraca igrac) {
-        SVGPath ikona = new SVGPath();
-        ikona.setScaleX(0.9);
-        ikona.setScaleY(0.9);
-
+    private String odrediEmojiUloge(KlasaIgraca igrac) {
         if (igrac instanceof RadnickaKlasa) {
-            ikona.setContent("M12 2 L14 8 L20 8 L15 12 L17 18 L12 14 L7 18 L9 12 L4 8 L10 8 Z");
+            return "👷";
         } else if (igrac instanceof SrednjaKlasa) {
-            ikona.setContent("M4 8 H20 V18 H4 Z M9 8 V5 H15 V8");
+            return "🏪";
         } else if (igrac instanceof KapitalistickaKlasa) {
-            ikona.setContent("M3 18 H21 V20 H3 Z M5 18 V10 H7 V18 Z M9 18 V6 H11 V18 Z M13 18 V11 H15 V18 Z M17 18 V8 H19 V18 Z");
+            return "🏭";
         } else {
-            ikona.setContent("M4 20 H20 V21 H4 Z M5 20 V11 H6.5 V20 Z M8 20 V11 H9.5 V20 Z M11.25 20 V11 H12.75 V20 Z "
-                    + "M14.5 20 V11 H16 V20 Z M17.5 20 V11 H19 V20 Z M3 11 L12 4 L21 11 Z");
+            return "🏛️";
         }
-        return ikona;
     }
 }

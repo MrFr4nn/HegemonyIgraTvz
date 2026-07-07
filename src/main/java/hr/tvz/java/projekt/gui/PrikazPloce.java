@@ -12,6 +12,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,7 @@ public class PrikazPloce {
     private final KreatorKartice kreatorKartice = new KreatorKartice();
     private final List<List<Label>> listaOznakaPoIgracu = new ArrayList<>();
     private final List<VBox> listaKarticaIgraca = new ArrayList<>();
+    private final List<ProgressBar> listaTrakaNapretka = new ArrayList<>();
 
     public HBox napraviDrzavnuPlocu(List<KlasaIgraca> listaIgraca) {
         HBox plocaIgre = new HBox(20);
@@ -31,6 +33,7 @@ public class PrikazPloce {
 
         listaOznakaPoIgracu.clear();
         listaKarticaIgraca.clear();
+        listaTrakaNapretka.clear();
 
         for (KlasaIgraca igrac : listaIgraca) {
             VBox karticaIgraca = napraviKarticuIgraca(igrac);
@@ -48,7 +51,9 @@ public class PrikazPloce {
         VBox sadrzajKartice = new VBox(8);
         sadrzajKartice.setPadding(new Insets(15, 18, 0, 18));
         sadrzajKartice.getChildren().addAll(oznakePodataka);
-        sadrzajKartice.getChildren().add(napraviMiniGrafZaIgraca(igrac));
+
+        VBox blokGrafa = napraviMiniGrafZaIgraca(igrac);
+        sadrzajKartice.getChildren().add(blokGrafa);
 
         Label oznakaBodova = kreatorKartice.napraviOznakuBodova(igrac);
         oznakePodataka.add(oznakaBodova);
@@ -60,16 +65,42 @@ public class PrikazPloce {
     }
 
     private VBox napraviMiniGrafZaIgraca(KlasaIgraca igrac) {
+        double trenutnaVrijednost = dohvatiVrijednostGrafa(igrac);
+        double maksimum = dohvatiMaksimumGrafa(igrac);
+        String nazivGrafa = dohvatiNazivGrafa(igrac);
+
+        ProgressBar traka = kreatorKartice.napraviTrakuNapretka(igrac, trenutnaVrijednost, maksimum);
+        listaTrakaNapretka.add(traka);
+        return kreatorKartice.spakirajTrakuUBlok(nazivGrafa, traka);
+    }
+
+    private double dohvatiVrijednostGrafa(KlasaIgraca igrac) {
         if (igrac instanceof RadnickaKlasa radnicka) {
-            return kreatorKartice.napraviMiniGraf(igrac, radnicka.getStandardZivota(), 100, "Standard zivota");
+            return radnicka.getStandardZivota();
         } else if (igrac instanceof hr.tvz.java.projekt.model.SrednjaKlasa srednja) {
-            return kreatorKartice.napraviMiniGraf(igrac, srednja.getStandardZivota(), 100, "Standard zivota");
+            return srednja.getStandardZivota();
         } else if (igrac instanceof KapitalistickaKlasa kapitalist) {
-            return kreatorKartice.napraviMiniGraf(igrac, kapitalist.getUkupniKapital(), 400, "Ukupni kapital");
+            return kapitalist.getUkupniKapital();
         } else if (igrac instanceof Vlada vlada) {
-            return kreatorKartice.napraviMiniGraf(igrac, vlada.getLegitimnost(), 100, "Legitimnost");
+            return vlada.getLegitimnost();
         }
-        return new VBox();
+        return 0.0;
+    }
+
+    private double dohvatiMaksimumGrafa(KlasaIgraca igrac) {
+        if (igrac instanceof KapitalistickaKlasa) {
+            return 400.0;
+        }
+        return 100.0;
+    }
+
+    private String dohvatiNazivGrafa(KlasaIgraca igrac) {
+        if (igrac instanceof KapitalistickaKlasa) {
+            return "Ukupni kapital";
+        } else if (igrac instanceof Vlada) {
+            return "Legitimnost";
+        }
+        return "Standard zivota";
     }
 
     private List<Label> napraviOznakePodataka(KlasaIgraca igrac) {
@@ -108,6 +139,10 @@ public class PrikazPloce {
             }
             oznakePodataka.get(oznakePodataka.size() - 1).setText("BODOVI: " + igrac.getBodoviPobjede());
             kreatorKartice.postaviOkvirIVanjskiStil(listaKarticaIgraca.get(i), igrac.isNaPotezu());
+
+            double trenutnaVrijednost = dohvatiVrijednostGrafa(igrac);
+            double maksimum = dohvatiMaksimumGrafa(igrac);
+            kreatorKartice.azurirajTrakuNapretka(listaTrakaNapretka.get(i), trenutnaVrijednost, maksimum);
         }
     }
 }

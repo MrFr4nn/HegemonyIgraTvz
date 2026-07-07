@@ -14,7 +14,6 @@ import javafx.scene.layout.BorderWidths;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.control.Label;
@@ -22,7 +21,7 @@ import javafx.util.Duration;
 
 public class KreatorKarticeUloge {
 
-    public VBox napraviKarticu(String nazivUloge, String opisUloge, String bojaHex, String svgIkona, boolean odabrana) {
+    public VBox napraviKarticu(String nazivUloge, String opisUloge, String bojaHex, String emojiIkona, boolean odabrana) {
         VBox kartica = new VBox(8);
         kartica.setAlignment(Pos.CENTER);
         kartica.setPadding(new Insets(18));
@@ -32,12 +31,8 @@ public class KreatorKarticeUloge {
         primijeniStilKartice(kartica, bojaHex, odabrana);
         dodajHoverEfekt(kartica, bojaHex, odabrana);
 
-        SVGPath ikona = new SVGPath();
-        ikona.setContent(svgIkona);
-        Color bojaIkone = Color.web(bojaHex);
-        ikona.setFill(bojaIkone);
-        ikona.setScaleX(1.7);
-        ikona.setScaleY(1.7);
+        Label ikona = new Label(emojiIkona);
+        ikona.setFont(Font.font(42));
 
         Label naslov = new Label(nazivUloge.toUpperCase());
         naslov.setFont(Font.font("Arial Black", FontWeight.BOLD, 14));
@@ -110,20 +105,19 @@ public class KreatorKarticeUloge {
     }
 
     public String dohvatiIkonuRadnicke() {
-        return "M12 2 L14 8 L20 8 L15 12 L17 18 L12 14 L7 18 L9 12 L4 8 L10 8 Z";
+        return "👷";
     }
 
     public String dohvatiIkonuSrednje() {
-        return "M4 8 H20 V18 H4 Z M9 8 V5 H15 V8";
+        return "🏪";
     }
 
     public String dohvatiIkonuKapitalisticke() {
-        return "M3 18 H21 V20 H3 Z M5 18 V10 H7 V18 Z M9 18 V6 H11 V18 Z M13 18 V11 H15 V18 Z M17 18 V8 H19 V18 Z";
+        return "🏭";
     }
 
     public String dohvatiIkonuVlade() {
-        return "M4 20 H20 V21 H4 Z M5 20 V11 H6.5 V20 Z M8 20 V11 H9.5 V20 Z M11.25 20 V11 H12.75 V20 Z "
-                + "M14.5 20 V11 H16 V20 Z M17.5 20 V11 H19 V20 Z M3 11 L12 4 L21 11 Z";
+        return "🏛️";
     }
 
     public String dohvatiOpisRadnicke() {

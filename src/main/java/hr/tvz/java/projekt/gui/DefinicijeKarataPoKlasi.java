@@ -3,19 +3,27 @@ package hr.tvz.java.projekt.gui;
 import hr.tvz.java.projekt.logika.HegemonyEngine;
 import hr.tvz.java.projekt.model.*;
 import javafx.scene.layout.HBox;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class DefinicijeKarataPoKlasi {
 
+    private static final int BROJ_KARATA_ZA_PRIKAZ = 2;
+
     private final PoolKarata poolKarata = new PoolKarata();
 
-    public void osvjeziPoolZaNovuRundu() {
-        poolKarata.izaberiBrzRandKarte();
+    public void prekiniSveStrajkoveNaPocetkuRunde(List<KlasaIgraca> listaIgraca) {
+        for (KlasaIgraca igrac : listaIgraca) {
+            if (igrac instanceof RadnickaKlasa radnicka && radnicka.isJeUStrajku()) {
+                radnicka.prekiniStrajk();
+            }
+        }
     }
 
     public void postaviLimiteAkoNisuPostavljeni(HegemonyEngine engineIgre, KlasaIgraca igrac) {
-        List<PoolKarata.PodaciKarte> aktivne = dohvatiAktivneKarte(igrac);
-        for (PoolKarata.PodaciKarte karta : aktivne) {
+        List<PoolKarata.PodaciKarte> cijeliPool = dohvatiCijeliPool(igrac);
+        for (PoolKarata.PodaciKarte karta : cijeliPool) {
             engineIgre.postaviLimitAkcijeTrenutnogIgraca(karta.getNazivAkcije(), 1);
         }
         if (igrac instanceof Vlada) {
@@ -23,22 +31,42 @@ public class DefinicijeKarataPoKlasi {
         }
     }
 
-    private List<PoolKarata.PodaciKarte> dohvatiAktivneKarte(KlasaIgraca igrac) {
-        if (igrac instanceof RadnickaKlasa) return poolKarata.getAktivneRadnicke();
-        if (igrac instanceof SrednjaKlasa) return poolKarata.getAktivneSrednje();
-        if (igrac instanceof KapitalistickaKlasa) return poolKarata.getAktivneKapitalisticke();
-        return poolKarata.getAktivneVlade();
+    private List<PoolKarata.PodaciKarte> dohvatiCijeliPool(KlasaIgraca igrac) {
+        if (igrac instanceof RadnickaKlasa) return poolKarata.getPoolRadnicke();
+        if (igrac instanceof SrednjaKlasa) return poolKarata.getPoolSrednje();
+        if (igrac instanceof KapitalistickaKlasa) return poolKarata.getPoolKapitalisticke();
+        return poolKarata.getPoolVlade();
     }
 
-    // Generička metoda koja je zamijenila 4 duplicirane petlje i skratila klasu za 50+ linija
+    private List<PoolKarata.PodaciKarte> dohvatiDvijeSlucajneDostupneKarte(HegemonyEngine engine, KlasaIgraca igrac) {
+        List<PoolKarata.PodaciKarte> cijeliPool = dohvatiCijeliPool(igrac);
+        List<PoolKarata.PodaciKarte> dostupne = new ArrayList<>();
+
+        for (PoolKarata.PodaciKarte karta : cijeliPool) {
+            if (engine.jeAkcijaDostupnaTrenutnomIgracu(karta.getNazivAkcije())) {
+                dostupne.add(karta);
+            }
+        }
+
+        Collections.shuffle(dostupne);
+
+        List<PoolKarata.PodaciKarte> rezultat = new ArrayList<>();
+        int brojac = 0;
+        while (brojac < BROJ_KARATA_ZA_PRIKAZ && brojac < dostupne.size()) {
+            rezultat.add(dostupne.get(brojac));
+            brojac = brojac + 1;
+        }
+        return rezultat;
+    }
+
     private void procesuirajKarte(HBox red, KontrolePoteza kontrole, HegemonyEngine engine,
-                                  KlasaIgraca igrac, List<PoolKarata.PodaciKarte> aktivne,
+                                  KlasaIgraca igrac, List<PoolKarata.PodaciKarte> zaPrikaz,
                                   java.util.function.Function<PoolKarata.PodaciKarte, Runnable> generatorEfekta) {
-        for (PoolKarata.PodaciKarte karta : aktivne) {
+        for (PoolKarata.PodaciKarte karta : zaPrikaz) {
             Runnable efekt = generatorEfekta.apply(karta);
             if (efekt != null) {
                 KontrolePoteza.PodaciOKarti podaci = new KontrolePoteza.PodaciOKarti(
-                        karta.getNaziv(), karta.getOpis(), karta.getSvgIkona(), karta.getNazivAkcije(), efekt
+                        karta.getNaziv(), karta.getOpis(), karta.getEmojiIkona(), karta.getNazivAkcije(), efekt
                 );
                 kontrole.dodajKartu(red, engine, igrac, podaci);
             }
@@ -46,34 +74,37 @@ public class DefinicijeKarataPoKlasi {
     }
 
     public void dodajKarteRadnicke(HBox red, KontrolePoteza kontrole, HegemonyEngine engine, RadnickaKlasa radnicka, Runnable akcija) {
-        procesuirajKarte(red, kontrole, engine, radnicka, poolKarata.getAktivneRadnicke(),
+        List<PoolKarata.PodaciKarte> zaPrikaz = dohvatiDvijeSlucajneDostupneKarte(engine, radnicka);
+        procesuirajKarte(red, kontrole, engine, radnicka, zaPrikaz,
                 karta -> napraviEfektRadnicke(karta.getNazivAkcije(), radnicka, akcija));
     }
 
     public void dodajKarteSrednje(HBox red, KontrolePoteza kontrole, HegemonyEngine engine, SrednjaKlasa srednja, Runnable akcija) {
-        procesuirajKarte(red, kontrole, engine, srednja, poolKarata.getAktivneSrednje(),
+        List<PoolKarata.PodaciKarte> zaPrikaz = dohvatiDvijeSlucajneDostupneKarte(engine, srednja);
+        procesuirajKarte(red, kontrole, engine, srednja, zaPrikaz,
                 karta -> napraviEfektSrednje(karta.getNazivAkcije(), srednja, akcija));
     }
 
     public void dodajKarteKapitalisticke(HBox red, KontrolePoteza kontrole, HegemonyEngine engine, KapitalistickaKlasa kapitalist, Runnable akcija) {
-        procesuirajKarte(red, kontrole, engine, kapitalist, poolKarata.getAktivneKapitalisticke(),
+        List<PoolKarata.PodaciKarte> zaPrikaz = dohvatiDvijeSlucajneDostupneKarte(engine, kapitalist);
+        procesuirajKarte(red, kontrole, engine, kapitalist, zaPrikaz,
                 karta -> napraviEfektKapitalisticke(karta.getNazivAkcije(), kapitalist, akcija));
     }
 
-    public void dodajKarteVlade(HBox red, KontrolePoteza kontrole, HegemonyEngine engine, Vlada vlada, Runnable akcija) {
-        procesuirajKarte(red, kontrole, engine, vlada, poolKarata.getAktivneVlade(),
-                karta -> napraviEfektVlade(karta.getNazivAkcije(), vlada, akcija));
+    public void dodajKarteVlade(HBox red, KontrolePoteza kontrole, HegemonyEngine engine, Vlada vlada,
+                                List<KlasaIgraca> listaIgraca, Runnable akcija) {
+        List<PoolKarata.PodaciKarte> zaPrikaz = dohvatiDvijeSlucajneDostupneKarte(engine, vlada);
+        procesuirajKarte(red, kontrole, engine, vlada, zaPrikaz,
+                karta -> napraviEfektVlade(karta.getNazivAkcije(), vlada, listaIgraca, akcija));
     }
 
     private Runnable napraviEfektRadnicke(String akcija, RadnickaKlasa r, Runnable osvezi) {
         switch (akcija) {
             case "Zaposljavanje": return () -> { r.zaposliRadnika(1); osvezi.run(); };
-            case "Obrazovanje": return () -> { r.investirajUObrazovanje(30); osvezi.run(); };
-            case "Strajk": return () -> { r.pokreniStrajk(); osvezi.run(); }; // Popravljen tipfelerski bug (bio je radnickaKlask)
+            case "Obrazovanje": return () -> { r.investirajUObrazovanje(30); r.setStandardZivota(r.getStandardZivota() + 3); osvezi.run(); };
+            case "Strajk": return () -> { r.pokreniStrajk(); osvezi.run(); };
             case "OtpustiRadnika": return () -> { r.otpustiRadnika(1); osvezi.run(); };
             case "KolektivniUgovor": return () -> { r.setStandardZivota(r.getStandardZivota() + 8); osvezi.run(); };
-            case "ZdravstvenaZastita": return () -> { r.setStandardZivota(r.getStandardZivota() + 6); r.kupiHranu(3, 5); osvezi.run(); };
-            case "PrekovremeniRad": return () -> { r.kupiHranu(2, 5); r.setStandardZivota(r.getStandardZivota() - 2); osvezi.run(); };
             case "RegionalniRazvoj": return () -> { r.zaposliRadnika(2); r.setStandardZivota(r.getStandardZivota() + 4); osvezi.run(); };
             default: return null;
         }
@@ -83,26 +114,22 @@ public class DefinicijeKarataPoKlasi {
         switch (akcija) {
             case "OtvoriPoduzece": return () -> { s.otvoriNovoPoduzece(15.0); osvezi.run(); };
             case "ObrazovanjeSrednja": return () -> { s.investirajUObrazovanje(10); osvezi.run(); };
-            case "OstvariPrihod": return () -> { s.ostvariPrihod(20.0); osvezi.run(); };
+            case "Marketing": return () -> { s.setUstedjeniKapital(s.getUstedjeniKapital() - 8.0); s.ostvariPrihod(18.0); osvezi.run(); };
             case "ZatvoriPoduzece": return () -> { s.zatvoriPoduzece(); osvezi.run(); };
-            case "Digitalizacija": return () -> { s.ostvariPrihod(25.0); osvezi.run(); };
             case "IzvozRobe": return () -> { s.ostvariPrihod(30.0); osvezi.run(); };
-            case "Partnerstvo": return () -> { s.setStandardZivota(s.getStandardZivota() + 7); osvezi.run(); };
             case "Stednja": return () -> { s.setUstedjeniKapital(s.getUstedjeniKapital() + 15.0); osvezi.run(); };
             default: return null;
         }
     }
 
-    @SuppressWarnings("java:S2245")
     private Runnable napraviEfektKapitalisticke(String akcija, KapitalistickaKlasa k, Runnable osvezi) {
         switch (akcija) {
+            case "TraziInvestitora": return () -> { k.ulozUInvesticiju(15.0); osvezi.run(); };
             case "IzgradiTvornicu": return () -> { k.izgradiTvornicu(50.0); osvezi.run(); };
             case "Lobiranje": return () -> { k.ulozUInvesticiju(30.0); osvezi.run(); };
             case "ProdajTvornicu": return () -> { k.prodajTvornicu(25.0); osvezi.run(); };
-            case "PlatiPorez": return () -> { k.platiPorez(10.0); osvezi.run(); };
+            case "Diverzifikacija": return () -> { k.setUkupniKapital(k.getUkupniKapital() - 20.0); k.ulozUInvesticiju(15.0); osvezi.run(); };
             case "FuzijaKompanija": return () -> { k.setUkupniKapital(k.getUkupniKapital() + 40.0); osvezi.run(); };
-            case "Outsourcing": return () -> { k.setUkupniKapital(k.getUkupniKapital() + 20.0); osvezi.run(); };
-            case "Monopolizacija": return () -> { k.ulozUInvesticiju(50.0); osvezi.run(); };
             case "BurzovnaSpeculacija":
                 return () -> {
                     if (Math.random() > 0.5) k.setUkupniKapital(k.getUkupniKapital() + 35.0);
@@ -113,15 +140,13 @@ public class DefinicijeKarataPoKlasi {
         }
     }
 
-    private Runnable napraviEfektVlade(String akcija, Vlada v, Runnable osvezi) {
+    private Runnable napraviEfektVlade(String akcija, Vlada v, List<KlasaIgraca> listaIgraca, Runnable osvezi) {
         switch (akcija) {
             case "JavneInvesticije": return () -> { v.povecajLegitimnost(5); osvezi.run(); };
             case "SocijalniPaket": return () -> { v.isplatiSubvenciju(15.0); osvezi.run(); };
-            case "NaplatiPorez": return () -> { v.naplatiPorez(50.0); osvezi.run(); };
+            case "NaplatiPorez": return () -> { v.naplatiPorezOdIgraca(listaIgraca); osvezi.run(); };
             case "Dekret": return () -> { v.povecajLegitimnost(10); osvezi.run(); };
             case "Infrastruktura": return () -> { v.povecajLegitimnost(8); v.setDrzavniProracun(v.getDrzavniProracun() - 20.0); osvezi.run(); };
-            case "ObrazovnaReforma": return () -> { v.povecajLegitimnost(6); v.setDrzavniProracun(v.getDrzavniProracun() - 10.0); osvezi.run(); };
-            case "AnticiklicnaPolitika": return () -> { v.setDrzavniProracun(v.getDrzavniProracun() + 25.0); osvezi.run(); };
             case "VanjskaPolitika": return () -> { v.setDrzavniProracun(v.getDrzavniProracun() + 30.0); v.povecajLegitimnost(4); osvezi.run(); };
             default: return null;
         }

@@ -20,24 +20,27 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class KreatorZavrsnogEkrana {
 
-    // Konstante definirane kako bi se izbjeglo dupliranje string literala
     private static final String FONT_ARIAL_BLACK = "Arial Black";
     private static final String FX_TEXT_FILL_STIL = "-fx-text-fill: ";
 
     public void prikaziEkranPobjede(String nazivPobjednika, List<KlasaIgraca> listaIgraca, Runnable akcijaNovaIgra) {
         Stage prozorPobjede = new Stage();
+        prozorPobjede.initStyle(StageStyle.UNDECORATED);
         prozorPobjede.setTitle("Kraj igre");
 
         VBox korijenskiLayout = new VBox(20);
         korijenskiLayout.setAlignment(Pos.CENTER);
         korijenskiLayout.setPadding(new Insets(40));
         korijenskiLayout.setBackground(new Background(new BackgroundFill(Color.web(StilGumba.POZADINA_TAMNA), CornerRadii.EMPTY, Insets.EMPTY)));
+        korijenskiLayout.setBorder(new Border(new BorderStroke(Color.web("#00D4FF"), BorderStrokeStyle.SOLID,
+                new CornerRadii(6), new BorderWidths(2))));
 
         Label naslovIgraJeZavrsena = new Label("IGRA JE ZAVRSENA");
         naslovIgraJeZavrsena.setFont(Font.font(FONT_ARIAL_BLACK, FontWeight.BOLD, 22));
@@ -52,9 +55,6 @@ public class KreatorZavrsnogEkrana {
 
         VBox rangLista = napraviRangListu(listaIgraca);
 
-        HBox redGumbova = new HBox(15);
-        redGumbova.setAlignment(Pos.CENTER);
-
         Button gumbNovaIgra = new Button("NOVA IGRA");
         StilGumba.primijeniNaglaseniVeliki(gumbNovaIgra);
         gumbNovaIgra.setOnAction(dogadjaj -> {
@@ -62,16 +62,15 @@ public class KreatorZavrsnogEkrana {
             akcijaNovaIgra.run();
         });
 
-        Button gumbZatvori = new Button("ZATVORI");
-        StilGumba.primijeniNeutralni(gumbZatvori);
-        gumbZatvori.setOnAction(dogadjaj -> prozorPobjede.close());
-
-        redGumbova.getChildren().addAll(gumbNovaIgra, gumbZatvori);
+        HBox redGumbova = new HBox(15);
+        redGumbova.setAlignment(Pos.CENTER);
+        redGumbova.getChildren().add(gumbNovaIgra);
 
         korijenskiLayout.getChildren().addAll(naslovIgraJeZavrsena, naslovPobjednika, rangLista, redGumbova);
 
-        Scene scenaPobjede = new Scene(korijenskiLayout, 600, 620);
+        Scene scenaPobjede = new Scene(korijenskiLayout, 600, 600);
         prozorPobjede.setScene(scenaPobjede);
+        prozorPobjede.setOnCloseRequest(dogadjaj -> dogadjaj.consume());
         prozorPobjede.show();
     }
 

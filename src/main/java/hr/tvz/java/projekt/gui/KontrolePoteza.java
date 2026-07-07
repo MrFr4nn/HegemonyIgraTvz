@@ -2,7 +2,6 @@ package hr.tvz.java.projekt.gui;
 
 import hr.tvz.java.projekt.logika.HegemonyEngine;
 import hr.tvz.java.projekt.model.*;
-import hr.tvz.java.projekt.util.XmlUpravitelj;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -12,44 +11,46 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
+import java.util.List;
+
 public class KontrolePoteza {
 
     private static final String FX_TEXT_FILL_STIL = "-fx-text-fill: ";
 
     private final KreatorIgraceKarte kreatorIgraceKarte;
     private final DefinicijeKarataPoKlasi definicijeKarata;
-    private final XmlUpravitelj xmlUpravitelj;
+    private final hr.tvz.java.projekt.util.XmlUpravitelj xmlUpravitelj;
 
     public static class PodaciOKarti {
         private final String naziv;
         private final String opis;
-        private final String svgIkona;
+        private final String emojiIkona;
         private final String nazivAkcije;
         private final Runnable efekt;
 
-        public PodaciOKarti(String naziv, String opis, String svgIkona, String nazivAkcije, Runnable efekt) {
+        public PodaciOKarti(String naziv, String opis, String emojiIkona, String nazivAkcije, Runnable efekt) {
             this.naziv = naziv;
             this.opis = opis;
-            this.svgIkona = svgIkona;
+            this.emojiIkona = emojiIkona;
             this.nazivAkcije = nazivAkcije;
             this.efekt = efekt;
         }
 
         public String getNaziv() { return naziv; }
         public String getOpis() { return opis; }
-        public String getSvgIkona() { return svgIkona; }
+        public String getEmojiIkona() { return emojiIkona; }
         public String getNazivAkcije() { return nazivAkcije; }
         public Runnable getEfekt() { return efekt; }
     }
 
-    public KontrolePoteza(XmlUpravitelj xmlUpravitelj) {
+    public KontrolePoteza(hr.tvz.java.projekt.util.XmlUpravitelj xmlUpravitelj) {
         this.kreatorIgraceKarte = new KreatorIgraceKarte();
         this.definicijeKarata = new DefinicijeKarataPoKlasi();
         this.xmlUpravitelj = xmlUpravitelj;
     }
 
-    public void osvjeziPoolZaNovuRundu() {
-        definicijeKarata.osvjeziPoolZaNovuRundu();
+    public void prekiniSveStrajkoveNaPocetku(List<KlasaIgraca> listaIgraca) {
+        definicijeKarata.prekiniSveStrajkoveNaPocetkuRunde(listaIgraca);
     }
 
     public VBox napraviKontroleZaIgraca(HegemonyEngine engineIgre, KlasaIgraca igrac,
@@ -83,7 +84,7 @@ public class KontrolePoteza {
 
     private void dodajKarteVladeIGumbGlasanja(HBox red, HegemonyEngine engineIgre, Vlada vlada,
                                               Runnable akcijaPonovnogPrikaza, Runnable akcijaPokreniGlasanje) {
-        definicijeKarata.dodajKarteVlade(red, this, engineIgre, vlada, akcijaPonovnogPrikaza);
+        definicijeKarata.dodajKarteVlade(red, this, engineIgre, vlada, engineIgre.getListaIgraca(), akcijaPonovnogPrikaza);
 
         VBox gumbKarta = new VBox(8);
         gumbKarta.setAlignment(Pos.CENTER);
@@ -102,18 +103,13 @@ public class KontrolePoteza {
     public void dodajKartu(HBox red, HegemonyEngine engineIgre, KlasaIgraca igrac, PodaciOKarti podaci) {
         boolean dostupna = engineIgre.jeAkcijaDostupnaTrenutnomIgracu(podaci.getNazivAkcije());
         String bojaHex = StilGumba.dohvatiBojuKlase(igrac);
-        VBox karta = kreatorIgraceKarte.napraviKartu(podaci.getNaziv(), podaci.getOpis(), podaci.getSvgIkona(), bojaHex, !dostupna);
+        VBox karta = kreatorIgraceKarte.napraviKartu(podaci.getNaziv(), podaci.getOpis(), podaci.getEmojiIkona(), bojaHex, !dostupna);
 
         if (dostupna) {
             kreatorIgraceKarte.omoguciHover(karta, bojaHex);
             karta.setOnMouseClicked(dogadjaj -> {
-                // 1. Obavještavamo engine igre da izvrši i limitira akciju (troši akcijski bod)
                 engineIgre.iskoristiAkcijuTrenutnogIgraca(podaci.getNazivAkcije());
-
-                // 2. Bilježimo odigrani potez u XML povijest igre
                 xmlUpravitelj.dodajPotezUPovijest(engineIgre.getBrojRunde(), igrac.getNaziv(), "Odigrana karta: " + podaci.getNaziv());
-
-                // 3. Pokrećemo logički efekt karte koji ujedno osvježava prikaz sučelja
                 podaci.getEfekt().run();
             });
         }
