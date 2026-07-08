@@ -81,7 +81,6 @@ public class UpraviteljReplay {
             return;
         }
 
-        // Pokretanje zadatka unutar lagane virtualne niti (Java 21+)
         Thread.ofVirtual().start(() -> {
             while (trenutnaPozicija < listaPoteza.size()) {
                 Platform.runLater(this::prikaziSljedeciKorak);
